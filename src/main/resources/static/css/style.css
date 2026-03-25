@@ -293,8 +293,10 @@ body {
 /* ===== CCTV FEED ===== */
 .cctv-feed {
     position: relative;
-    background: #DCDCDC;
-    height: 260px;
+    background: #000;        /* 검은 배경으로 변경 */
+    height: 480px;           /*260px → 480px로 변경! */
+    width: 640px;
+    /*aspect-ratio: 4/3;    ← 640:480 = 4:3 비율 자동 유지 */
     display: flex;
     align-items: center;
     justify-content: center;
