@@ -24,12 +24,28 @@ repositories {
 }
 
 dependencies {
+    // 웹 서버 (HTTP 요청 받기)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // JPA (DB 연동)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Thymeleaf (HTML 화면)
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // MySQL 드라이버
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // Lombok (getter/setter 자동 생성)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // 개발 편의 도구 (서버 자동 재시작)
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    testImplementation 'org.springframework.boot:spring-boot-starter-thymeleaf-test'
+
+    // 테스트
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 }
 
 tasks.named('test') {
