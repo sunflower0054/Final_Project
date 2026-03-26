@@ -26,16 +26,16 @@ public class IndexController {
         return "event/event";
     }
 
-    @GetMapping("/status")  // 경로 수정
-    public String status() {
-        return "status/status";
-    }
-
-    @GetMapping("setting")  // 경로 수정
+    @GetMapping("/setting")  // 경로 수정
     public String setting() {
         return "setting/setting";
     }
 
+//<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e9d7e2bd6e01da3c13623c221568aed7&libraries=services"></script>
 
+    @GetMapping("/test")  // 경로 수정
+    public String test() {
+        return "/send_message/test";
+    }
 
 }
