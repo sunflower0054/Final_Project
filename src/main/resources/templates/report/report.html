@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관제 시스템 - 신고 완료</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-wrapper">
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <span class="logo-text">관제 시스템</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/index/index" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                대시보드
+            </a>
+            <a href="/camera/camera" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                카메라 관리
+            </a>
+            <a href="/events/events_timeline" class="nav-item active">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                이벤트 타임라인
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">관리</div>
+            <a href="/resident/detail" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                거주자 정보
+            </a>
+            <a href="/setting/setting" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                설정
+            </a>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-btn" onclick="history.back()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <h1 class="page-title">신고 완료</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="icon-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </button>
+                <div class="profile-dropdown-wrap">
+                    <button class="icon-btn avatar-btn" id="profileBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </button>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-dropdown-header">
+                            <div class="profile-avatar-lg">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div>
+                                <div class="profile-name">홍길동</div>
+                                <div class="profile-role">관리자 · 스마트 관제 센터</div>
+                            </div>
+                        </div>
+                        <div class="profile-dropdown-footer">
+                            <a href="/myinfo/myinfo" class="btn-profile-detail">내 정보 상세보기</a>
+                            <button class="btn-profile-logout">로그아웃</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="report-layout">
+
+            <!-- 신고 유형 선택 -->
+            <div>
+                <div style="font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:12px">신고 유형</div>
+                <div class="report-type-cards">
+                    <!-- 자동 신고 -->
+                    <div class="report-type-card selected" onclick="selectType(this)">
+                        <div class="report-type-icon auto">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <div class="report-type-name">자동 신고</div>
+                        <div class="report-type-desc">AI가 낙상·무음담·폭행을 감지하여 자동으로 신고 처리한 내역입니다.</div>
+                    </div>
+                    <!-- 수동 신고 -->
+                    <div class="report-type-card" onclick="selectType(this)">
+                        <div class="report-type-icon manual">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                        </div>
+                        <div class="report-type-name">수동 신고</div>
+                        <div class="report-type-desc">관리자가 직접 판단하여 수동으로 신고를 접수한 내역입니다.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 신고 완료 목록 -->
+            <div class="report-detail-card">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--gray-200)">
+                    <span style="font-size:13px;font-weight:700;color:var(--gray-800)">신고 완료 내역</span>
+                    <span style="font-size:12px;color:var(--gray-500)">전체 4건</span>
+                </div>
+                <div class="report-list">
+
+                    <!-- Row 1 -->
+                    <div class="report-row">
+                        <div class="event-thumb-sm" style="width:70px;height:52px">
+                            <svg viewBox="0 0 60 60" width="60" height="60" fill="none">
+                                <rect width="60" height="60" fill="#D0D0D0" rx="4"/>
+                                <circle cx="38" cy="22" r="7" fill="#aaa"/>
+                                <line x1="38" y1="29" x2="28" y2="40" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
+                                <line x1="28" y1="40" x2="16" y2="36" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="report-row-info">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                                <span class="report-badge auto">자동</span>
+                                <span class="report-row-name">낙상 감지 · 카메라 1</span>
+                            </div>
+                            <div class="report-row-meta">2024-04-27 10:21 &nbsp;·&nbsp; 신고 대상: 김영희 (서울시 강남구 역삼동)</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                            <span class="report-status-badge done">신고 완료</span>
+                            <span style="font-size:10px;color:var(--gray-400)">119 · 10:22 접수</span>
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="report-row">
+                        <div class="event-thumb-sm" style="width:70px;height:52px">
+                            <svg viewBox="0 0 60 60" width="60" height="60" fill="none">
+                                <rect width="60" height="60" fill="#D0D0D0" rx="4"/>
+                                <circle cx="30" cy="18" r="7" fill="#aaa"/>
+                                <line x1="30" y1="25" x2="30" y2="42" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="report-row-info">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                                <span class="report-badge manual">수동</span>
+                                <span class="report-row-name">무음담 감지 · 카메라 2</span>
+                            </div>
+                            <div class="report-row-meta">2024-04-27 09:55 &nbsp;·&nbsp; 신고 대상: 이철수 (서울시 서초구 방배동)</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                            <span class="report-status-badge done">신고 완료</span>
+                            <span style="font-size:10px;color:var(--gray-400)">경찰 · 10:01 접수</span>
+                        </div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="report-row">
+                        <div class="event-thumb-sm" style="width:70px;height:52px">
+                            <svg viewBox="0 0 60 60" width="60" height="60" fill="none">
+                                <rect width="60" height="60" fill="#D0D0D0" rx="4"/>
+                                <circle cx="22" cy="18" r="6" fill="#aaa"/>
+                                <circle cx="42" cy="22" r="6" fill="#aaa"/>
+                                <line x1="22" y1="24" x2="20" y2="40" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
+                                <line x1="42" y1="28" x2="44" y2="44" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="report-row-info">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                                <span class="report-badge auto">자동</span>
+                                <span class="report-row-name">폭행 의심 · 카메라 3</span>
+                            </div>
+                            <div class="report-row-meta">2024-04-27 10:15 &nbsp;·&nbsp; 위치: 3번 구역 복도</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                            <span class="report-status-badge pending">처리 중</span>
+                            <span style="font-size:10px;color:var(--gray-400)">경찰 · 접수 대기</span>
+                        </div>
+                    </div>
+
+                    <!-- Row 4 -->
+                    <div class="report-row">
+                        <div class="event-thumb-sm" style="width:70px;height:52px">
+                            <svg viewBox="0 0 60 60" width="60" height="60" fill="none">
+                                <rect width="60" height="60" fill="#D0D0D0" rx="4"/>
+                                <circle cx="38" cy="22" r="7" fill="#aaa"/>
+                                <line x1="38" y1="29" x2="28" y2="40" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
+                                <line x1="28" y1="40" x2="16" y2="36" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="report-row-info">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                                <span class="report-badge manual">수동</span>
+                                <span class="report-row-name">낙상 감지 · 카메라 1</span>
+                            </div>
+                            <div class="report-row-meta">2024-04-26 15:31 &nbsp;·&nbsp; 신고 대상: 최민준 (서울시 마포구 합정동)</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                            <span class="report-status-badge done">신고 완료</span>
+                            <span style="font-size:10px;color:var(--gray-400)">119 · 15:33 접수</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectType(el) {
+      document.querySelectorAll('.report-type-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    const btn = document.getElementById('profileBtn');
+    const dropdown = document.getElementById('profileDropdown');
+    btn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+    document.addEventListener('click', () => dropdown.classList.remove('open'));
+    dropdown.addEventListener('click', e => e.stopPropagation());
+</script>
+</body>
+</html>

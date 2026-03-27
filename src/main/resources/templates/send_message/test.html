@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="referrer" content="unsafe-url" />
+        <title>카카오맵 API 테스트</title>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet" />
+        <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=05dea7c839bf99daaa3a652b70da85fe&libraries=services"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Noto Sans KR', sans-serif;
+          background: #F0F2F5;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 30px 16px;
+          min-height: 100vh;
+        }
+
+        h1 {
+          font-size: 20px;
+          font-weight: 900;
+          color: #1A1A2E;
+          margin-bottom: 20px;
+          letter-spacing: -0.5px;
+        }
+
+        /* 상태 배지 */
+        #status-box {
+          width: 100%;
+          max-width: 480px;
+          border-radius: 14px;
+          padding: 16px 20px;
+          font-size: 15px;
+          font-weight: 700;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          transition: all 0.3s ease;
+        }
+        #status-box.loading { background: #E3F2FD; color: #1565C0; border: 1.5px solid #90CAF9; }
+        #status-box.ok      { background: #E8F5E9; color: #1B5E20; border: 1.5px solid #A5D6A7; }
+        #status-box.error   { background: #FFEBEE; color: #B71C1C; border: 1.5px solid #EF9A9A; }
+
+        .status-icon { font-size: 20px; }
+
+        /* 지도 영역 */
+        #map-wrapper {
+          width: 100%;
+          max-width: 480px;
+          border-radius: 18px;
+          overflow: hidden;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+          background: #ddd;
+          margin-bottom: 20px;
+        }
+        #map { width: 100%; height: 360px; }
+
+        /* 결과 로그 */
+        #log-box {
+          width: 100%;
+          max-width: 480px;
+          background: #1A1A2E;
+          border-radius: 14px;
+          padding: 18px 20px;
+          color: #A0AEC0;
+          font-size: 13px;
+          line-height: 1.8;
+          font-family: 'Courier New', monospace;
+        }
+        #log-box .log-ok   { color: #68D391; }
+        #log-box .log-err  { color: #FC8181; }
+        #log-box .log-info { color: #63B3ED; }
+    </style>
+</head>
+<body>
+
+<h1>🗺️ 카카오맵 API 연동 테스트</h1>
+
+<div id="status-box" class="loading">
+    <span class="status-icon">⏳</span>
+    <span id="status-text">API 로딩 중...</span>
+</div>
+
+<div id="map-wrapper">
+    <div id="map"></div>
+</div>
+
+<div id="log-box"></div>
+
+<script>
+    const statusBox  = document.getElementById('status-box');
+    const statusText = document.getElementById('status-text');
+    const logBox     = document.getElementById('log-box');
+
+    function log(msg, type = 'info') {
+      const line = document.createElement('div');
+      line.className = `log-${type}`;
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      logBox.appendChild(line);
+    }
+
+    function setStatus(type, msg) {
+      statusBox.className = type;
+      const icons = { loading: '⏳', ok: '✅', error: '❌' };
+      statusBox.querySelector('.status-icon').textContent = icons[type] || '';
+      statusText.textContent = msg;
+    }
+
+    // ── 카카오맵 초기화 ──
+    try {
+      log('카카오맵 SDK 감지 중...', 'info');
+
+      if (typeof kakao === 'undefined' || !kakao.maps) {
+        throw new Error('kakao 객체를 찾을 수 없습니다. SDK 로드 실패.');
+      }
+
+      log('kakao.maps 객체 확인 ✔', 'ok');
+
+      kakao.maps.load(function () {
+        log('kakao.maps.load() 콜백 진입 ✔', 'ok');
+
+        try {
+          // 서울 강남구 테헤란로 기준 테스트
+          const center = new kakao.maps.LatLng(37.5005, 127.0362);
+          const map = new kakao.maps.Map(document.getElementById('map'), {
+            center: center,
+            level: 5
+          });
+
+          log('지도 렌더링 성공 ✔', 'ok');
+
+          // 마커
+          const marker = new kakao.maps.Marker({ position: center, map: map });
+          log('마커 생성 성공 ✔', 'ok');
+
+          // 인포윈도우
+          const iw = new kakao.maps.InfoWindow({
+            content: '<div style="padding:8px 12px;font-size:13px;font-family:\'Noto Sans KR\',sans-serif;font-weight:700;">📍 API 테스트 위치</div>'
+          });
+          iw.open(map, marker);
+          log('인포윈도우 오픈 ✔', 'ok');
+
+          // Places 서비스 테스트
+          if (kakao.maps.services) {
+            const ps = new kakao.maps.services.Places();
+            log('Places 서비스 초기화 성공 ✔', 'ok');
+
+            ps.keywordSearch('응급실', function(data, status) {
+              if (status === kakao.maps.services.Status.OK) {
+                log(`응급실 검색 성공 — ${data.length}건 반환 ✔`, 'ok');
+                data.slice(0, 3).forEach((p, i) => {
+                  log(`  ${i+1}. ${p.place_name} (${p.distance || '-'}m)`, 'info');
+                });
+              } else {
+                log(`Places 검색 실패: status=${status}`, 'err');
+              }
+            }, {
+              location: center,
+              radius: 5000,
+              sort: kakao.maps.services.SortBy.DISTANCE
+            });
+          } else {
+            log('services 라이브러리 없음 (libraries=services 확인 필요)', 'err');
+          }
+
+          setStatus('ok', '✅ 카카오맵 API 정상 작동 중');
+
+        } catch(innerErr) {
+          log('지도 초기화 오류: ' + innerErr.message, 'err');
+          setStatus('error', '지도 초기화 실패 — 콘솔 확인');
+        }
+      });
+
+    } catch(e) {
+      log('SDK 로드 오류: ' + e.message, 'err');
+      setStatus('error', 'API 키 오류 또는 SDK 로드 실패');
+    }
+</script>
+</body>
+</html>

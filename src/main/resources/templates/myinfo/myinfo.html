@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관제 시스템 - 내 정보</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-wrapper">
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <span class="logo-text">관제 시스템</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/index/index" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                대시보드
+            </a>
+            <a href="/camera/camera" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                카메라 관리
+            </a>
+            <a href="/events/events_timeline" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                이벤트 타임라인
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">관리</div>
+            <a href="/resident/detail" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                거주자 정보
+            </a>
+            <a href="/setting/setting" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                설정
+            </a>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-btn" onclick="history.back()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <h1 class="page-title">내 정보</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="icon-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </button>
+                <a href="/myinfo/myinfo" class="icon-btn avatar-btn" style="display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--gray-600)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </a>
+            </div>
+        </header>
+
+        <div class="myinfo-layout">
+
+            <!-- Left: Profile Card -->
+            <div>
+                <div class="myinfo-profile-card">
+                    <div class="myinfo-avatar">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <div class="myinfo-name">홍길동</div>
+                    <div class="myinfo-badge">관리자</div>
+                    <div class="myinfo-meta">
+                        스마트 관제 센터<br>
+                        가입일: 2023-09-01
+                    </div>
+
+                    <hr class="myinfo-card-divider">
+
+                    <!-- Quick actions -->
+                    <div style="width:100%;display:flex;flex-direction:column;gap:8px">
+                        <button class="btn-secondary" style="font-size:12px;padding:9px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            비밀번호 변경
+                        </button>
+                        <button class="btn-secondary" style="font-size:12px;padding:9px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px" onclick="location.href='/resident/register'">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                            거주자 등록
+                        </button>
+                        <button class="btn-secondary" style="font-size:12px;padding:9px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            로그아웃
+                        </button>
+                    </div>
+
+                    <hr class="myinfo-card-divider">
+
+                    <!-- Danger Zone -->
+                    <div class="myinfo-danger-zone">
+                        <span class="myinfo-danger-title">위험 구역</span>
+                        <button class="btn-withdraw">회원 탈퇴</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Detail Info -->
+            <div style="display:flex;flex-direction:column;gap:16px">
+
+                <!-- 계정 정보 -->
+                <div class="myinfo-detail-card">
+                    <div class="myinfo-detail-header">
+                        <span class="myinfo-detail-title">계정 정보</span>
+                        <button class="btn-secondary btn-small" style="font-size:11px;padding:6px 14px;display:flex;align-items:center;gap:5px">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            수정
+                        </button>
+                    </div>
+                    <div class="myinfo-field-grid">
+                        <div class="myinfo-field">
+                            <div class="myinfo-field-label">아이디</div>
+                            <div class="myinfo-field-value">hong_admin</div>
+                        </div>
+                        <div class="myinfo-field">
+                            <div class="myinfo-field-label">이름</div>
+                            <div class="myinfo-field-value">홍길동</div>
+                        </div>
+                        <div class="myinfo-field">
+                            <div class="myinfo-field-label">이메일</div>
+                            <div class="myinfo-field-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ddbcb9b0b4b39daeb8bea8afb4a9a4f3beb2b0">[email&#160;protected]</a></div>
+                        </div>
+                        <div class="myinfo-field">
+                            <div class="myinfo-field-label">전화번호</div>
+                            <div class="myinfo-field-value">010-1234-5678</div>
+                        </div>
+                        <div class="myinfo-field">
+                            <div class="myinfo-field-label">권한</div>
+                            <div class="myinfo-field-value">관리자</div>
+                        </div>
+                        <div class="myinfo-field">
+                            <div class="myinfo-field-label">소속</div>
+                            <div class="myinfo-field-value">스마트 관제 센터</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 로그인 기록 -->
+                <div class="myinfo-detail-card">
+                    <div class="myinfo-detail-header">
+                        <span class="myinfo-detail-title">최근 로그인 기록</span>
+                    </div>
+                    <div style="padding:0">
+                        <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--gray-100)">
+                            <div style="width:8px;height:8px;border-radius:50%;background:#4CAF50;flex-shrink:0"></div>
+                            <div style="flex:1">
+                                <div style="font-size:12px;font-weight:600;color:var(--gray-800)">2024-04-27 09:15:32</div>
+                                <div style="font-size:11px;color:var(--gray-400)">Chrome · Windows 10 · 서울, 대한민국</div>
+                            </div>
+                            <span style="font-size:11px;background:#E8F5E9;color:#388E3C;padding:2px 8px;border-radius:4px;font-weight:600">현재 세션</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--gray-100)">
+                            <div style="width:8px;height:8px;border-radius:50%;background:var(--gray-300);flex-shrink:0"></div>
+                            <div style="flex:1">
+                                <div style="font-size:12px;font-weight:600;color:var(--gray-700)">2024-04-26 18:42:10</div>
+                                <div style="font-size:11px;color:var(--gray-400)">Chrome · Windows 10 · 서울, 대한민국</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;padding:12px 18px">
+                            <div style="width:8px;height:8px;border-radius:50%;background:var(--gray-300);flex-shrink:0"></div>
+                            <div style="flex:1">
+                                <div style="font-size:12px;font-weight:600;color:var(--gray-700)">2024-04-25 08:55:01</div>
+                                <div style="font-size:11px;color:var(--gray-400)">Chrome · Windows 10 · 서울, 대한민국</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 알림 수신 설정 -->
+                <div class="myinfo-detail-card">
+                    <div class="myinfo-detail-header">
+                        <span class="myinfo-detail-title">알림 수신 설정</span>
+                    </div>
+                    <div style="padding:0">
+                        <div style="display:flex;align-items:center;padding:12px 18px;border-bottom:1px solid var(--gray-100)">
+                            <span style="flex:1;font-size:13px;color:var(--gray-700)">이메일 알림</span>
+                            <label class="toggle">
+                                <input type="checkbox" checked>
+                                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                            </label>
+                        </div>
+                        <div style="display:flex;align-items:center;padding:12px 18px;border-bottom:1px solid var(--gray-100)">
+                            <span style="flex:1;font-size:13px;color:var(--gray-700)">SMS 알림</span>
+                            <label class="toggle">
+                                <input type="checkbox" checked>
+                                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                            </label>
+                        </div>
+                        <div style="display:flex;align-items:center;padding:12px 18px">
+                            <span style="flex:1;font-size:13px;color:var(--gray-700)">일일 요약 리포트</span>
+                            <label class="toggle">
+                                <input type="checkbox">
+                                <div class="toggle-track" style="background:var(--gray-300)"><div class="toggle-thumb" style="right:auto;left:2px"></div></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
