@@ -5,16 +5,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/event")
+@RequestMapping("/events")
 public class EventController {
 
     @GetMapping({"", "/events_timeline"})
     public String eventsTimeline() {
-        return "event/events_timeline";
+        return "events/event_timeline";
     }
 
     @GetMapping("/detail")
     public String eventDetail() {
-        return "event/event_detail";
+        return "events/event_detail";
     }
 }

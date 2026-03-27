@@ -8,11 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/resident")
 public class ResidentController {
 
-    @GetMapping({"", "/resident"})
-    public String resident() {
-        return "resident/resident";
-    }
-
     @GetMapping("/detail")
     public String residentDetail() {
         return "resident/resident_detail";
