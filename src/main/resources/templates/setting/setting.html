@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관제 시스템 - AI 감지 설정</title>
+    <link rel="stylesheet" href="./css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -12,17 +13,6 @@
           --primary: #E53935;
           --primary-hover: #C62828;
           --primary-light: #FFEBEE;
-          --sidebar-bg: #1a1a2e;
-          --sidebar-text: #a0a0b0;
-          --sidebar-active: #fff;
-          --bg: #f4f5f7;
-          --card-bg: #fff;
-          --border: #e8e8e8;
-          --text: #1a1a2e;
-          --text-sub: #888;
-          --success: #43A047;
-          --warning: #F57C00;
-          --info: #1976D2;
           --shadow: 0 2px 8px rgba(0,0,0,0.07);
           --radius: 10px;
         }
@@ -35,74 +25,26 @@
           display: flex;
         }
 
-        /* ── Sidebar ── */
-        .sidebar {
-          width: 200px;
-          background: var(--sidebar-bg);
-          display: flex;
-          flex-direction: column;
-          position: fixed;
-          top: 0; left: 0; bottom: 0;
-          z-index: 100;
-        }
-        .sidebar-logo {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 22px 20px;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        .logo-icon {
-          width: 32px; height: 32px;
-          background: var(--primary);
-          border-radius: 8px;
-          display: flex; align-items: center; justify-content: center;
-          color: #fff;
-        }
-        .logo-text { color: #fff; font-weight: 700; font-size: 14px; }
-        .sidebar-nav { padding: 14px 10px; display: flex; flex-direction: column; gap: 2px; }
-        .nav-item {
-          display: flex; align-items: center; gap: 10px;
-          padding: 10px 12px;
-          border-radius: 8px;
-          color: var(--sidebar-text);
-          text-decoration: none;
-          font-size: 13px;
-          font-weight: 400;
-          transition: all .18s;
-        }
-        .nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
-        .nav-item.active { background: rgba(229,57,53,0.18); color: var(--primary); font-weight: 600; }
-        .nav-item.active svg { stroke: var(--primary); }
 
-        /* ── Main ── */
-        .main-content { margin-left: 200px; flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+
+
+
+
+
+
+
+
+
 
         /* ── Topbar ── */
-        .topbar {
-          background: #fff;
-          border-bottom: 1px solid var(--border);
-          padding: 0 28px;
-          height: 58px;
-          display: flex; align-items: center; justify-content: space-between;
-          position: sticky; top: 0; z-index: 50;
-        }
-        .topbar-left { display: flex; align-items: center; gap: 12px; }
-        .page-title { font-size: 16px; font-weight: 700; }
+
+
+
         .breadcrumb { font-size: 12px; color: var(--text-sub); }
-        .breadcrumb span { color: var(--primary); }
-        .topbar-right { display: flex; align-items: center; gap: 8px; }
-        .icon-btn {
-          width: 36px; height: 36px;
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          background: #fff;
-          cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          color: #555;
-          transition: all .15s;
-        }
-        .icon-btn:hover { background: var(--bg); }
+        .breadcrumb span { color: var(--red); }
+
+
+
 
         /* ── Page Body ── */
         .page-body { padding: 28px; flex: 1; max-width: 960px; }
@@ -181,7 +123,7 @@
           grid-row: 1 / 3;
           align-self: center;
         }
-        .si-icon.red { background: #FFEBEE; color: var(--primary); }
+        .si-icon.red { background: #FFEBEE; color: var(--red); }
         .si-icon.orange { background: #FFF3E0; color: #E65100; }
         .si-icon.yellow { background: #FFFDE7; color: #F57F17; }
 
@@ -214,10 +156,10 @@
           transition: transform .15s;
         }
         input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
-        .slider-fall { color: var(--primary); }
+        .slider-fall { color: var(--red); }
         .slider-motion { color: #E65100; }
         .slider-assault { color: #F57F17; }
-        .slider-fall::-webkit-slider-runnable-track { background: linear-gradient(to right, var(--primary) 0%, var(--primary) var(--pct, 70%), #e8e8e8 var(--pct, 70%)); border-radius: 3px; }
+        .slider-fall::-webkit-slider-runnable-track { background: linear-gradient(to right, var(--red) 0%, var(--red) var(--pct, 70%), #e8e8e8 var(--pct, 70%)); border-radius: 3px; }
         .slider-motion::-webkit-slider-runnable-track { background: linear-gradient(to right, #E65100 0%, #E65100 var(--pct, 25%), #e8e8e8 var(--pct, 25%)); border-radius: 3px; }
         .slider-assault::-webkit-slider-runnable-track { background: linear-gradient(to right, #F57F17 0%, #F57F17 var(--pct, 40%), #e8e8e8 var(--pct, 40%)); border-radius: 3px; }
 
@@ -302,7 +244,7 @@
         /* ── Apply Button ── */
         .apply-btn {
           display: flex; align-items: center; gap: 6px;
-          background: var(--primary);
+          background: var(--red);
           color: #fff; border: none;
           border-radius: 7px;
           padding: 8px 20px;
@@ -311,7 +253,7 @@
           font-family: 'Noto Sans KR', sans-serif;
           transition: background .15s;
         }
-        .apply-btn:hover { background: var(--primary-hover); }
+        .apply-btn:hover { background: var(--red-mid); }
 
         /* ── Impact Table ── */
         .impact-grid {
@@ -375,7 +317,7 @@
         }
         .btn-save {
           padding: 9px 22px;
-          background: var(--primary);
+          background: var(--red);
           color: #fff;
           border: none;
           border-radius: 7px;
@@ -385,7 +327,7 @@
           display: flex; align-items: center; gap: 6px;
           transition: background .15s;
         }
-        .btn-save:hover { background: var(--primary-hover); }
+        .btn-save:hover { background: var(--red-mid); }
 
         /* ── Loading State ── */
         .loading-overlay {
@@ -399,7 +341,7 @@
         .spinner {
           width: 36px; height: 36px;
           border: 3px solid #eee;
-          border-top-color: var(--primary);
+          border-top-color: var(--red);
           border-radius: 50%;
           animation: spin .7s linear infinite;
         }
@@ -407,451 +349,460 @@
     </style>
 </head>
 <body>
+<div class="app-wrapper">
 
-<!-- Sidebar -->
-<aside class="sidebar">
-    <div class="sidebar-logo">
-        <div class="logo-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <span class="logo-text">관제 시스템</span>
         </div>
-        <span class="logo-text">관제 시스템</span>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="/" class="nav-item">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>대시보드
-        </a>
-        <a href="/camera" class="nav-item">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>카메라 관리
-        </a>
-        <a href="/event" class="nav-item">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>이벤트 기록
-        </a>
-        <a href="/status" class="nav-item">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>통계
-        </a>
-        <a href="/setting" class="nav-item active">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>설정
-        </a>
-    </nav>
-</aside>
-
-<div class="main-content">
-    <!-- Topbar -->
-    <header class="topbar">
-        <div class="topbar-left">
-            <h1 class="page-title">AI 감지 설정</h1>
-            <span class="breadcrumb">설정 / <span>AI 감지 설정</span></span>
-        </div>
-        <div class="topbar-right">
-            <button class="icon-btn">
+        <nav class="sidebar-nav">
+            <a href="/index/index" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                대시보드
+            </a>
+            <a href="/camera/camera" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                카메라 관리
+            </a>
+            <a href="/event/events_timeline" class="nav-item">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            </button>
-            <button class="icon-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </button>
-        </div>
-    </header>
+                이벤트 타임라인
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">관리</div>
+            <a href="/resident/resident" class="nav-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                거주자 정보
+            </a>
+            <a href="/setting/setting" class="nav-item active">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                설정
+            </a>
+        </nav>
+    </aside>
 
-    <div class="page-body">
-
-        <!-- Status Banner -->
-        <div class="status-banner">
-            <div class="status-dot"></div>
-            <div>
-                <div class="status-text">AI 감지 엔진 연결됨</div>
-                <div class="status-sub">Python 감지 서버 정상 작동 중 · 마지막 동기화: <span id="last-sync">방금 전</span></div>
+    <div class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 class="page-title">AI 감지 설정</h1>
+                <span class="breadcrumb">설정 / <span>AI 감지 설정</span></span>
             </div>
-            <span class="status-badge">● 실시간 연동</span>
-        </div>
+            <div class="topbar-right">
+                <button class="icon-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </button>
+                <button class="icon-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </button>
+            </div>
+        </header>
 
-        <!-- Sensitivity Settings -->
-        <div class="section">
-            <div class="section-header">
-                <div class="section-title">
-                    <div class="section-title-icon" style="background:#FFF5F5;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    </div>
-                    감지 파라미터 조정
+        <div class="page-body">
+
+            <!-- Status Banner -->
+            <div class="status-banner">
+                <div class="status-dot"></div>
+                <div>
+                    <div class="status-text">AI 감지 엔진 연결됨</div>
+                    <div class="status-sub">Python 감지 서버 정상 작동 중 · 마지막 동기화: <span id="last-sync">방금 전</span></div>
                 </div>
+                <span class="status-badge">● 실시간 연동</span>
             </div>
 
-            <div class="card">
-                <!-- Fall Sensitivity -->
-                <div class="sensitivity-item">
-                    <div class="si-icon red">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 7l-5 5-5-5"/><line x1="12" y1="12" x2="12" y2="19"/></svg>
-                    </div>
-                    <div class="si-main">
-                        <div class="si-header">
-                            <span class="si-name">낙상 감지 민감도</span>
-                            <span class="si-field">fallSensitivity: Double</span>
-                            <span class="si-desc">— 값이 높을수록 작은 움직임에도 낙상으로 판단</span>
+            <!-- Sensitivity Settings -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <div class="section-title-icon" style="background:#FFF5F5;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                         </div>
-                        <div class="slider-wrap">
-                            <span style="font-size:11px;color:#bbb;min-width:20px">0.0</span>
-                            <input type="range" id="fall-slider" class="slider-fall"
-                                   min="0" max="1" step="0.05" value="0.7"
-                                   oninput="updateSlider(this,'fall-val','fall-impact',false)">
-                            <span style="font-size:11px;color:#bbb;min-width:20px">1.0</span>
-                        </div>
-                        <div class="slider-labels">
-                            <span>낮음 (오탐 감소)</span>
-                            <span>높음 (민감)</span>
-                        </div>
-                    </div>
-                    <div class="si-value-box">
-                        <div class="si-value" id="fall-val" style="color:var(--primary)">0.70</div>
-                        <div class="si-unit">감도값</div>
+                        감지 파라미터 조정
                     </div>
                 </div>
 
-                <!-- No-motion Threshold -->
-                <div class="sensitivity-item">
-                    <div class="si-icon orange">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    </div>
-                    <div class="si-main">
-                        <div class="si-header">
-                            <span class="si-name">무응답 감지 시간</span>
-                            <span class="si-field">noMotionThreshold: Integer</span>
-                            <span class="si-desc">— 움직임이 없을 때 알림 발송까지의 대기 초</span>
+                <div class="card">
+                    <!-- Fall Sensitivity -->
+                    <div class="sensitivity-item">
+                        <div class="si-icon red">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 7l-5 5-5-5"/><line x1="12" y1="12" x2="12" y2="19"/></svg>
                         </div>
-                        <div class="slider-wrap">
-                            <span style="font-size:11px;color:#bbb;min-width:20px">5</span>
-                            <input type="range" id="motion-slider" class="slider-motion"
-                                   min="5" max="60" step="1" value="15"
-                                   oninput="updateSlider(this,'motion-val','motion-impact',true)">
-                            <span style="font-size:11px;color:#bbb;min-width:24px">60</span>
+                        <div class="si-main">
+                            <div class="si-header">
+                                <span class="si-name">낙상 감지 민감도</span>
+                                <span class="si-field">fallSensitivity: Double</span>
+                                <span class="si-desc">— 값이 높을수록 작은 움직임에도 낙상으로 판단</span>
+                            </div>
+                            <div class="slider-wrap">
+                                <span style="font-size:11px;color:#bbb;min-width:20px">0.0</span>
+                                <input type="range" id="fall-slider" class="slider-fall"
+                                       min="0" max="1" step="0.05" value="0.7"
+                                       oninput="updateSlider(this,'fall-val','fall-impact',false)">
+                                <span style="font-size:11px;color:#bbb;min-width:20px">1.0</span>
+                            </div>
+                            <div class="slider-labels">
+                                <span>낮음 (오탐 감소)</span>
+                                <span>높음 (민감)</span>
+                            </div>
                         </div>
-                        <div class="slider-labels">
-                            <span>5초 (즉각 반응)</span>
-                            <span>60초 (여유)</span>
+                        <div class="si-value-box">
+                            <div class="si-value" id="fall-val" style="color:var(--red)">0.70</div>
+                            <div class="si-unit">감도값</div>
                         </div>
                     </div>
-                    <div class="si-value-box">
-                        <div class="si-value" id="motion-val" style="color:#E65100">15</div>
-                        <div class="si-unit">초 (sec)</div>
-                    </div>
-                </div>
 
-                <!-- Assault Threshold -->
-                <div class="sensitivity-item">
-                    <div class="si-icon yellow">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                    </div>
-                    <div class="si-main">
-                        <div class="si-header">
-                            <span class="si-name">폭행 의심 임계값</span>
-                            <span class="si-field">velocityThreshold: Double</span>
-                            <span class="si-desc">— 동작 속도가 이 값 이상일 때 폭행으로 분류</span>
+                    <!-- No-motion Threshold -->
+                    <div class="sensitivity-item">
+                        <div class="si-icon orange">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                         </div>
-                        <div class="slider-wrap">
-                            <span style="font-size:11px;color:#bbb;min-width:20px">0.0</span>
-                            <input type="range" id="assault-slider" class="slider-assault"
-                                   min="0" max="1" step="0.05" value="0.4"
-                                   oninput="updateSlider(this,'assault-val','assault-impact',false)">
-                            <span style="font-size:11px;color:#bbb;min-width:20px">1.0</span>
+                        <div class="si-main">
+                            <div class="si-header">
+                                <span class="si-name">무응답 감지 시간</span>
+                                <span class="si-field">noMotionThreshold: Integer</span>
+                                <span class="si-desc">— 움직임이 없을 때 알림 발송까지의 대기 초</span>
+                            </div>
+                            <div class="slider-wrap">
+                                <span style="font-size:11px;color:#bbb;min-width:20px">5</span>
+                                <input type="range" id="motion-slider" class="slider-motion"
+                                       min="5" max="60" step="1" value="15"
+                                       oninput="updateSlider(this,'motion-val','motion-impact',true)">
+                                <span style="font-size:11px;color:#bbb;min-width:24px">60</span>
+                            </div>
+                            <div class="slider-labels">
+                                <span>5초 (즉각 반응)</span>
+                                <span>60초 (여유)</span>
+                            </div>
                         </div>
-                        <div class="slider-labels">
-                            <span>낮음 (민감)</span>
-                            <span>높음 (오탐 감소)</span>
+                        <div class="si-value-box">
+                            <div class="si-value" id="motion-val" style="color:#E65100">15</div>
+                            <div class="si-unit">초 (sec)</div>
                         </div>
                     </div>
-                    <div class="si-value-box">
-                        <div class="si-value" id="assault-val" style="color:#F57F17">0.40</div>
-                        <div class="si-unit">임계값</div>
-                    </div>
-                </div>
 
-                <!-- Info -->
-                <div class="info-box">
-                    <div class="info-box-icon">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <!-- Assault Threshold -->
+                    <div class="sensitivity-item">
+                        <div class="si-icon yellow">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                        <div class="si-main">
+                            <div class="si-header">
+                                <span class="si-name">폭행 의심 임계값</span>
+                                <span class="si-field">velocityThreshold: Double</span>
+                                <span class="si-desc">— 동작 속도가 이 값 이상일 때 폭행으로 분류</span>
+                            </div>
+                            <div class="slider-wrap">
+                                <span style="font-size:11px;color:#bbb;min-width:20px">0.0</span>
+                                <input type="range" id="assault-slider" class="slider-assault"
+                                       min="0" max="1" step="0.05" value="0.4"
+                                       oninput="updateSlider(this,'assault-val','assault-impact',false)">
+                                <span style="font-size:11px;color:#bbb;min-width:20px">1.0</span>
+                            </div>
+                            <div class="slider-labels">
+                                <span>낮음 (민감)</span>
+                                <span>높음 (오탐 감소)</span>
+                            </div>
+                        </div>
+                        <div class="si-value-box">
+                            <div class="si-value" id="assault-val" style="color:#F57F17">0.40</div>
+                            <div class="si-unit">임계값</div>
+                        </div>
                     </div>
-                    <div class="info-box-text">
-                        저장 시 Python 감지 서버에 <b>REST API</b>로 즉시 반영됩니다.
-                        <code style="background:#ddeeff;padding:1px 5px;border-radius:3px;font-size:11px">POST /api/ai-settings/apply</code>를 통해 실행 중인 모델 파라미터가 업데이트됩니다.
-                        변경 이력은 <b>감지 설정 로그</b>에 자동 저장됩니다.
-                    </div>
-                </div>
 
-                <!-- Python Preview -->
-                <div class="py-preview">
-                    <div class="py-header">
-                        <div class="py-dots">
-                            <div class="py-dot r"></div>
-                            <div class="py-dot y"></div>
-                            <div class="py-dot g"></div>
+                    <!-- Info -->
+                    <div class="info-box">
+                        <div class="info-box-icon">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                         </div>
-                        <span class="py-filename">detector_config.py (실시간 미리보기)</span>
-                        <button class="py-copy" onclick="copyCode()">복사</button>
+                        <div class="info-box-text">
+                            저장 시 Python 감지 서버에 <b>REST API</b>로 즉시 반영됩니다.
+                            <code style="background:#ddeeff;padding:1px 5px;border-radius:3px;font-size:11px">POST /api/ai-settings/apply</code>를 통해 실행 중인 모델 파라미터가 업데이트됩니다.
+                            변경 이력은 <b>감지 설정 로그</b>에 자동 저장됩니다.
+                        </div>
                     </div>
-                    <div class="py-body" id="py-code">
-                        <span class="py-comment"># AI 감지 파라미터 - 설정값 자동 반영</span><br>
-                        <span class="py-kw">class </span><span class="py-fn">DetectorConfig</span>:<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-comment"># 낙상 감지 민감도 (Double: 0.0 ~ 1.0)</span><br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">FALL_SENSITIVITY</span> = <span class="py-num" id="py-fall">0.70</span><br>
-                        <br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-comment"># 무응답 감지 시간 (Integer: 초 단위)</span><br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">NO_MOTION_THRESHOLD</span> = <span class="py-num" id="py-motion">15</span>&nbsp;&nbsp;<span class="py-comment"># seconds</span><br>
-                        <br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-comment"># 폭행 의심 임계값 (Double: 0.0 ~ 1.0)</span><br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">VELOCITY_THRESHOLD</span> = <span class="py-num" id="py-assault">0.40</span><br>
-                    </div>
-                </div>
 
-                <div class="card-footer">
-                    <button class="reset-btn" onclick="resetDefaults()">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.93"/></svg>
-                        기본값으로 초기화
-                    </button>
-                    <button class="apply-btn" onclick="applyToPython()">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                        Python에 즉시 적용
-                    </button>
-                </div>
-            </div>
-        </div>
+                    <!-- Python Preview -->
+                    <div class="py-preview">
+                        <div class="py-header">
+                            <div class="py-dots">
+                                <div class="py-dot r"></div>
+                                <div class="py-dot y"></div>
+                                <div class="py-dot g"></div>
+                            </div>
+                            <span class="py-filename">detector_config.py (실시간 미리보기)</span>
+                            <button class="py-copy" onclick="copyCode()">복사</button>
+                        </div>
+                        <div class="py-body" id="py-code">
+                            <span class="py-comment"># AI 감지 파라미터 - 설정값 자동 반영</span><br>
+                            <span class="py-kw">class </span><span class="py-fn">DetectorConfig</span>:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-comment"># 낙상 감지 민감도 (Double: 0.0 ~ 1.0)</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">FALL_SENSITIVITY</span> = <span class="py-num" id="py-fall">0.70</span><br>
+                            <br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-comment"># 무응답 감지 시간 (Integer: 초 단위)</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">NO_MOTION_THRESHOLD</span> = <span class="py-num" id="py-motion">15</span>&nbsp;&nbsp;<span class="py-comment"># seconds</span><br>
+                            <br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-comment"># 폭행 의심 임계값 (Double: 0.0 ~ 1.0)</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="py-var">VELOCITY_THRESHOLD</span> = <span class="py-num" id="py-assault">0.40</span><br>
+                        </div>
+                    </div>
 
-        <!-- Impact Visualization -->
-        <div class="section">
-            <div class="section-header">
-                <div class="section-title">
-                    <div class="section-title-icon" style="background:#F0F4FF;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1976D2" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-                    </div>
-                    현재 설정값 영향도
-                </div>
-            </div>
-            <div class="card">
-                <div class="impact-grid">
-                    <div class="impact-card">
-                        <div class="impact-label">낙상 감지</div>
-                        <div class="impact-level">
-                            <div class="impact-dot" style="background:var(--primary)"></div>
-                            <span id="fall-impact-label">높음</span>
-                        </div>
-                        <div class="impact-bar-wrap">
-                            <div class="impact-bar" id="fall-impact" style="width:70%;background:var(--primary)"></div>
-                        </div>
-                        <div class="impact-hint">민감도 높음 → 오탐 주의</div>
-                    </div>
-                    <div class="impact-card">
-                        <div class="impact-label">무응답 감지</div>
-                        <div class="impact-level">
-                            <div class="impact-dot" style="background:#E65100"></div>
-                            <span id="motion-impact-label">보통</span>
-                        </div>
-                        <div class="impact-bar-wrap">
-                            <div class="impact-bar" id="motion-impact" style="width:17%;background:#E65100"></div>
-                        </div>
-                        <div class="impact-hint">15초 후 알림 발송</div>
-                    </div>
-                    <div class="impact-card">
-                        <div class="impact-label">폭행 감지</div>
-                        <div class="impact-level">
-                            <div class="impact-dot" style="background:#F57F17"></div>
-                            <span id="assault-impact-label">보통</span>
-                        </div>
-                        <div class="impact-bar-wrap">
-                            <div class="impact-bar" id="assault-impact" style="width:40%;background:#F57F17"></div>
-                        </div>
-                        <div class="impact-hint">임계값 낮음 → 민감</div>
+                    <div class="card-footer">
+                        <button class="reset-btn" onclick="resetDefaults()">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.93"/></svg>
+                            기본값으로 초기화
+                        </button>
+                        <button class="apply-btn" onclick="applyToPython()">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                            Python에 즉시 적용
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-    </div><!-- /page-body -->
+            <!-- Impact Visualization -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <div class="section-title-icon" style="background:#F0F4FF;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1976D2" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                        </div>
+                        현재 설정값 영향도
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="impact-grid">
+                        <div class="impact-card">
+                            <div class="impact-label">낙상 감지</div>
+                            <div class="impact-level">
+                                <div class="impact-dot" style="background:var(--red)"></div>
+                                <span id="fall-impact-label">높음</span>
+                            </div>
+                            <div class="impact-bar-wrap">
+                                <div class="impact-bar" id="fall-impact" style="width:70%;background:var(--red)"></div>
+                            </div>
+                            <div class="impact-hint">민감도 높음 → 오탐 주의</div>
+                        </div>
+                        <div class="impact-card">
+                            <div class="impact-label">무응답 감지</div>
+                            <div class="impact-level">
+                                <div class="impact-dot" style="background:#E65100"></div>
+                                <span id="motion-impact-label">보통</span>
+                            </div>
+                            <div class="impact-bar-wrap">
+                                <div class="impact-bar" id="motion-impact" style="width:17%;background:#E65100"></div>
+                            </div>
+                            <div class="impact-hint">15초 후 알림 발송</div>
+                        </div>
+                        <div class="impact-card">
+                            <div class="impact-label">폭행 감지</div>
+                            <div class="impact-level">
+                                <div class="impact-dot" style="background:#F57F17"></div>
+                                <span id="assault-impact-label">보통</span>
+                            </div>
+                            <div class="impact-bar-wrap">
+                                <div class="impact-bar" id="assault-impact" style="width:40%;background:#F57F17"></div>
+                            </div>
+                            <div class="impact-hint">임계값 낮음 → 민감</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Footer -->
-    <div class="footer-bar">
-        <span class="footer-note">마지막 저장: <span id="footer-date">2024-04-24 14:30:25</span></span>
-        <div class="footer-btns">
-            <button class="btn-cancel" onclick="cancelChanges()">취소</button>
-            <button class="btn-save" onclick="saveSettings()">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-                모든 설정 저장
-            </button>
+        </div><!-- /page-body -->
+
+        <!-- Footer -->
+        <div class="footer-bar">
+            <span class="footer-note">마지막 저장: <span id="footer-date">2024-04-24 14:30:25</span></span>
+            <div class="footer-btns">
+                <button class="btn-cancel" onclick="cancelChanges()">취소</button>
+                <button class="btn-save" onclick="saveSettings()">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                    모든 설정 저장
+                </button>
+            </div>
         </div>
+    </div><!-- /main -->
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <div class="toast-icon">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span id="toast-msg">설정이 저장되었습니다.</span>
     </div>
-</div><!-- /main -->
 
-<!-- Toast -->
-<div class="toast" id="toast">
-    <div class="toast-icon">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    <!-- Loading -->
+    <div class="loading-overlay" id="loading">
+        <div class="spinner"></div>
     </div>
-    <span id="toast-msg">설정이 저장되었습니다.</span>
-</div>
 
-<!-- Loading -->
-<div class="loading-overlay" id="loading">
-    <div class="spinner"></div>
-</div>
+    <script>
+        // ── 초기 기본값 ──
+        const DEFAULTS = { fall: 0.7, motion: 15, assault: 0.4 };
+        let saved = { ...DEFAULTS };
 
-<script>
-    // ── 초기 기본값 ──
-    const DEFAULTS = { fall: 0.7, motion: 15, assault: 0.4 };
-    let saved = { ...DEFAULTS };
+        // ── 슬라이더 업데이트 ──
+        function updateSlider(el, valId, impactId, isInt) {
+          const v = parseFloat(el.value);
+          const display = isInt ? v : v.toFixed(2);
+          document.getElementById(valId).textContent = display;
 
-    // ── 슬라이더 업데이트 ──
-    function updateSlider(el, valId, impactId, isInt) {
-      const v = parseFloat(el.value);
-      const display = isInt ? v : v.toFixed(2);
-      document.getElementById(valId).textContent = display;
+          // Python preview
+          const pyMap = { 'fall-val': 'py-fall', 'motion-val': 'py-motion', 'assault-val': 'py-assault' };
+          if (pyMap[valId]) document.getElementById(pyMap[valId]).textContent = display;
 
-      // Python preview
-      const pyMap = { 'fall-val': 'py-fall', 'motion-val': 'py-motion', 'assault-val': 'py-assault' };
-      if (pyMap[valId]) document.getElementById(pyMap[valId]).textContent = display;
+          // Impact bar
+          let pct;
+          if (valId === 'fall-val')    pct = v * 100;
+          if (valId === 'motion-val')  pct = ((v - 5) / 55) * 100;
+          if (valId === 'assault-val') pct = v * 100;
 
-      // Impact bar
-      let pct;
-      if (valId === 'fall-val')    pct = v * 100;
-      if (valId === 'motion-val')  pct = ((v - 5) / 55) * 100;
-      if (valId === 'assault-val') pct = v * 100;
+          const bar = document.getElementById(impactId);
+          if (bar) bar.style.width = pct + '%';
 
-      const bar = document.getElementById(impactId);
-      if (bar) bar.style.width = pct + '%';
+          // Impact label
+          const labelId = impactId + '-label';
+          const labelEl = document.getElementById(labelId);
+          if (labelEl) labelEl.textContent = pct > 65 ? '높음' : pct > 30 ? '보통' : '낮음';
 
-      // Impact label
-      const labelId = impactId + '-label';
-      const labelEl = document.getElementById(labelId);
-      if (labelEl) labelEl.textContent = pct > 65 ? '높음' : pct > 30 ? '보통' : '낮음';
-
-      updateTrack(el);
-    }
-
-    function updateTrack(el) {
-      const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
-      const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
-      el.style.setProperty('--pct', pct);
-    }
-
-    // ── 초기화 ──
-    function init() {
-      ['fall-slider','motion-slider','assault-slider'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) updateTrack(el);
-      });
-      // Load from server
-      loadSettings();
-    }
-
-    // ── 서버에서 설정 로드 ──
-    async function loadSettings() {
-      try {
-        const res = await fetch('/api/ai-settings');
-        if (!res.ok) return; // 서버 없으면 기본값 유지
-        const data = await res.json();
-        if (data.fallSensitivity !== undefined) {
-          document.getElementById('fall-slider').value = data.fallSensitivity;
-          updateSlider(document.getElementById('fall-slider'), 'fall-val', 'fall-impact', false);
+          updateTrack(el);
         }
-        if (data.noMotionThreshold !== undefined) {
-          document.getElementById('motion-slider').value = data.noMotionThreshold;
-          updateSlider(document.getElementById('motion-slider'), 'motion-val', 'motion-impact', true);
+
+        function updateTrack(el) {
+          const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
+          const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
+          el.style.setProperty('--pct', pct);
         }
-        if (data.velocityThreshold !== undefined) {
-          document.getElementById('assault-slider').value = data.velocityThreshold;
+
+        // ── 초기화 ──
+        function init() {
+          ['fall-slider','motion-slider','assault-slider'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) updateTrack(el);
+          });
+          // Load from server
+          loadSettings();
+        }
+
+        // ── 서버에서 설정 로드 ──
+        async function loadSettings() {
+          try {
+            const res = await fetch('/api/ai-settings');
+            if (!res.ok) return; // 서버 없으면 기본값 유지
+            const data = await res.json();
+            if (data.fallSensitivity !== undefined) {
+              document.getElementById('fall-slider').value = data.fallSensitivity;
+              updateSlider(document.getElementById('fall-slider'), 'fall-val', 'fall-impact', false);
+            }
+            if (data.noMotionThreshold !== undefined) {
+              document.getElementById('motion-slider').value = data.noMotionThreshold;
+              updateSlider(document.getElementById('motion-slider'), 'motion-val', 'motion-impact', true);
+            }
+            if (data.velocityThreshold !== undefined) {
+              document.getElementById('assault-slider').value = data.velocityThreshold;
+              updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
+            }
+            if (data.updatedAt) document.getElementById('footer-date').textContent = data.updatedAt;
+          } catch(e) {
+            console.log('서버 미연결 - 기본값 사용');
+          }
+        }
+
+        // ── 저장 (DB → Python 자동 전파) ──
+        async function saveSettings() {
+          const payload = getPayload();
+          showLoading(true);
+          try {
+            // 1. DB 저장
+            const res = await fetch('/api/ai-settings', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('저장 실패');
+            const data = await res.json();
+            if (data.updatedAt) document.getElementById('footer-date').textContent = data.updatedAt;
+
+            // 2. Python 서버에 자동 적용
+            await applyToPython();
+
+            showToast('✅ 설정이 저장되고 Python에 적용되었습니다.');
+            document.getElementById('last-sync').textContent = '방금 전';
+          } catch(e) {
+            // 개발 모드: 서버 없이도 미리보기 동작
+            showToast('설정이 저장되었습니다. (개발 모드)');
+          } finally {
+            showLoading(false);
+          }
+        }
+
+        // ── Python 서버에 즉시 적용 ──
+        async function applyToPython() {
+          const payload = getPayload();
+          try {
+            await fetch('/api/ai-settings/apply', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            showToast('Python 감지 서버에 적용되었습니다.');
+            document.getElementById('last-sync').textContent = '방금 전';
+          } catch(e) {
+            showToast('Python 적용 완료 (개발 모드)');
+          }
+        }
+
+        function getPayload() {
+          return {
+            fallSensitivity:    parseFloat(document.getElementById('fall-slider').value),
+            noMotionThreshold:  parseInt(document.getElementById('motion-slider').value),
+            velocityThreshold:  parseFloat(document.getElementById('assault-slider').value)
+          };
+        }
+
+        // ── 기본값 초기화 ──
+        function resetDefaults() {
+          document.getElementById('fall-slider').value = DEFAULTS.fall;
+          document.getElementById('motion-slider').value = DEFAULTS.motion;
+          document.getElementById('assault-slider').value = DEFAULTS.assault;
+          updateSlider(document.getElementById('fall-slider'),    'fall-val',    'fall-impact',    false);
+          updateSlider(document.getElementById('motion-slider'),  'motion-val',  'motion-impact',  true);
           updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
+          showToast('기본값으로 초기화되었습니다.');
         }
-        if (data.updatedAt) document.getElementById('footer-date').textContent = data.updatedAt;
-      } catch(e) {
-        console.log('서버 미연결 - 기본값 사용');
-      }
-    }
 
-    // ── 저장 (DB → Python 자동 전파) ──
-    async function saveSettings() {
-      const payload = getPayload();
-      showLoading(true);
-      try {
-        // 1. DB 저장
-        const res = await fetch('/api/ai-settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('저장 실패');
-        const data = await res.json();
-        if (data.updatedAt) document.getElementById('footer-date').textContent = data.updatedAt;
+        function cancelChanges() {
+          loadSettings();
+          showToast('변경사항이 취소되었습니다.');
+        }
 
-        // 2. Python 서버에 자동 적용
-        await applyToPython();
+        // ── Toast ──
+        function showToast(msg) {
+          const t = document.getElementById('toast');
+          document.getElementById('toast-msg').textContent = msg;
+          t.classList.add('show');
+          setTimeout(() => t.classList.remove('show'), 3000);
+        }
 
-        showToast('✅ 설정이 저장되고 Python에 적용되었습니다.');
-        document.getElementById('last-sync').textContent = '방금 전';
-      } catch(e) {
-        // 개발 모드: 서버 없이도 미리보기 동작
-        showToast('설정이 저장되었습니다. (개발 모드)');
-      } finally {
-        showLoading(false);
-      }
-    }
+        function showLoading(v) {
+          document.getElementById('loading').classList.toggle('show', v);
+        }
 
-    // ── Python 서버에 즉시 적용 ──
-    async function applyToPython() {
-      const payload = getPayload();
-      try {
-        await fetch('/api/ai-settings/apply', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        showToast('Python 감지 서버에 적용되었습니다.');
-        document.getElementById('last-sync').textContent = '방금 전';
-      } catch(e) {
-        showToast('Python 적용 완료 (개발 모드)');
-      }
-    }
+        // ── 코드 복사 ──
+        function copyCode() {
+          const f = parseFloat(document.getElementById('fall-slider').value).toFixed(2);
+          const m = parseInt(document.getElementById('motion-slider').value);
+          const a = parseFloat(document.getElementById('assault-slider').value).toFixed(2);
+          const code = `class DetectorConfig:\n    FALL_SENSITIVITY = ${f}\n    NO_MOTION_THRESHOLD = ${m}  # seconds\n    VELOCITY_THRESHOLD = ${a}`;
+          navigator.clipboard.writeText(code).then(() => showToast('코드가 복사되었습니다.'));
+        }
 
-    function getPayload() {
-      return {
-        fallSensitivity:    parseFloat(document.getElementById('fall-slider').value),
-        noMotionThreshold:  parseInt(document.getElementById('motion-slider').value),
-        velocityThreshold:  parseFloat(document.getElementById('assault-slider').value)
-      };
-    }
-
-    // ── 기본값 초기화 ──
-    function resetDefaults() {
-      document.getElementById('fall-slider').value = DEFAULTS.fall;
-      document.getElementById('motion-slider').value = DEFAULTS.motion;
-      document.getElementById('assault-slider').value = DEFAULTS.assault;
-      updateSlider(document.getElementById('fall-slider'),    'fall-val',    'fall-impact',    false);
-      updateSlider(document.getElementById('motion-slider'),  'motion-val',  'motion-impact',  true);
-      updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
-      showToast('기본값으로 초기화되었습니다.');
-    }
-
-    function cancelChanges() {
-      loadSettings();
-      showToast('변경사항이 취소되었습니다.');
-    }
-
-    // ── Toast ──
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      document.getElementById('toast-msg').textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
-    function showLoading(v) {
-      document.getElementById('loading').classList.toggle('show', v);
-    }
-
-    // ── 코드 복사 ──
-    function copyCode() {
-      const f = parseFloat(document.getElementById('fall-slider').value).toFixed(2);
-      const m = parseInt(document.getElementById('motion-slider').value);
-      const a = parseFloat(document.getElementById('assault-slider').value).toFixed(2);
-      const code = `class DetectorConfig:\n    FALL_SENSITIVITY = ${f}\n    NO_MOTION_THRESHOLD = ${m}  # seconds\n    VELOCITY_THRESHOLD = ${a}`;
-      navigator.clipboard.writeText(code).then(() => showToast('코드가 복사되었습니다.'));
-    }
-
-    init();
-</script>
+        init();
+    </script>
+</div>
 </body>
 </html>
