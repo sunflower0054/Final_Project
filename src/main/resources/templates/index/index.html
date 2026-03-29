@@ -4,86 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>골든노미스 - 통합 관제 시스템</title>
+
+
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
-<header class="header-area">
-    <a href="/" class="brand-logo">
-        <div class="logo-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3" /></svg></div>
-        <span class="brand-name">골든노미스</span>
-    </a>
-    <div class="topbar-right">
-        <div class="system-time" id="currentTime">2026. 03. 29 15:30:12</div>
-
-        <!-- 알림 드롭다운 -->
-        <div class="dropdown-wrap">
-            <button class="icon-btn" id="notiBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                <div class="noti-dot"></div>
-            </button>
-            <div class="dropdown-menu" id="notiDropdown">
-                <div class="dropdown-header">
-                    <span>알림</span>
-                    <span class="noti-count">1건</span>
-                </div>
-                <div class="noti-list">
-                    <div class="noti-item">
-                        <div class="noti-detail-title">낙상 후 활동량 추적</div>
-                        <div class="noti-detail-row"><span>최근 낙상</span><span class="value">3월 20일 07:22</span></div>
-                        <div class="noti-detail-row"><span>낙상 후 활동량</span><span class="value">평소 대비 23%</span></div>
-                        <div class="noti-alert-box">활동량이 현재저 감소했습니다.<br>병원 방문을 권장합니다.</div>
-                    </div>
-                </div>
-                <div class="dropdown-footer">
-                    <button class="btn-profile-detail" style="width: 100%;">모든 알림 보기</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 프로필 드롭다운 (네이버 ID 스타일) -->
-        <div class="dropdown-wrap">
-            <button class="icon-btn" id="profileBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </button>
-            <div class="dropdown-menu" id="profileDropdown">
-                <div class="profile-header">
-                    <div class="avatar-container">
-                        <div class="profile-avatar-lg">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="user-name">홍길동</div>
-                    <div class="user-email">admin@goldennomis.com</div>
-                </div>
-
-                <div class="profile-menu">
-                    <a href="/myinfo/myinfo">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        내 프로필
-                    </a>
-                    <a href="/setting/setting">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                        설정
-                    </a>
-                </div>
-
-                <div class="dropdown-footer">
-                    <button class="btn-profile-logout" style="width:100%;">로그아웃</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <div class="main-container">
     <div class="top-row">
         <section class="content-card">
             <div class="monitoring-box">
-                <img src="http://192.168.0.79:5005/video_feed" alt="Realtime Video">
+<!--                <img src="http://192.168.0.79:5005/video_feed" alt="Realtime Video">-->
                 <div class="live-indicator"><div class="live-dot"></div> LIVE MONITORING</div>
             </div>
         </section>
