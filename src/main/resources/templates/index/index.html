@@ -261,6 +261,46 @@
         .btn-profile-detail:hover svg {
             transform: scale(1.1); /* 살짝 커지는 효과 */
         }
+
+
+        /* 추가된 css */
+        .tl-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px 16px;
+            margin: 6px 0 4px;
+        }
+        .tl-meta-grid-4 {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
+        .tl-meta-block {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .tl-meta-label {
+            font-size: 11px;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+        .tl-meta-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        .tl-val-danger  { color: var(--error); }
+        .tl-val-warning { color: var(--warning); }
+        .tl-val-success { color: var(--success); }
+
+        .tl-badge-area {
+            margin-top: 6px;
+        }
+        .tl-sub-note {
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
     </style>
 </head>
 <body>
@@ -386,37 +426,105 @@
         <div class="timeline-section">
             <h3 class="timeline-title">이벤트 타임라인 (최근 24시간)</h3>
             <div class="timeline-container">
+                <!-- 낙상 카드 -->
                 <div class="tl-item">
-                    <div class="tl-icon active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 9v4m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 17c-.77 1.333.192 3 1.732 3z"/></svg></div>
+                    <div class="tl-icon active">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 9v4m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 17c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
                     <div class="tl-content">
-                        <div class="tl-img"><img src="https://via.placeholder.com/100x60/FEE2E2/DC2626?text=FALL" alt="Fall"></div>
-                        <div class="tl-details">
-                            <div class="tl-header"><span class="tl-main-text">낙상 감지 · 카메라 1</span><span class="tl-time">15:28</span></div>
-                            <div class="tl-sub-text">신뢰도 98% | 김영희 (거실)</div>
+                        <div class="tl-img">
+                            <img src="https://via.placeholder.com/100x60/FEE2E2/DC2626?text=FALL" alt="Fall">
                         </div>
-                        <span class="status-badge badge-danger">신고 완료</span>
+                        <div class="tl-details">
+                            <div class="tl-header">
+                                <span class="tl-main-text">낙상 / 기절 감지</span>
+                                <span class="tl-time">07:22</span>
+                            </div>
+                            <div class="tl-meta-grid">
+                                <div class="tl-meta-block">
+                                    <span class="tl-meta-label">신뢰도</span>
+                                    <span class="tl-meta-value">0.88</span>
+                                </div>
+                                <div class="tl-meta-block">
+                                    <span class="tl-meta-label">처리</span>
+                                    <span class="tl-meta-value tl-val-danger">가족 신고</span>
+                                </div>
+                            </div>
+                            <div class="tl-badge-area">
+                                <span class="status-badge badge-danger">신고완료</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- 무응답 카드 -->
                 <div class="tl-item">
-                    <div class="tl-icon warning"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+                    <div class="tl-icon warning">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
                     <div class="tl-content">
-                        <div class="tl-img"><img src="https://via.placeholder.com/100x60/FEF3C7/D97706?text=WARN" alt="Warning"></div>
-                        <div class="tl-details">
-                            <div class="tl-header"><span class="tl-main-text">폭행 의심 · 카메라 3</span><span class="tl-time">14:10</span></div>
-                            <div class="tl-sub-text">신뢰도 82% | 이철수 (현관)</div>
+                        <div class="tl-img">
+                            <img src="https://via.placeholder.com/100x60/FEF3C7/D97706?text=WARN" alt="Warning">
                         </div>
-                        <span class="status-badge badge-warning">보호자 확인중</span>
+                        <div class="tl-details">
+                            <div class="tl-header">
+                                <span class="tl-main-text">장시간 무응답 감지</span>
+                                <span class="tl-time">09:00</span>
+                            </div>
+                            <div class="tl-meta-grid">
+                                <div class="tl-meta-block">
+                                    <span class="tl-meta-label">신뢰도</span>
+                                    <span class="tl-meta-value">0.81</span>
+                                </div>
+                                <div class="tl-meta-block">
+                                    <span class="tl-meta-label">처리</span>
+                                    <span class="tl-meta-value tl-val-warning">자동신고</span>
+                                </div>
+                            </div>
+                            <div class="tl-sub-note">마지막 움직임: 06:30 (2시간 30분 전)</div>
+                            <div class="tl-badge-area">
+                                <span class="status-badge badge-warning">자동신고</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- 폭행 카드 -->
                 <div class="tl-item">
-                    <div class="tl-icon success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+                    <div class="tl-icon success">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+                    </div>
                     <div class="tl-content">
-                        <div class="tl-img"><img src="https://via.placeholder.com/100x60/D1FAE5/059669?text=SAFE" alt="Safe"></div>
-                        <div class="tl-details">
-                            <div class="tl-header"><span class="tl-main-text">정상 활동 감지</span><span class="tl-time">12:30</span></div>
-                            <div class="tl-sub-text">이상 징후 없음 | 박말순 (주방)</div>
+                        <div class="tl-img">
+                            <img src="https://via.placeholder.com/100x60/D1FAE5/059669?text=SAFE" alt="Safe">
                         </div>
-                        <span class="status-badge badge-success">정상</span>
+                        <div class="tl-details">
+                            <div class="tl-header">
+                                <span class="tl-main-text">폭행 의심 감지</span>
+                                <span class="tl-time">19:47</span>
+                            </div>
+                            <div class="tl-meta-grid tl-meta-grid-4">
+                                <div class="tl-meta-block">
+                                    <span class="tl-meta-label">신뢰도</span>
+                                    <span class="tl-meta-value">0.93</span>
+                                </div>
+                                <div class="tl-meta-block">
+                                    <span class="tl-meta-label">이동속도</span>
+                                    <span class="tl-meta-value">0.87</span>
+                                </div>
+                                <div class="tl-meta-block">
+                                    <span class="tl-meta-label">감지 인원</span>
+                                    <span class="tl-meta-value">2명</span>
+                                </div>
+                                <div class="tl-meta-block">
+                                    <span class="tl-meta-label">처리</span>
+                                    <span class="tl-meta-value tl-val-success">정상확인</span>
+                                </div>
+                            </div>
+                            <div class="tl-badge-area">
+                                <span class="status-badge badge-success">정상확인</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
