@@ -95,11 +95,36 @@ body {
 
 
 .profile-menu { padding: 8px 0; }
-.profile-menu a {
+/*.profile-menu a {
     display: block; padding: 14px 24px; font-size: 15px; color: var(--gray-900);
     text-decoration: none; transition: 0.2s;
 }
-.profile-menu a:hover { background: var(--gray-100); }
+.profile-menu a:hover { background: var(--gray-100); }*/
+
+.profile-menu { padding: 8px 0; }
+.profile-menu a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-decoration: none;
+    transition: 0.2s;
+}
+.profile-menu a svg {
+    color: var(--gray-400);
+    flex-shrink: 0;
+    transition: 0.2s;
+}
+.profile-menu a:hover {
+    background: var(--navy-light);
+    color: var(--navy);
+}
+.profile-menu a:hover svg {
+    color: var(--navy);
+}
 
 /* ===== Main Layout ===== */
 .main-container { display: flex; flex-direction: column; gap: 20px; }
