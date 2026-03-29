@@ -1,636 +1,430 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>관제 시스템 - 이벤트 타임라인</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>골든노미스 - 통합 관제 시스템</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ===== TIMELINE ===== */
-        .timeline-layout {
-          flex: 1;
-          overflow-y: auto;
-          padding: 20px;
-          display: flex;
-          flex-direction: column;
-          gap: 0;
+        :root {
+            --navy: #3B5B9D; --navy-mid: #4E71B8; --navy-light: #F0F4FB;
+            --success: #059669; --success-bg: #D1FAE5;
+            --error: #DC2626; --error-bg: #FEE2E2;
+            --warning: #D97706; --warning-bg: #FEF3C7;
+            --purple: #7B1FA2; --purple-bg: #F3E5F5;
+            --gray-50: #F8FAFC; --gray-100: #F1F5F9; --gray-200: #E2E8F0;
+            --gray-300: #CBD5E1; --gray-400: #94A3B8; --gray-500: #64748B; --gray-600: #475569;
+            --gray-900: #0F172A;
+            --radius: 16px;
         }
 
-        .timeline-header-bar {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 20px;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--gray-100); color: var(--gray-900);
+            padding: 20px; min-height: 100vh;
+            display: flex; flex-direction: column; gap: 20px;
+            overflow-y: auto;
         }
 
-        .timeline-filter-group {
-          display: flex;
-          gap: 8px;
+        /* ===== Header & Topbar ===== */
+        .header-area { display: flex; align-items: center; justify-content: space-between; padding: 0 10px; flex-shrink: 0; }
+        .brand-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-box { width: 36px; height: 36px; background: var(--navy); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; }
+        .brand-name { font-size: 24px; font-weight: 800; color: var(--navy); letter-spacing: -1px; }
+
+        .topbar-right { display: flex; align-items: center; gap: 14px; position: relative; }
+        .system-time { font-size: 14px; font-weight: 600; color: var(--gray-500); margin-right: 8px; }
+
+        .icon-btn {
+            background: #fff; border: 1px solid var(--gray-300); cursor: pointer; color: var(--gray-600);
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            position: relative; transition: 0.2s;
         }
+        .noti-dot { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: var(--error); border: 2px solid #fff; border-radius: 50%; }
 
-        .filter-chip {
-          padding: 5px 14px;
-          border-radius: 20px;
-          border: 1px solid var(--gray-300);
-          background: #fff;
-          font-size: 11px;
-          font-weight: 500;
-          color: var(--gray-600);
-          cursor: pointer;
-          transition: all 0.15s;
+        /* ===== Dropdown Common Style ===== */
+        .dropdown-wrap { position: relative; }
+        .dropdown-menu {
+            position: absolute; top: 50px; right: 0; width: 280px; background: #fff;
+            border: 1px solid var(--gray-300); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: none; flex-direction: column; z-index: 100; overflow: hidden;
         }
+        .dropdown-menu.open { display: flex; }
 
-        .filter-chip.active {
-          background: var(--red);
-          border-color: var(--red);
-          color: #fff;
-        }
+        .dropdown-header { padding: 16px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 12px; }
+        .dropdown-footer { padding: 12px; border-top: 1px solid var(--gray-100); background: var(--gray-50); display: flex; gap: 8px; }
 
-        .filter-chip:hover:not(.active) {
-          background: var(--gray-100);
-          color: var(--gray-800);
-        }
+        /* Profile Dropdown Specific */
+        .profile-avatar-lg { width: 44px; height: 44px; background: var(--navy-light); color: var(--navy); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .profile-name { font-size: 15px; font-weight: 700; color: var(--gray-900); }
+        .profile-role { font-size: 12px; color: var(--gray-500); }
+        .btn-profile-detail { flex: 1; padding: 8px; text-align: center; background: #fff; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; color: var(--gray-700); }
+        .btn-profile-logout { padding: 8px 12px; background: var(--error-bg); color: var(--error); border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; }
 
-        /* Date group label */
-        .timeline-date-label {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin: 18px 0 10px;
-        }
+        /* Notification Dropdown Specific */
+        .noti-list { max-height: 300px; overflow-y: auto; }
+        .noti-item { padding: 12px 16px; border-bottom: 1px solid var(--gray-50); display: flex; gap: 12px; transition: 0.2s; cursor: pointer; }
+        .noti-item:hover { background: var(--gray-50); }
+        .noti-item:last-child { border-bottom: none; }
+        .noti-type-icon { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .noti-info { flex: 1; }
+        .noti-title { font-size: 13px; font-weight: 700; color: var(--gray-900); margin-bottom: 2px; }
+        .noti-msg { font-size: 12px; color: var(--gray-500); }
+        .noti-time { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
 
-        .timeline-date-label span {
-          font-size: 11px;
-          font-weight: 700;
-          color: var(--gray-500);
-          text-transform: uppercase;
-          white-space: nowrap;
-          letter-spacing: 0.4px;
-        }
+        /* ===== Main Layout & Others ===== */
+        .main-container { display: flex; flex-direction: column; gap: 20px; }
+        .top-row { display: grid; grid-template-columns: 1fr 360px; gap: 20px; min-height: 500px; }
+        .content-card { background: #fff; border: 2px solid var(--gray-300); border-radius: var(--radius); box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; }
+        .monitoring-box { position: relative; background: #000; flex: 1; display: flex; align-items: center; justify-content: center; min-height: 400px; }
+        .monitoring-box img { width: 100%; height: 100%; object-fit: contain; }
+        .live-indicator { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.7); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(4px); }
+        .live-dot { width: 8px; height: 8px; background: var(--error); border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.3; } }
+        .control-panel { padding: 24px; }
+        .urgent-alert { background: var(--error-bg); border: 2px solid var(--error); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .urgent-alert h3 { color: var(--error); font-size: 20px; margin-bottom: 8px; }
+        .btn-group { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
+        .btn { padding: 16px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        .btn-red { background: var(--error); color: #fff; }
+        .btn-outline { background: #fff; border: 2px solid var(--gray-300); color: var(--gray-700); }
+        .btn-success { background: var(--success); color: #fff; }
 
-        .timeline-date-label::before,
-        .timeline-date-label::after {
-          content: '';
-          flex: 1;
-          height: 1px;
-          background: var(--gray-200);
-        }
-
-        /* Timeline track */
-        .timeline-track {
-          display: flex;
-          flex-direction: column;
-          gap: 0;
-          position: relative;
-          padding-left: 28px;
-        }
-
-        .timeline-track::before {
-          content: '';
-          position: absolute;
-          left: 9px;
-          top: 6px;
-          bottom: 6px;
-          width: 2px;
-          background: var(--gray-200);
-          border-radius: 1px;
-        }
-
-        /* Timeline item */
-        .timeline-item {
-          display: flex;
-          gap: 14px;
-          padding: 10px 0;
-          position: relative;
-          cursor: pointer;
-          transition: background 0.12s;
-          border-radius: 8px;
-        }
-
-        .timeline-item:hover {
-          background: var(--gray-50);
-        }
-
-        /* Dot */
-        .timeline-dot {
-          position: absolute;
-          left: -24px;
-          top: 16px;
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          border: 2px solid #fff;
-          flex-shrink: 0;
-          z-index: 1;
-          box-shadow: 0 0 0 2px var(--gray-300);
-        }
-
-        .timeline-dot.fall    { background: var(--red);    box-shadow: 0 0 0 2px #FFCDD2; }
-        .timeline-dot.silent  { background: var(--orange);  box-shadow: 0 0 0 2px #FFE0B2; }
-        .timeline-dot.assault { background: #7B1FA2;        box-shadow: 0 0 0 2px #E1BEE7; }
-        .timeline-dot.normal  { background: #43A047;        box-shadow: 0 0 0 2px #C8E6C9; }
-
-        /* Thumb */
-        .timeline-thumb {
-          width: 72px;
-          height: 54px;
-          border-radius: 6px;
-          overflow: hidden;
-          flex-shrink: 0;
-          background: var(--gray-200);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        /* Info */
-        .timeline-info {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .timeline-top-row {
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          margin-bottom: 3px;
-        }
-
-        .event-badge {
-          font-size: 10px;
-          font-weight: 700;
-          padding: 2px 7px;
-          border-radius: 4px;
-          flex-shrink: 0;
-        }
-
-        .event-badge.fall    { background: var(--red-light);   color: var(--red); }
-        .event-badge.silent  { background: var(--orange-light); color: var(--orange); }
-        .event-badge.assault { background: #F3E5F5;             color: #7B1FA2; }
-        .event-badge.normal  { background: #E8F5E9;             color: #388E3C; }
-
-        .timeline-event-name {
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--gray-800);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .timeline-meta {
-          font-size: 11px;
-          color: var(--gray-500);
-          margin-bottom: 4px;
-        }
-
-        .timeline-meta span {
-          margin-right: 8px;
-        }
-
-        .timeline-resident-tag {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 11px;
-          color: var(--gray-600);
-          background: var(--gray-100);
-          padding: 2px 8px;
-          border-radius: 4px;
-        }
-
-        /* Right: status + report */
-        .timeline-right {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 5px;
-          flex-shrink: 0;
-        }
-
-        .timeline-time {
-          font-size: 11px;
-          font-weight: 600;
-          color: var(--gray-500);
-        }
-
-        .report-badge-sm {
-          font-size: 10px;
-          padding: 2px 8px;
-          border-radius: 4px;
-          font-weight: 600;
-        }
-
-        .report-badge-sm.done    { background: #E3F2FD; color: #1976D2; }
-        .report-badge-sm.pending { background: var(--orange-light); color: var(--orange); }
-        .report-badge-sm.none    { background: var(--gray-100); color: var(--gray-500); }
-
-        /* Summary chips */
-        .timeline-summary {
-          display: flex;
-          gap: 8px;
-          flex-wrap: wrap;
-        }
-
-        .summary-chip {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          background: #fff;
-          border: 1px solid var(--gray-200);
-          border-radius: 8px;
-          padding: 7px 14px;
-          font-size: 12px;
-          font-weight: 500;
-          color: var(--gray-700);
-        }
-
-        .summary-chip .chip-num {
-          font-size: 16px;
-          font-weight: 700;
-        }
-
-        .summary-chip.chip-red    { border-color: #FFCDD2; }
-        .summary-chip.chip-orange { border-color: #FFE0B2; }
-        .summary-chip.chip-purple { border-color: #E1BEE7; }
-        .summary-chip.chip-green  { border-color: #C8E6C9; }
-
-        /* Search bar */
-        .timeline-search {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: var(--gray-100);
-          border-radius: 7px;
-          padding: 7px 12px;
-          min-width: 200px;
-          color: var(--gray-500);
-        }
-
-        .timeline-search input {
-          border: none;
-          background: transparent;
-          outline: none;
-          font-size: 12px;
-          color: var(--gray-800);
-          width: 100%;
-          font-family: inherit;
-        }
-
-        .timeline-search input::placeholder { color: var(--gray-400); }
+        .risk-score-section { padding: 24px; display: flex; align-items: center; gap: 30px; }
+        .score-info { min-width: 180px; }
+        .score-info .label { font-size: 14px; color: var(--gray-500); font-weight: 700; margin-bottom: 4px; }
+        .score-info .val { font-size: 32px; font-weight: 900; }
+        .progress-container { flex: 1; height: 20px; background: var(--gray-200); border-radius: 20px; overflow: hidden; border: 1px solid var(--gray-300); }
+        .progress-bar { height: 100%; transition: width 1s ease, background 0.5s ease; border-radius: 20px; }
+        .safe { background: linear-gradient(90deg, #10b981, #059669); }
+        .caution { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .danger { background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .event-stats-section { padding: 0 24px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+        .stats-header { display: flex; justify-content: space-between; align-items: center; }
+        .filter-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+        .pill { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; border: 1px solid transparent; cursor: pointer; transition: 0.2s; }
+        .pill-blue { background: #DBEAFE; color: #2563EB; border-color: #BFDBFE; }
+        .pill-pink { background: #FFE4E6; color: #E11D48; border-color: #FECDD3; }
+        .pill-orange { background: #FEF3C7; color: #D97706; border-color: #FDE68A; }
+        .pill-purple { background: #EDE9FE; color: #7C3AED; border-color: #DDD6FE; }
+        .date-picker-wrapper { position: relative; display: flex; align-items: center; background: #fff; border: 1px solid var(--gray-300); border-radius: 20px; padding: 4px 12px; cursor: pointer; }
+        .date-picker-wrapper input { border: none; outline: none; font-size: 13px; font-weight: 600; color: var(--gray-700); cursor: pointer; }
+        .calendar-icon { color: var(--gray-500); margin-left: 6px; pointer-events: none; display: flex; align-items: center; }
+        .summary-cards { display: flex; gap: 16px; }
+        .stat-card { flex: 1; background: #F8FAFC; padding: 16px 20px; border-radius: 12px; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--gray-200); }
+        .stat-card .stat-title { font-size: 13px; color: var(--gray-500); font-weight: 700; }
+        .stat-card .stat-value { font-size: 24px; font-weight: 800; color: var(--gray-900); }
+        .stat-card .stat-value.red { color: var(--error); }
+        .timeline-section { padding: 24px; border-top: 2px solid var(--gray-200); background: #fff; width: 100%; }
+        .timeline-title { font-size: 18px; font-weight: 800; color: var(--gray-900); margin-bottom: 24px; }
+        .timeline-container { position: relative; padding-left: 10px; width: 100%; }
+        .timeline-container::before { content: ''; position: absolute; left: 26px; top: 10px; bottom: 10px; width: 2px; border-left: 2px dashed var(--gray-300); }
+        .tl-item { position: relative; display: flex; align-items: flex-start; gap: 15px; padding-bottom: 30px; width: 100%; }
+        .tl-icon { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 2px solid var(--gray-300); z-index: 1; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .tl-icon.active { border-color: var(--error); background: var(--error); color: #fff; }
+        .tl-icon.warning { border-color: var(--warning); background: var(--warning); color: #fff; }
+        .tl-icon.success { border-color: var(--success); background: var(--success); color: #fff; }
+        .tl-content { flex: 1; display: flex; align-items: center; gap: 20px; background: var(--gray-50); padding: 16px; border-radius: 12px; border: 1px solid var(--gray-200); min-width: 0; }
+        .tl-img { width: 100px; height: 60px; border-radius: 6px; overflow: hidden; background: #ddd; flex-shrink: 0; }
+        .tl-img img { width: 100%; height: 100%; object-fit: cover; }
+        .tl-details { flex: 1; min-width: 0; }
+        .tl-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 10px; }
+        .tl-main-text { font-size: 15px; font-weight: 700; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tl-time { font-size: 12px; color: var(--gray-400); font-weight: 500; flex-shrink: 0; }
+        .tl-sub-text { font-size: 13px; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; flex-shrink: 0; }
+        .badge-danger { background: var(--error-bg); color: var(--error); }
+        .badge-warning { background: var(--warning-bg); color: var(--warning); }
+        .badge-success { background: var(--success-bg); color: var(--success); }
     </style>
 </head>
 <body>
-<div class="app-wrapper">
 
-    <!-- ===== SIDEBAR ===== -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="logo-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+<header class="header-area">
+    <a href="/" class="brand-logo">
+        <div class="logo-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3" /></svg></div>
+        <span class="brand-name">골든노미스</span>
+    </a>
+    <div class="topbar-right">
+        <div class="system-time" id="currentTime">2026. 03. 29 15:30:12</div>
+
+        <div class="dropdown-wrap">
+            <button class="icon-btn" id="notiBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <div class="noti-dot"></div>
+            </button>
+            <div class="dropdown-menu" id="notiDropdown">
+                <div class="dropdown-header">
+                    <span style="font-weight: 800; font-size: 14px;">최근 알림</span>
+                </div>
+                <div class="noti-list">
+                    <div class="noti-item">
+                        <div class="noti-type-icon" style="background: var(--error-bg); color: var(--error);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 17c-.77 1.333.192 3 1.732 3z"/></svg></div>
+                        <div class="noti-info">
+                            <div class="noti-title">낙상 감지 위험</div>
+                            <div class="noti-msg">거실 카메라에서 낙상 상황이 감지되었습니다.</div>
+                            <div class="noti-time">방금 전</div>
+                        </div>
+                    </div>
+                    <div class="noti-item">
+                        <div class="noti-type-icon" style="background: var(--warning-bg); color: var(--warning);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                        <div class="noti-info">
+                            <div class="noti-title">미접속 장치 발생</div>
+                            <div class="noti-msg">주방 카메라 2의 연결이 불안정합니다.</div>
+                            <div class="noti-time">10분 전</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-footer">
+                    <button class="btn-profile-detail" style="width: 100%;">모든 알림 보기</button>
+                </div>
             </div>
-            <span class="logo-text">관제 시스템</span>
         </div>
-        <nav class="sidebar-nav">
-            <a href="/index/index" class="nav-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                대시보드
-            </a>
-            <a href="/camera/camera" class="nav-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                카메라 관리
-            </a>
-            <a href="/event/events_timeline" class="nav-item active">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                이벤트 타임라인
-            </a>
-            <div class="nav-divider"></div>
-            <div class="nav-section-label">관리</div>
-            <a href="/resident/detail" class="nav-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                거주자 정보
-            </a>
-            <a href="/setting/setting" class="nav-item">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                설정
-            </a>
-        </nav>
-    </aside>
 
-    <!-- ===== MAIN ===== -->
-    <div class="main-content">
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="menu-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                </button>
-                <h1 class="page-title">이벤트 타임라인</h1>
-            </div>
-            <div class="topbar-right">
-                <button class="icon-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </button>
-                <div class="profile-dropdown-wrap">
-                    <button class="icon-btn avatar-btn" id="profileBtn">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    </button>
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="profile-dropdown-header">
-                            <div class="profile-avatar-lg">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            </div>
-                            <div>
-                                <div class="profile-name">홍길동</div>
-                                <div class="profile-role">관리자 · 스마트 관제 센터</div>
-                            </div>
-                        </div>
-                        <div class="profile-dropdown-footer">
-                            <a href="/myinfo/myinfo" class="btn-profile-detail">내 정보 상세보기</a>
-                            <button class="btn-profile-logout">로그아웃</button>
-                        </div>
+        <div class="dropdown-wrap">
+            <button class="icon-btn" id="profileBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+            <div class="dropdown-menu" id="profileDropdown">
+                <div class="dropdown-header">
+                    <div class="profile-avatar-lg">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     </div>
+                    <div>
+                        <div class="profile-name">홍길동</div>
+                        <div class="profile-role">관리자 · 스마트 관제 센터</div>
+                    </div>
+                </div>
+                <div class="dropdown-footer">
+                    <a href="/myinfo/myinfo" class="btn-profile-detail">내 정보 상세보기</a>
+                    <button class="btn-profile-logout">로그아웃</button>
                 </div>
             </div>
-        </header>
-
-        <div class="timeline-layout">
-
-            <!-- 오늘 요약 칩 -->
-            <div class="timeline-summary">
-                <div class="summary-chip chip-red">
-                    <span class="chip-num" style="color:var(--red)">3</span>
-                    <span>낙상 감지</span>
-                </div>
-                <div class="summary-chip chip-orange">
-                    <span class="chip-num" style="color:var(--orange)">2</span>
-                    <span>무음담</span>
-                </div>
-                <div class="summary-chip chip-purple">
-                    <span class="chip-num" style="color:#7B1FA2">1</span>
-                    <span>폭행 의심</span>
-                </div>
-                <div class="summary-chip chip-green">
-                    <span class="chip-num" style="color:#388E3C">8</span>
-                    <span>정상</span>
-                </div>
-            </div>
-
-            <!-- 필터 & 검색 -->
-            <div class="timeline-header-bar" style="margin-top:14px">
-                <div class="timeline-filter-group">
-                    <div class="filter-chip active" onclick="setFilter(this)">전체</div>
-                    <div class="filter-chip" onclick="setFilter(this)">낙상</div>
-                    <div class="filter-chip" onclick="setFilter(this)">무음담</div>
-                    <div class="filter-chip" onclick="setFilter(this)">폭행</div>
-                    <div class="filter-chip" onclick="setFilter(this)">정상</div>
-                </div>
-                <div class="timeline-search">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" placeholder="이름, 카메라로 검색">
-                </div>
-            </div>
-
-            <!-- ===== 2024-04-27 ===== -->
-            <div class="timeline-date-label"><span>2024년 4월 27일 (오늘)</span></div>
-
-            <div class="timeline-track">
-
-                <!-- Item 1: 낙상 -->
-                <div class="timeline-item" onclick="location.href='/event/detail'">
-                    <div class="timeline-dot fall"></div>
-                    <div class="timeline-thumb">
-                        <svg viewBox="0 0 72 54" width="72" height="54" fill="none">
-                            <rect width="72" height="54" fill="#D0D0D0" rx="4"/>
-                            <circle cx="46" cy="16" r="7" fill="#aaa"/>
-                            <line x1="46" y1="23" x2="34" y2="36" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
-                            <line x1="34" y1="36" x2="20" y2="32" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div class="timeline-info">
-                        <div class="timeline-top-row">
-                            <span class="event-badge fall">낙상</span>
-                            <span class="timeline-event-name">낙상 감지 · 카메라 1</span>
-                        </div>
-                        <div class="timeline-meta">
-                            <span>10:21</span>
-                            <span>신뢰도 94%</span>
-                        </div>
-                        <span class="timeline-resident-tag">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              김영희 · 서울시 강남구 역삼동
-            </span>
-                    </div>
-                    <div class="timeline-right">
-                        <span class="timeline-time">10:21</span>
-                        <span class="report-badge-sm done">신고 완료</span>
-                    </div>
-                </div>
-
-                <!-- Item 2: 폭행 -->
-                <div class="timeline-item" onclick="location.href='/event/detail'">
-                    <div class="timeline-dot assault"></div>
-                    <div class="timeline-thumb">
-                        <svg viewBox="0 0 72 54" width="72" height="54" fill="none">
-                            <rect width="72" height="54" fill="#D0D0D0" rx="4"/>
-                            <circle cx="26" cy="14" r="6" fill="#aaa"/>
-                            <circle cx="50" cy="16" r="6" fill="#aaa"/>
-                            <line x1="26" y1="20" x2="24" y2="36" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
-                            <line x1="50" y1="22" x2="52" y2="38" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div class="timeline-info">
-                        <div class="timeline-top-row">
-                            <span class="event-badge assault">폭행</span>
-                            <span class="timeline-event-name">폭행 의심 · 카메라 3</span>
-                        </div>
-                        <div class="timeline-meta">
-                            <span>10:15</span>
-                            <span>신뢰도 81%</span>
-                        </div>
-                        <span class="timeline-resident-tag">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><line x1="14" y1="7" x2="20" y2="7"/><line x1="17" y1="4" x2="17" y2="10"/></svg>
-              미확인 · 3번 구역 복도
-            </span>
-                    </div>
-                    <div class="timeline-right">
-                        <span class="timeline-time">10:15</span>
-                        <span class="report-badge-sm pending">처리 중</span>
-                    </div>
-                </div>
-
-                <!-- Item 3: 무음담 -->
-                <div class="timeline-item" onclick="location.href='/event/detail'">
-                    <div class="timeline-dot silent"></div>
-                    <div class="timeline-thumb">
-                        <svg viewBox="0 0 72 54" width="72" height="54" fill="none">
-                            <rect width="72" height="54" fill="#D0D0D0" rx="4"/>
-                            <circle cx="36" cy="14" r="7" fill="#aaa"/>
-                            <line x1="36" y1="21" x2="36" y2="38" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div class="timeline-info">
-                        <div class="timeline-top-row">
-                            <span class="event-badge silent">무음담</span>
-                            <span class="timeline-event-name">무음담 감지 · 카메라 2</span>
-                        </div>
-                        <div class="timeline-meta">
-                            <span>09:55</span>
-                            <span>신뢰도 88%</span>
-                        </div>
-                        <span class="timeline-resident-tag">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              이철수 · 서울시 서초구 방배동
-            </span>
-                    </div>
-                    <div class="timeline-right">
-                        <span class="timeline-time">09:55</span>
-                        <span class="report-badge-sm done">신고 완료</span>
-                    </div>
-                </div>
-
-                <!-- Item 4: 정상 -->
-                <div class="timeline-item">
-                    <div class="timeline-dot normal"></div>
-                    <div class="timeline-thumb">
-                        <svg viewBox="0 0 72 54" width="72" height="54" fill="none">
-                            <rect width="72" height="54" fill="#D0D0D0" rx="4"/>
-                            <circle cx="36" cy="14" r="7" fill="#bbb"/>
-                            <line x1="36" y1="21" x2="36" y2="36" stroke="#bbb" stroke-width="3" stroke-linecap="round"/>
-                            <line x1="28" y1="28" x2="36" y2="36" stroke="#bbb" stroke-width="3" stroke-linecap="round"/>
-                            <line x1="44" y1="28" x2="36" y2="36" stroke="#bbb" stroke-width="3" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div class="timeline-info">
-                        <div class="timeline-top-row">
-                            <span class="event-badge normal">정상</span>
-                            <span class="timeline-event-name">이동 감지 · 카메라 2</span>
-                        </div>
-                        <div class="timeline-meta">
-                            <span>09:30</span>
-                        </div>
-                        <span class="timeline-resident-tag">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              이철수 · 서울시 서초구 방배동
-            </span>
-                    </div>
-                    <div class="timeline-right">
-                        <span class="timeline-time">09:30</span>
-                        <span class="report-badge-sm none">이상 없음</span>
-                    </div>
-                </div>
-
-                <!-- Item 5: 낙상 -->
-                <div class="timeline-item" onclick="location.href='/event/detail'">
-                    <div class="timeline-dot fall"></div>
-                    <div class="timeline-thumb">
-                        <svg viewBox="0 0 72 54" width="72" height="54" fill="none">
-                            <rect width="72" height="54" fill="#D0D0D0" rx="4"/>
-                            <circle cx="46" cy="16" r="7" fill="#aaa"/>
-                            <line x1="46" y1="23" x2="34" y2="36" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
-                            <line x1="34" y1="36" x2="20" y2="32" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div class="timeline-info">
-                        <div class="timeline-top-row">
-                            <span class="event-badge fall">낙상</span>
-                            <span class="timeline-event-name">낙상 감지 · 카메라 4</span>
-                        </div>
-                        <div class="timeline-meta">
-                            <span>08:47</span>
-                            <span>신뢰도 97%</span>
-                        </div>
-                        <span class="timeline-resident-tag">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              최민준 · 서울시 마포구 합정동
-            </span>
-                    </div>
-                    <div class="timeline-right">
-                        <span class="timeline-time">08:47</span>
-                        <span class="report-badge-sm done">신고 완료</span>
-                    </div>
-                </div>
-
-            </div><!-- /timeline-track -->
-
-            <!-- ===== 2024-04-26 ===== -->
-            <div class="timeline-date-label"><span>2024년 4월 26일</span></div>
-
-            <div class="timeline-track">
-
-                <div class="timeline-item" onclick="location.href='/event/detail'">
-                    <div class="timeline-dot fall"></div>
-                    <div class="timeline-thumb">
-                        <svg viewBox="0 0 72 54" width="72" height="54" fill="none">
-                            <rect width="72" height="54" fill="#D0D0D0" rx="4"/>
-                            <circle cx="46" cy="16" r="7" fill="#aaa"/>
-                            <line x1="46" y1="23" x2="34" y2="36" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
-                            <line x1="34" y1="36" x2="20" y2="32" stroke="#aaa" stroke-width="3" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div class="timeline-info">
-                        <div class="timeline-top-row">
-                            <span class="event-badge fall">낙상</span>
-                            <span class="timeline-event-name">낙상 감지 · 카메라 1</span>
-                        </div>
-                        <div class="timeline-meta">
-                            <span>15:31</span>
-                            <span>신뢰도 91%</span>
-                        </div>
-                        <span class="timeline-resident-tag">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              최민준 · 서울시 마포구 합정동
-            </span>
-                    </div>
-                    <div class="timeline-right">
-                        <span class="timeline-time">15:31</span>
-                        <span class="report-badge-sm done">신고 완료</span>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-dot normal"></div>
-                    <div class="timeline-thumb">
-                        <svg viewBox="0 0 72 54" width="72" height="54" fill="none">
-                            <rect width="72" height="54" fill="#D0D0D0" rx="4"/>
-                            <circle cx="36" cy="14" r="7" fill="#bbb"/>
-                            <line x1="36" y1="21" x2="36" y2="36" stroke="#bbb" stroke-width="3" stroke-linecap="round"/>
-                        </svg>
-                    </div>
-                    <div class="timeline-info">
-                        <div class="timeline-top-row">
-                            <span class="event-badge normal">정상</span>
-                            <span class="timeline-event-name">이동 감지 · 카메라 3</span>
-                        </div>
-                        <div class="timeline-meta"><span>10:02</span></div>
-                        <span class="timeline-resident-tag">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              박순자 · 서울시 송파구 잠실동
-            </span>
-                    </div>
-                    <div class="timeline-right">
-                        <span class="timeline-time">10:02</span>
-                        <span class="report-badge-sm none">이상 없음</span>
-                    </div>
-                </div>
-
-            </div><!-- /timeline-track -->
-
-        </div><!-- /timeline-layout -->
+        </div>
     </div>
+</header>
+
+<div class="main-container">
+    <div class="top-row">
+        <section class="content-card">
+            <div class="monitoring-box">
+                <img src="http://192.168.0.79:5005/video_feed" alt="Realtime Video">
+                <div class="live-indicator"><div class="live-dot"></div> LIVE MONITORING</div>
+            </div>
+        </section>
+        <aside class="content-card control-panel">
+            <h2 style="font-size: 14px; color: var(--gray-500); margin-bottom: 15px;">실시간 감지 정보</h2>
+            <div class="urgent-alert">
+                <h3>🚨 낙상 발생</h3>
+                <p><b>김영희 (거실)</b></p>
+                <p style="font-size:13px; margin-top:5px;">신뢰도 98% | 15:28:05</p>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-red">119 긴급 신고</button>
+                <button class="btn btn-outline">보호자 비상 연락</button>
+                <button class="btn btn-success">상황 종료 및 복구</button>
+            </div>
+        </aside>
+    </div>
+
+    <section class="content-card">
+        <div class="risk-score-section">
+            <div class="score-info">
+                <div class="label">오늘의 위험 지수</div>
+                <div id="scoreText" class="val">130 <span style="font-size:18px; color:var(--gray-400); font-weight:600;">/ 200</span></div>
+            </div>
+            <div class="progress-container"><div id="progressBar" class="progress-bar" style="width: 0%;"></div></div>
+            <div id="statusLabel" style="font-weight: 800;">상태: 확인중</div>
+        </div>
+
+        <div class="event-stats-section">
+            <div class="stats-header">
+                <div class="filter-pills">
+                    <span class="pill pill-blue">전체 3건</span>
+                    <span class="pill pill-pink">낙상 1건</span>
+                    <span class="pill pill-orange">무응답 1건</span>
+                    <span class="pill pill-purple">폭행 1건</span>
+                </div>
+                <div class="date-picker-wrapper">
+                    <input type="date" id="eventDate" value="2026-03-25" onchange="fetchDataByDate(this.value)">
+                    <div class="calendar-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="summary-cards">
+                <div class="stat-card">
+                    <span class="stat-title">총 이벤트</span>
+                    <span class="stat-value">3건</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-title">신고횟수</span>
+                    <span class="stat-value red">2건</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-title">정상확인</span>
+                    <span class="stat-value">1건</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-section">
+            <h3 class="timeline-title">이벤트 타임라인 (최근 24시간)</h3>
+            <div class="timeline-container">
+                <div class="tl-item">
+                    <div class="tl-icon active">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 9v4m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 17c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div class="tl-content">
+                        <div class="tl-img"><img src="https://via.placeholder.com/100x60/FEE2E2/DC2626?text=FALL" alt="Fall"></div>
+                        <div class="tl-details">
+                            <div class="tl-header">
+                                <span class="tl-main-text">낙상 감지 · 카메라 1</span>
+                                <span class="tl-time">15:28</span>
+                            </div>
+                            <div class="tl-sub-text">신뢰도 98% | 김영희 (거실)</div>
+                        </div>
+                        <span class="status-badge badge-danger">신고 완료</span>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-icon warning">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div class="tl-content">
+                        <div class="tl-img"><img src="https://via.placeholder.com/100x60/FEF3C7/D97706?text=WARN" alt="Warning"></div>
+                        <div class="tl-details">
+                            <div class="tl-header">
+                                <span class="tl-main-text">폭행 의심 · 카메라 3</span>
+                                <span class="tl-time">14:10</span>
+                            </div>
+                            <div class="tl-sub-text">신뢰도 82% | 이철수 (현관)</div>
+                        </div>
+                        <span class="status-badge badge-warning">보호자 확인중</span>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-icon success">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div class="tl-content">
+                        <div class="tl-img"><img src="https://via.placeholder.com/100x60/D1FAE5/059669?text=SAFE" alt="Safe"></div>
+                        <div class="tl-details">
+                            <div class="tl-header">
+                                <span class="tl-main-text">정상 활동 감지</span>
+                                <span class="tl-time">12:30</span>
+                            </div>
+                            <div class="tl-sub-text">이상 징후 없음 | 박말순 (주방)</div>
+                        </div>
+                        <span class="status-badge badge-success">정상</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
-<script>
-    function setFilter(el) {
-      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
+<script th:inline="javascript">
+    // ==================== 시계 ====================
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('currentTime').innerText =
+            now.getFullYear() + '. ' +
+            (now.getMonth() + 1).toString().padStart(2, '0') + '. ' +
+            now.getDate().toString().padStart(2, '0') + ' ' +
+            now.getHours().toString().padStart(2, '0') + ':' +
+            now.getMinutes().toString().padStart(2, '0') + ':' +
+            now.getSeconds().toString().padStart(2, '0');
     }
 
-    const btn = document.getElementById('profileBtn');
-    const dropdown = document.getElementById('profileDropdown');
-    btn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
-    document.addEventListener('click', () => dropdown.classList.remove('open'));
-    dropdown.addEventListener('click', e => e.stopPropagation());
+    // ==================== 위험 지수 UI ====================
+    function updateRiskUI(score) {
+        const bar = document.getElementById('progressBar');
+        const text = document.getElementById('scoreText');
+        const label = document.getElementById('statusLabel');
+        const percent = (score / 200) * 100;
+
+        bar.style.width = percent + '%';
+
+        if (score < 70) {
+            bar.className = 'progress-bar safe';
+            text.style.color = 'var(--success)';
+            label.innerText = '상태: 안전';
+            label.style.color = 'var(--success)';
+        } else if (score < 140) {
+            bar.className = 'progress-bar caution';
+            text.style.color = 'var(--warning)';
+            label.innerText = '상태: 주의';
+            label.style.color = 'var(--warning)';
+        } else {
+            bar.className = 'progress-bar danger';
+            text.style.color = 'var(--error)';
+            label.innerText = '상태: 위험';
+            label.style.color = 'var(--error)';
+        }
+    }
+
+    // ==================== 드롭다운 (완전 수정版) ====================
+    function setupDropdown(btnId, dropdownId) {
+        const btn = document.getElementById(btnId);
+        const dropdown = document.getElementById(dropdownId);
+        if (!btn || !dropdown) return;
+
+        btn.addEventListener('click', (e) => {
+            e.stopImmediatePropagation();   // 더 강력한 전파 차단
+
+            // 다른 드롭다운 모두 닫기
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.id !== dropdownId) menu.classList.remove('open');
+            });
+
+            // 현재 드롭다운 토글
+            dropdown.classList.toggle('open');
+        });
+    }
+
+    // 페이지 어디를 클릭해도 드롭다운 닫기 (드롭다운 영역 제외)
+    function closeAllDropdownsOnOutsideClick(e) {
+        if (!e.target.closest('.dropdown-wrap')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('open');
+            });
+        }
+    }
+
+    // 드롭다운 내부 클릭 시 닫히지 않게
+    function preventDropdownCloseOnInsideClick() {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.addEventListener('click', (e) => {
+                e.stopImmediatePropagation();
+            });
+        });
+    }
+
+    // ==================== 초기화 ====================
+    function initialize() {
+        // 시계
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // 위험 지수
+        setTimeout(() => updateRiskUI(130), 500);
+
+        // 드롭다운 설정
+        setupDropdown('notiBtn', 'notiDropdown');
+        setupDropdown('profileBtn', 'profileDropdown');
+
+        // 바깥 클릭 시 닫기
+        document.addEventListener('click', closeAllDropdownsOnOutsideClick);
+
+        // 내부 클릭 방지
+        preventDropdownCloseOnInsideClick();
+    }
+
+    // 페이지 로드 완료 후 실행
+    window.addEventListener('load', initialize);
 </script>
 </body>
 </html>
