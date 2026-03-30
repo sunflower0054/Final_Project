@@ -110,3 +110,32 @@ Spring Boot 4.x / Java 17 / Thymeleaf / JPA 기반의 오피스 모니터링 프
 ### 인증/인가 실패 동작
 - 인증되지 않은 사용자가 보호된 페이지에 접근하면 `/member/login` 으로 이동합니다.
 - 인증은 되었지만 권한이 부족한 경우 HTTP `403 Forbidden` 이 반환됩니다.
+
+## 작업 5: 로그인 화면 연결 및 보안 테스트 추가
+이번 단계에서는 기존 로그인 화면을 Spring Security form login과 실제로 연결하고, 핵심 보안 동작을 검증하는 테스트를 추가했습니다.
+
+### 로그인
+- 로그인 페이지 경로: `GET /member/login`
+- 로그인 폼 전송 방식:
+  - `method="post"`
+  - `action="/member/login"`
+  - 아이디 필드: `name="username"`
+  - 비밀번호 필드: `name="password"`
+- 로그인 실패 시: `/member/login?error` 로 이동하며 실패 메시지를 표시합니다.
+- 로그아웃 후: `/member/login?logout` 파라미터로 로그인 페이지 진입 시 완료 메시지를 표시합니다.
+
+### 보안 테스트
+`MockMvc` 기반 보안 테스트로 아래 시나리오를 검증합니다.
+
+1. 비로그인 사용자가 보호 페이지(`/myinfo`)에 접근하면 로그인 페이지(`/member/login`)로 리다이렉트
+2. USER 권한 계정이 관리자 페이지(`/setting`)에 접근하면 `403 Forbidden`
+3. ADMIN 권한 계정이 관리자 페이지(`/setting`)에 접근하면 `200 OK`
+4. 로그인 성공 시 `/` 로 리다이렉트
+5. 로그인 실패 시 `/member/login?error` 로 리다이렉트
+
+### 테스트 실행
+```bash
+./gradlew test
+```
+
+> 참고: 테스트는 `test` 프로파일(H2 메모리 DB) 기준으로 동작하도록 구성되어 있습니다.
