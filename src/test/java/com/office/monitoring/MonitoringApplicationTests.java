@@ -9,14 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -60,20 +59,18 @@ class MonitoringApplicationTests {
     void 비로그인_사용자_myinfo_접근시_로그인페이지로_리다이렉트() throws Exception {
         mockMvc.perform(get("/myinfo"))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrlPattern("**/member/login"));
+            .andExpect(redirectedUrl("/member/login"));
     }
 
     @Test
-    @WithMockUser(username = "user", roles = {"USER"})
     void USER_권한_setting_접근시_403() throws Exception {
-        mockMvc.perform(get("/setting"))
+        mockMvc.perform(get("/setting").with(user("user").roles("USER")))
             .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
     void ADMIN_권한_setting_접근시_200() throws Exception {
-        mockMvc.perform(get("/setting"))
+        mockMvc.perform(get("/setting").with(user("admin").roles("ADMIN")))
             .andExpect(status().isOk());
     }
 
