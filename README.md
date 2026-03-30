@@ -15,7 +15,7 @@ Spring Boot 4.x / Java 17 / Thymeleaf / JPA 기반의 오피스 모니터링 프
 - 인증이 필요한 요청과 공개 요청을 명확히 분리하기 위한 기반 마련
 - 이후 `Member` 기반 로그인/인증 로직을 안전하게 연결하기 위한 구조 선반영
 
-### 현재 적용된 기본 보안 구조
+### 작업 1 당시 적용된 기본 보안 구조
 - `SecurityFilterChain` 등록 (`com.office.monitoring.security.SecurityConfig`)
 - 공개 경로(`permitAll`):
   - `/`
@@ -91,5 +91,22 @@ Spring Boot 4.x / Java 17 / Thymeleaf / JPA 기반의 오피스 모니터링 프
 
 > ⚠️ 주의: 위 계정은 **개발/테스트 전용**입니다. 운영 환경에서 동일 계정/비밀번호를 그대로 사용하면 안 됩니다.
 
-## 다음 단계 예정
-- 권한(Role) 세분화 및 인가 정책 고도화
+## 작업 4: URL별 권한 제어와 CSRF 예외 설정
+
+### 보안 정책 (URL 권한 정책)
+
+| 구분 | 경로 |
+|---|---|
+| 공개 접근 가능 (`permitAll`) | `/`, `/index`, `/index/**`, `/member/login`, `/member/register`, `/css/**`, `/js/**`, `/images/**`, `/favicon.ico`, `POST /api/v1/events/receive` |
+| 로그인 필요 (`authenticated`) | `/camera/**`, `/events/**`, `/report/**`, `/myinfo/**`, `/resident/detail` |
+| 관리자 전용 (`hasRole("ADMIN")`) | `/setting/**`, `/resident/edit`, `/resident/register`, `/api/v1/settings/**` |
+| 기본 정책 | 위 매핑 외 모든 요청은 인증 필요 |
+
+### CSRF 예외 정책
+- `POST /api/v1/events/receive` 는 외부 이벤트 수신(브라우저 폼 기반 요청이 아닌 호출) 용도를 고려해 **공개 + CSRF 예외**로 최소 범위 적용했습니다.
+- 그 외 브라우저 기반 요청은 기본적으로 CSRF 보호를 유지합니다.
+- TODO: 해당 API는 추후 **API Key** 또는 **서버 간 인증** 도입을 검토해야 합니다.
+
+### 인증/인가 실패 동작
+- 인증되지 않은 사용자가 보호된 페이지에 접근하면 `/member/login` 으로 이동합니다.
+- 인증은 되었지만 권한이 부족한 경우 HTTP `403 Forbidden` 이 반환됩니다.
