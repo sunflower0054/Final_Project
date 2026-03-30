@@ -39,7 +39,35 @@ Spring Boot 4.x / Java 17 / Thymeleaf / JPA 기반의 오피스 모니터링 프
 - `security` 패키지에 `SecurityConfig` 추가
 - `BCryptPasswordEncoder` 빈 추가
 
+## 작업 2: 인증용 Member 도메인 최소 구현
+이번 단계에서는 **세션 기반 로그인에 필요한 최소 회원 인증 도메인**만 반영했습니다.
+
+### 인증/권한 모델
+- `Member` 엔티티 추가
+- `Role` enum 도입: `USER`, `ADMIN`
+- `MemberRepository` 추가 (`findByLoginId`)
+- `CustomUserDetailsService` 추가
+
+### 핵심 인증 필드
+`Member` 엔티티는 인증에 필요한 최소 필드를 포함합니다.
+- `loginId` (로그인 식별자)
+- `password` (암호화 저장)
+- `role` (권한: `USER` 또는 `ADMIN`)
+- `enabled` (계정 활성화 여부)
+
+### Spring Security 회원 조회 방식 (요약)
+- 사용자가 `/member/login`으로 로그인하면, Spring Security가 `UserDetailsService`를 통해 회원을 조회합니다.
+- 이 프로젝트에서는 `CustomUserDetailsService`가 `MemberRepository.findByLoginId(...)`로 사용자를 조회합니다.
+- 조회된 `Member` 정보를 `UserDetails`로 변환하여 인증에 사용합니다.
+
+### 비밀번호 저장 방식
+- 비밀번호는 `BCryptPasswordEncoder` 기반으로 저장/검증하는 것을 전제로 합니다.
+- 따라서 DB에는 **BCrypt 해시 값**이 저장되어야 합니다.
+
+### 현재 범위 아님
+- 회원가입(Registration) 전체 기능
+- 이메일 인증
+- OAuth/Social Login
+
 ## 다음 단계 예정
-- `Member` 엔티티 연동
-- `UserDetailsService` 구현
 - 권한(Role) 세분화 및 인가 정책 고도화

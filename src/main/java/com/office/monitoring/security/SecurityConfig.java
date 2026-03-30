@@ -1,5 +1,7 @@
 package com.office.monitoring.security;
 
+import com.office.monitoring.member.CustomUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,11 +10,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .userDetailsService(customUserDetailsService)
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
                     "/",
@@ -37,7 +43,6 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/")
             );
 
-        // TODO: Member/UserDetailsService 연동 후 인증 로직을 연결한다.
         return http.build();
     }
 
