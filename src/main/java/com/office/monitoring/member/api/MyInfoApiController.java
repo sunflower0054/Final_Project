@@ -5,14 +5,11 @@ import com.office.monitoring.member.dto.MyInfoResponse;
 import com.office.monitoring.member.dto.UpdateMyInfoRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,11 +24,7 @@ public class MyInfoApiController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateMyInfo(@Valid @RequestBody UpdateMyInfoRequest request) {
-        memberService.updateMyInfo(request);
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "내 정보가 수정되었습니다."
-        ));
+    public MyInfoResponse updateMyInfo(@Valid @RequestBody UpdateMyInfoRequest request) {
+        return memberService.updateMyInfo(request);
     }
 }
