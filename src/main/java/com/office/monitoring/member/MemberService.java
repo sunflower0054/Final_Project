@@ -56,13 +56,14 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateMyInfo(UpdateMyInfoRequest request) {
+    public MyInfoResponse updateMyInfo(UpdateMyInfoRequest request) {
         Member member = getCurrentMember();
         member.updateMyInfo(
                 request.name(),
                 request.phone(),
                 request.purpose()
         );
+        return MyInfoResponse.from(member);
     }
 
     private Member getCurrentMember() {
