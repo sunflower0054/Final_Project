@@ -1,184 +1,237 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관제 시스템 - 거주자 정보 수정</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/myinfo.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="app-wrapper">
 
-    <div th:replace="~{fragments/header :: header}"></div>
+<div th:replace="~{fragments/header :: header}"></div>
 
-    <div class="main-content">
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="menu-btn" onclick="history.back()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-                </button>
-                <h1 class="page-title">거주자 정보 수정</h1>
-            </div>
-            <div class="topbar-right">
-                <button class="icon-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </button>
-                <div class="profile-dropdown-wrap">
-                    <button class="icon-btn avatar-btn" id="profileBtn">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    </button>
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <div class="profile-dropdown-header">
-                            <div class="profile-avatar-lg">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            </div>
-                            <div>
-                                <div class="profile-name">홍길동</div>
-                                <div class="profile-role">관리자 · 스마트 관제 센터</div>
-                            </div>
-                        </div>
-                        <div class="profile-dropdown-footer">
-                            <a href="/myinfo/myinfo" class="btn-profile-detail">내 정보 상세보기</a>
-                            <button class="btn-profile-logout">로그아웃</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
+<div class="main-container">
+    <main class="content-area">
+        <div class="page-header">
+            <h2 class="page-title">거주자 정보 수정</h2>
+            <p class="page-subtitle">김영희 거주자님의 정보를 수정합니다. 변경 후 저장해주세요.</p>
+        </div>
 
-        <!-- 안내 배너 -->
-        <div style="background:#FFF3E0;border-bottom:1px solid #FFE0B2;padding:10px 20px;display:flex;align-items:center;gap:8px;font-size:12px;color:#F57C00">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <!-- 안내 배너 (myinfo 스타일에 맞게 조정) -->
+        <div style="background:#FFF3E0; border:1px solid #FFE0B2; border-radius:12px; padding:14px 20px; display:flex; align-items:center; gap:10px; font-size:14px; color:#F57C00; margin-bottom:24px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
             기존 정보를 불러왔습니다. 변경할 항목만 수정 후 저장해주세요.
         </div>
 
-        <div style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px">
+        <div style="display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 960px;">
 
-            <!-- 기본 정보 폼 -->
-            <div class="edit-form-card">
-                <div class="edit-form-title">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    기본 정보
+            <!-- 기본 정보 수정 카드 -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h3 class="card-title">기본 정보</h3>
                 </div>
-                <div class="edit-form-body">
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label class="form-label">이름 <span style="color:var(--red)">*</span></label>
-                            <input type="text" class="form-input" value="김영희">
-                        </div>
-                        <div class="form-field">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">이름 <span style="color:#E53935;">*</span></label>
+                        <input type="text" class="form-control" value="김영희">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
                             <label class="form-label">성별</label>
-                            <select class="form-input" style="cursor:pointer">
+                            <select class="form-control" style="cursor:pointer;">
                                 <option selected>여성</option>
                                 <option>남성</option>
                             </select>
                         </div>
+                        <!-- 생년월일 입력 영역 (교체용) -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">생년월일 <span style="color:#E53935;">*</span></label>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="text" id="birthYear" class="form-control" value="1948" maxlength="4"
+                                           style="text-align: center; font-size: 16px;" placeholder="1948"
+                                           oninput="if(this.value.length === 4) document.getElementById('birthMonth').focus();">
+                                    <span style="color:#64748b; font-weight:500; font-size:15px;">년</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">&nbsp;</label>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="text" id="birthMonth" class="form-control" value="3" maxlength="2"
+                                           style="text-align: center; font-size: 16px;" placeholder="3"
+                                           oninput="handleMonthDayInput(this, 'birthDay')">
+                                    <span style="color:#64748b; font-weight:500; font-size:15px;">월</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">&nbsp;</label>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="text" id="birthDay" class="form-control" value="12" maxlength="2"
+                                           style="text-align: center; font-size: 16px;" placeholder="12"
+                                           oninput="handleMonthDayInput(this)">
+                                    <span style="color:#64748b; font-weight:500; font-size:15px;">일</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 서버로 실제 전송할 hidden 필드 -->
+                        <input type="hidden" id="birthDateHidden" name="birthDate" value="1948-03-12">
                     </div>
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label class="form-label">생년월일 <span style="color:var(--red)">*</span></label>
-                            <input type="date" class="form-input" value="1948-03-12">
-                        </div>
-                        <div class="form-field">
-                            <label class="form-label">전화번호 <span style="color:var(--red)">*</span></label>
-                            <input type="tel" class="form-input" value="010-9876-5432">
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">전화번호 <span style="color:#E53935;">*</span></label>
+                        <input type="tel" class="form-control" value="010-9876-5432">
                     </div>
-                    <div class="form-row">
-                        <div class="form-field full">
-                            <label class="form-label">주소 <span style="color:var(--red)">*</span></label>
-                            <input type="text" class="form-input" value="서울시 강남구 역삼동 123-45, 2층">
-                            <span class="form-hint">상세 주소까지 입력해주세요</span>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">주소 <span style="color:#E53935;">*</span></label>
+                        <input type="text" class="form-control" value="서울시 강남구 역삼동 123-45, 2층">
+                        <span class="form-hint" style="font-size:13px; color:#64748b; margin-top:4px; display:block;">상세 주소까지 정확히 입력해주세요</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 건강 정보 폼 -->
-            <div class="edit-form-card">
-                <div class="edit-form-title">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                    건강 / 기저질환 정보
+            <!-- 건강 / 기저질환 정보 -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h3 class="card-title">건강 / 기저질환 정보</h3>
                 </div>
-                <div class="edit-form-body">
-                    <div class="form-row">
-                        <div class="form-field full">
-                            <label class="form-label">기저질환</label>
-                            <input type="text" class="form-input" value="고혈압, 당뇨, 골다공증">
-                            <span class="form-hint">쉼표(,)로 구분하여 입력 · 예: 고혈압, 당뇨</span>
-                        </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">기저질환</label>
+                        <input type="text" class="form-control" value="고혈압, 당뇨, 골다공증">
+                        <span class="form-hint" style="font-size:13px; color:#64748b;">쉼표(,)로 구분하여 입력하세요</span>
                     </div>
-                    <div class="form-row">
-                        <div class="form-field">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
                             <label class="form-label">복용 약물</label>
-                            <input type="text" class="form-input" value="혈압약, 인슐린">
+                            <input type="text" class="form-control" value="혈압약, 인슐린">
                         </div>
-                        <div class="form-field">
+                        <div class="form-group">
                             <label class="form-label">혈액형</label>
-                            <select class="form-input" style="cursor:pointer">
-                                <option>A형</option>
+                            <select class="form-control" style="cursor:pointer;">
+                                <option selected>A형</option>
                                 <option>B형</option>
                                 <option>O형</option>
                                 <option>AB형</option>
                             </select>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-field full">
-                            <label class="form-label">특이사항</label>
-                            <textarea class="form-textarea">낙상 이력 있음. 야간 이동 시 주의 필요.</textarea>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">특이사항</label>
+                        <textarea class="form-control" style="height: 100px; resize: vertical;">낙상 이력 있음. 야간 이동 시 주의 필요.</textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- 비상 연락처 폼 -->
-            <div class="edit-form-card">
-                <div class="edit-form-title">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.39 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    비상 연락처
+            <!-- 비상 연락처 -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h3 class="card-title">비상 연락처</h3>
                 </div>
-                <div class="edit-form-body">
-                    <div class="form-row">
-                        <div class="form-field">
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
                             <label class="form-label">보호자 이름</label>
-                            <input type="text" class="form-input" value="김민수">
+                            <input type="text" class="form-control" value="김민수">
                         </div>
-                        <div class="form-field">
+                        <div class="form-group">
                             <label class="form-label">관계</label>
-                            <input type="text" class="form-input" value="아들">
+                            <input type="text" class="form-control" value="아들">
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label class="form-label">보호자 연락처</label>
-                            <input type="tel" class="form-input" value="010-1234-9999">
-                        </div>
-                        <div class="form-field">
-                            <!-- empty -->
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">보호자 연락처</label>
+                        <input type="tel" class="form-control" value="010-1234-9999">
                     </div>
-                </div>
-                <div class="edit-form-footer">
-                    <button class="btn-secondary" style="font-size:12px;padding:9px 20px" onclick="history.back()">취소</button>
-                    <button class="btn-primary" style="font-size:12px;padding:9px 24px;border-radius:7px;width:auto;display:flex;align-items:center;gap:6px">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-                        저장하기
-                    </button>
                 </div>
             </div>
 
         </div>
-    </div>
+
+        <!-- 저장/취소 버튼 영역 -->
+        <div style="margin-top: 32px; display: flex; justify-content: flex-end; gap: 12px; max-width: 960px;">
+            <button onclick="history.back()"
+                    class="btn"
+                    style="background:#f8f9fa; color:#475569; border:1px solid #dee2e6; padding:12px 28px; font-weight:600;">
+                취소
+            </button>
+            <button onclick="alert('거주자 정보가 저장되었습니다.'); history.back()"
+                    class="btn btn-navy"
+                    style="padding:12px 32px; font-weight:600; display:flex; align-items:center; gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                    <polyline points="17 21 17 13 7 13 7 21"/>
+                </svg>
+                저장하기
+            </button>
+        </div>
+
+    </main>
 </div>
 
 <script>
-    const btn = document.getElementById('profileBtn');
-    const dropdown = document.getElementById('profileDropdown');
-    btn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
-    document.addEventListener('click', () => dropdown.classList.remove('open'));
-    dropdown.addEventListener('click', e => e.stopPropagation());
+    // 월/일 입력 시 1자리 → 자동으로 앞에 0 붙여서 처리
+    function handleMonthDayInput(input, nextFieldId = null) {
+        let value = input.value.trim();
+
+        // 숫자만 허용
+        value = value.replace(/[^0-9]/g, '');
+
+        // 1자리 입력 시 (예: 3 → 03)
+        if (value.length === 1 && value !== '0') {
+            value = '0' + value;
+        }
+
+        input.value = value;
+
+        // 자동 포커스 이동 (월 → 일)
+        if (nextFieldId && value.length === 2) {
+            document.getElementById(nextFieldId).focus();
+        }
+
+        updateBirthDate(); // hidden 필드 업데이트
+    }
+
+    // hidden 필드에 YYYY-MM-DD 형식으로 자동 저장
+    function updateBirthDate() {
+        const year = document.getElementById('birthYear').value.padStart(4, '0');
+        let month = document.getElementById('birthMonth').value;
+        let day = document.getElementById('birthDay').value;
+
+        // 월/일이 한 자리면 0 자동 추가
+        if (month.length === 1) month = '0' + month;
+        if (day.length === 1) day = '0' + day;
+
+        const fullDate = `${year}-${month}-${day}`;
+        document.getElementById('birthDateHidden').value = fullDate;
+    }
+
+    // 입력 제한 및 이벤트 연결
+    document.addEventListener('DOMContentLoaded', () => {
+        const year = document.getElementById('birthYear');
+        const month = document.getElementById('birthMonth');
+        const day = document.getElementById('birthDay');
+
+        [year, month, day].forEach(input => {
+            input.addEventListener('input', () => {
+                // 숫자만 입력 허용
+                input.value = input.value.replace(/[^0-9]/g, '');
+            });
+            input.addEventListener('keypress', (e) => {
+                if (!/[0-9]/.test(e.key)) e.preventDefault();
+            });
+        });
+
+        // 초기 실행
+        updateBirthDate();
+    });
 </script>
+
+<script th:src="@{/js/dropdown.js}"></script>
+
 </body>
 </html>
