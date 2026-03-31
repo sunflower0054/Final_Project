@@ -82,7 +82,7 @@ public class SecurityConfig {
                             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
                             String username = authentication.getName();
-                            Member member = memberRepository.findByLoginId(username).orElse(null);
+                            Member member = memberRepository.findByUsername(username).orElse(null);
                             String name = member != null ? member.getName() : username;
                             String role = member != null ? member.getRole().name() : "";
 
