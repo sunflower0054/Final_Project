@@ -29,7 +29,7 @@ public class Member {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 20)
     private String phone;
 
     @Enumerated(EnumType.STRING)
