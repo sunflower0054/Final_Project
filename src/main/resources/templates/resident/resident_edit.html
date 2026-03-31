@@ -88,8 +88,21 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">주소 <span style="color:#E53935;">*</span></label>
-                        <input type="text" class="form-control" value="서울시 강남구 역삼동 123-45, 2층">
-                        <span class="form-hint" style="font-size:13px; color:#64748b; margin-top:4px; display:block;">상세 주소까지 정확히 입력해주세요</span>
+
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="postcode" class="form-control" placeholder="우편번호" readonly style="max-width:150px;">
+                            <button type="button" onclick="execDaumPostcode()"
+                                    style="padding:8px 12px; background:#1e3a5f; color:white; border:none; border-radius:6px; cursor:pointer;">
+                                주소 검색
+                            </button>
+                        </div>
+
+                        <input type="text" id="address" class="form-control" placeholder="주소" readonly style="margin-top:8px;">
+                        <input type="text" id="detailAddress" class="form-control" placeholder="상세주소" style="margin-top:8px;">
+
+                        <span class="form-hint" style="font-size:13px; color:#64748b; margin-top:4px; display:block;">
+                            상세 주소까지 정확히 입력해주세요
+                        </span>
                     </div>
                 </div>
             </div>
@@ -231,7 +244,33 @@
     });
 </script>
 
+<script>
+    function execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+
+                let addr = '';
+
+                // 도로명 / 지번 선택
+                if (data.userSelectedType === 'R') {
+                    addr = data.roadAddress;
+                } else {
+                    addr = data.jibunAddress;
+                }
+
+                // 값 넣기
+                document.getElementById('postcode').value = data.zonecode;
+                document.getElementById('address').value = addr;
+
+                // 상세주소 포커스
+                document.getElementById('detailAddress').focus();
+            }
+        }).open();
+    }
+</script>
+
 <script th:src="@{/js/dropdown.js}"></script>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 </body>
 </html>
