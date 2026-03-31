@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.nullValue;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -88,6 +89,7 @@ class MonitoringApplicationTests {
             .andExpect(jsonPath("$.username").value("user"))
             .andExpect(jsonPath("$.name").value("테스트 사용자"))
             .andExpect(jsonPath("$.role").value("FAMILY"))
+            .andExpect(jsonPath("$.token").value(nullValue()))
             .andExpect(jsonPath("$.message").value("로그인 성공"));
     }
 
