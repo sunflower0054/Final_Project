@@ -43,6 +43,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // Validation (입력값 검증)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     // 개발 편의 도구 (서버 자동 재시작)
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
