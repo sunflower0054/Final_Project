@@ -1,5 +1,6 @@
 package com.office.monitoring.aiSettings;
 
+import com.office.monitoring.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +15,17 @@ import java.util.Map;
 public class AiSettingsAPIController {
 
     private final AiSettingsService aiSettingsService;
+    private final CurrentUserService currentUserService;
 
-    // 현재 설정값 조회
     @GetMapping
     public ResponseEntity<?> getSettings() {
         try {
-            AiSettings settings = aiSettingsService.getSettings();
+            AiSettings settings = aiSettingsService.getSettings(currentUserService.getUsername());
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "fallSensitivity",    settings.getFallSensitivity(),
-                    "noMotionThreshold",  settings.getNoMotionThreshold(),
-                    "velocityThreshold",  settings.getVelocityThreshold()
+                    "fallSensitivity", settings.getFallSensitivity(),
+                    "noMotionThreshold", settings.getNoMotionThreshold(),
+                    "velocityThreshold", settings.getVelocityThreshold()
             ));
         } catch (Exception e) {
             log.error("❌ 설정값 조회 실패", e);
@@ -35,7 +36,6 @@ public class AiSettingsAPIController {
         }
     }
 
-    // 슬라이더 값 변경 시 호출
     @PutMapping
     public ResponseEntity<?> updateSettings(@RequestBody AiSettingsDto dto) {
         try {
@@ -43,12 +43,14 @@ public class AiSettingsAPIController {
                     dto.getFallSensitivity(),
                     dto.getNoMotionThreshold(),
                     dto.getVelocityThreshold());
-            AiSettings saved = aiSettingsService.updateSettings(dto);
+
+            AiSettings saved = aiSettingsService.updateSettings(currentUserService.getUsername(), dto);
+
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "fallSensitivity",    saved.getFallSensitivity(),
-                    "noMotionThreshold",  saved.getNoMotionThreshold(),
-                    "velocityThreshold",  saved.getVelocityThreshold()
+                    "fallSensitivity", saved.getFallSensitivity(),
+                    "noMotionThreshold", saved.getNoMotionThreshold(),
+                    "velocityThreshold", saved.getVelocityThreshold()
             ));
         } catch (Exception e) {
             log.error("❌ 설정값 변경 실패", e);

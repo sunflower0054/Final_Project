@@ -5,6 +5,7 @@ import com.office.monitoring.member.dto.RegisterRequest;
 import com.office.monitoring.member.dto.RegisterResponse;
 import com.office.monitoring.member.dto.UpdateMyInfoRequest;
 import com.office.monitoring.member.dto.WithdrawResponse;
+import com.office.monitoring.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final WithdrawnUserRepository withdrawnUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CurrentUserService currentUserService;
 
     public boolean checkUsernameAvailable(String username) {
         if (username == null || username.isBlank()) {
@@ -50,13 +52,13 @@ public class MemberService {
         return new RegisterResponse(true, "회원가입이 완료되었습니다.");
     }
 
-    public MyInfoResponse getMyInfo(String username) {
-        return MyInfoResponse.from(getMemberByUsername(username));
+    public MyInfoResponse getMyInfo() {
+        return MyInfoResponse.from(currentUserService.getCurrentMember());
     }
 
     @Transactional
-    public MyInfoResponse updateMyInfo(String username, UpdateMyInfoRequest request) {
-        Member member = getMemberByUsername(username);
+    public MyInfoResponse updateMyInfo(UpdateMyInfoRequest request) {
+        Member member = currentUserService.getCurrentMember();
         member.updateMyInfo(
                 request.name(),
                 request.phone(),
@@ -66,8 +68,8 @@ public class MemberService {
     }
 
     @Transactional
-    public WithdrawResponse withdraw(String username) {
-        Member member = getMemberByUsername(username);
+    public WithdrawResponse withdraw() {
+        Member member = currentUserService.getCurrentMember();
 
         WithdrawnUser withdrawnUser = WithdrawnUser.from(member);
         withdrawnUserRepository.save(withdrawnUser);
@@ -75,14 +77,5 @@ public class MemberService {
         memberRepository.delete(member);
 
         return new WithdrawResponse(true, "회원탈퇴가 완료되었습니다.");
-    }
-
-    private Member getMemberByUsername(String username) {
-        if (username == null || username.isBlank()) {
-            throw new IllegalStateException("로그인한 사용자만 이용할 수 있습니다.");
-        }
-
-        return memberRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalStateException("현재 로그인한 사용자를 찾을 수 없습니다."));
     }
 }
