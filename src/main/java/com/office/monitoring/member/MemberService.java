@@ -4,6 +4,7 @@ import com.office.monitoring.member.dto.MyInfoResponse;
 import com.office.monitoring.member.dto.RegisterRequest;
 import com.office.monitoring.member.dto.RegisterResponse;
 import com.office.monitoring.member.dto.UpdateMyInfoRequest;
+import com.office.monitoring.member.dto.WithdrawResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final WithdrawnUserRepository withdrawnUserRepository;
     private final PasswordEncoder passwordEncoder;
 
     public boolean checkUsernameAvailable(String username) {
@@ -61,6 +63,18 @@ public class MemberService {
                 request.purpose()
         );
         return MyInfoResponse.from(member);
+    }
+
+    @Transactional
+    public WithdrawResponse withdraw(String username) {
+        Member member = getMemberByUsername(username);
+
+        WithdrawnUser withdrawnUser = WithdrawnUser.from(member);
+        withdrawnUserRepository.save(withdrawnUser);
+
+        memberRepository.delete(member);
+
+        return new WithdrawResponse(true, "회원탈퇴가 완료되었습니다.");
     }
 
     private Member getMemberByUsername(String username) {
