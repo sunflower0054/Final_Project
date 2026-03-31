@@ -5,9 +5,6 @@ import com.office.monitoring.member.dto.RegisterRequest;
 import com.office.monitoring.member.dto.RegisterResponse;
 import com.office.monitoring.member.dto.UpdateMyInfoRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,13 +48,13 @@ public class MemberService {
         return new RegisterResponse(true, "회원가입이 완료되었습니다.");
     }
 
-    public MyInfoResponse getMyInfo() {
-        return MyInfoResponse.from(getCurrentMember());
+    public MyInfoResponse getMyInfo(String username) {
+        return MyInfoResponse.from(getMemberByUsername(username));
     }
 
     @Transactional
-    public MyInfoResponse updateMyInfo(UpdateMyInfoRequest request) {
-        Member member = getCurrentMember();
+    public MyInfoResponse updateMyInfo(String username, UpdateMyInfoRequest request) {
+        Member member = getMemberByUsername(username);
         member.updateMyInfo(
                 request.name(),
                 request.phone(),
@@ -66,16 +63,10 @@ public class MemberService {
         return MyInfoResponse.from(member);
     }
 
-    private Member getCurrentMember() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null
-                || !authentication.isAuthenticated()
-                || authentication instanceof AnonymousAuthenticationToken) {
+    private Member getMemberByUsername(String username) {
+        if (username == null || username.isBlank()) {
             throw new IllegalStateException("로그인한 사용자만 이용할 수 있습니다.");
         }
-
-        String username = authentication.getName();
 
         return memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalStateException("현재 로그인한 사용자를 찾을 수 없습니다."));
