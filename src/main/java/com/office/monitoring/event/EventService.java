@@ -28,8 +28,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final EventImageRepository eventImageRepository;
     private final ResidentRepository residentRepository;
-
-    private final JsonMapper objectMapper = new JsonMapper();
+    private final JsonMapper objectMapper;
 
     private static final Path IMAGE_DIR =
             Paths.get(System.getProperty("user.dir"), "uploads", "events");
