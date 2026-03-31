@@ -233,7 +233,7 @@ class MonitoringApplicationTests {
     void 비로그인_상태_GET_myinfo_API_접근시_인증진입점_리다이렉트() throws Exception {
         mockMvc.perform(get("/api/v1/my-info"))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("http://localhost/member/login"));
+            .andExpect(redirectedUrl("/member/login"));
     }
 
     @Test
