@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
     @UniqueConstraint(name = "uk_users_username", columnNames = "username")
 })
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -56,5 +55,11 @@ public class Member {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
+    }
+
+    public void updateMyInfo(String name, String phone, String purpose) {
+        this.name = name.trim();
+        this.phone = phone.trim();
+        this.purpose = purpose.trim();
     }
 }
