@@ -99,7 +99,7 @@ Spring Boot 4.x / Java 17 / Thymeleaf / JPA 기반의 오피스 모니터링 프
 
 | 구분 | 경로 |
 |---|---|
-| 공개 접근 가능 (`permitAll`) | `/`, `/index`, `/index/**`, `/member/login`, `/member/register`, `/css/**`, `/js/**`, `/images/**`, `/favicon.ico`, `POST /api/v1/events/receive` |
+| 공개 접근 가능 (`permitAll`) | `/`, `/index`, `/index/**`, `/member/login`, `/member/register`, `/api/v1/auth/**`, `/css/**`, `/js/**`, `/images/**`, `/favicon.ico`, `POST /api/v1/events/receive` |
 | 로그인 필요 (`authenticated`) | `/camera/**`, `/events/**`, `/report/**`, `/myinfo/**`, `/resident/detail` |
 | 관리자 전용 (`hasRole("ADMIN")`) | `/setting/**`, `/resident/edit`, `/resident/register`, `/api/v1/settings/**` |
 | 기본 정책 | 위 매핑 외 모든 요청은 인증 필요 |

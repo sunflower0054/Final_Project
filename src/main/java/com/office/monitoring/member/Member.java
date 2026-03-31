@@ -39,7 +39,7 @@ public class Member {
     @Column(name = "birth_year")
     private Integer birthYear;
 
-    @Column
+    @Column(length = 255)
     private String purpose;
 
     @Column(name = "resident_id")
@@ -50,6 +50,9 @@ public class Member {
 
     @PrePersist
     protected void onCreate() {
+        if (role == null) {
+            role = Role.FAMILY;
+        }
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
