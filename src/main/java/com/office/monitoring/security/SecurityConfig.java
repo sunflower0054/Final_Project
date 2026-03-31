@@ -86,8 +86,10 @@ public class SecurityConfig {
                             String name = member != null ? member.getName() : username;
                             String role = member != null ? member.getRole().name() : "";
 
+                            // NOTE: Authentication is handled by the HTTP session (JSESSIONID).
+                            // `token` is returned as `null` only for response-contract compatibility.
                             response.getWriter().write("""
-                                {"success":true,"username":"%s","name":"%s","role":"%s","message":"로그인 성공"}
+                                {"success":true,"username":"%s","name":"%s","role":"%s","token":null,"message":"로그인 성공"}
                                 """.formatted(escapeJson(username), escapeJson(name), escapeJson(role)).trim());
                         })
                         .failureHandler((request, response, exception) -> {
