@@ -243,42 +243,6 @@ body {
     transform: translateX(2px); /* 호버 시 아이콘이 오른쪽으로 살짝 이동 */
 }
 
-/* 모든 알림 보기 버튼 - 모던 스타일 */
-.btn-profile-detail {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 100%;
-    padding: 10px;
-    background-color: #ffffff;
-    color: var(--gray-600); /* 은은한 그레이 */
-    border: 1px solid var(--gray-200);
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-/* 마우스를 올렸을 때 (Hover) */
-.btn-profile-detail:hover {
-    background-color: var(--gray-50);
-    color: var(--navy); /* 강조색인 네이비로 변경 */
-    border-color: var(--navy-mid);
-    box-shadow: 0 2px 6px rgba(59, 91, 157, 0.08);
-}
-
-/* 아이콘 애니메이션 */
-.btn-profile-detail svg {
-    transition: transform 0.2s ease;
-}
-
-.btn-profile-detail:hover svg {
-    transform: scale(1.1); /* 살짝 커지는 효과 */
-}
-
 
 /* 추가된 css */
 .tl-meta-grid {
@@ -437,3 +401,46 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 .loading-overlay.show { display: flex; }
 .spinner { width: 44px; height: 44px; border: 4px solid var(--gray-200); border-top-color: var(--error); border-radius: 50%; animation: spin .8s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+
+/* =========================================================
+   [화면 표시 설정 전용 CSS - setting.html 추가분]
+   ========================================================= */
+
+/* 언어 선택 옵션 */
+.lang-option {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 8px; border: 1.5px solid var(--gray-200);
+    font-size: 13px; font-weight: 600; color: var(--gray-600);
+    cursor: pointer; transition: all .15s; background: #fff; user-select: none;
+}
+.lang-option:hover { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
+.lang-option.active { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
+
+/* 테마 선택 버튼 */
+.theme-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 8px; border: 1.5px solid var(--gray-200);
+    font-size: 13px; font-weight: 600; color: var(--gray-600);
+    cursor: pointer; transition: all .15s; background: #fff;
+}
+.theme-btn:hover { border-color: var(--navy); color: var(--navy); background: var(--navy-light); }
+.theme-btn.active { border-color: var(--navy); color: var(--navy); background: var(--navy-light); }
+
+/* 글꼴 슬라이더 */
+.slider-font { color: #16A34A; }
+.slider-font::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, #16A34A 0%, #16A34A var(--pct, 50%), var(--gray-200) var(--pct, 50%));
+    border-radius: 3px; height: 6px;
+}
+.slider-font::-webkit-slider-thumb { border-color: #16A34A; }
+/* 실시간 연동 실패 뱃지 */
+.status-badge.badge-fail {
+    background: var(--error-bg);
+    color: var(--error);
+    animation: pulse-fail 1.4s ease-in-out infinite;
+}
+@keyframes pulse-fail {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.45; }
+}

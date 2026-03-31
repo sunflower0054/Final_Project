@@ -17,7 +17,7 @@
     <div class="top-row">
         <section class="content-card">
             <div class="monitoring-box">
-<!--                <img src="http://192.168.0.79:5005/video_feed" alt="Realtime Video">-->
+                <img src="http://192.168.0.23:5005/video_feed" alt="Realtime Video">
                 <div class="live-indicator"><div class="live-dot"></div> LIVE MONITORING</div>
             </div>
         </section>
@@ -39,7 +39,7 @@
     <section class="content-card">
         <div class="risk-score-section">
             <div class="score-info">
-                <div class="label">오늘의 위험 지수</div>
+                <div class="label">최근 7일 위험 지수 <span id="dateRangeLabel" style="font-size:13px; font-weight:500; color:var(--gray-400); margin-left:8px;"></span></div>
                 <div id="scoreText" class="val">130 <span style="font-size:18px; color:var(--gray-400); font-weight:600;">/ 200</span></div>
             </div>
             <div class="progress-container"><div id="progressBar" class="progress-bar" style="width: 0%;"></div></div>
@@ -55,7 +55,7 @@
                     <span class="pill pill-purple">폭행 1건</span>
                 </div>
                 <div class="date-picker-wrapper">
-                    <input type="date" id="eventDate" value="2026-03-25" onchange="fetchDataByDate(this.value)">
+                    <input type="date" id="eventDate" value="2026-03-25">
                     <div class="calendar-icon">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
@@ -233,6 +233,14 @@
         });
     }
 
+    function updateDateRangeLabel(dateStr) {
+        const end = new Date(dateStr);
+        const start = new Date(dateStr);
+        start.setDate(start.getDate() - 6);
+        const fmt = (d) => (d.getMonth() + 1) + '/' + d.getDate();
+        document.getElementById('dateRangeLabel').innerText = '(' + fmt(start) + ' ~ ' + fmt(end) + ')';
+    }
+
     function initialize() {
         updateClock();
         setInterval(updateClock, 1000);
@@ -241,6 +249,20 @@
         setupDropdown('profileBtn', 'profileDropdown');
         document.addEventListener('click', closeDropdownsOnOutside);
         preventCloseInsideDropdown();
+
+        const dateInput = document.getElementById('eventDate');
+        if (dateInput) {
+            // 초기 날짜 범위 표시
+            updateDateRangeLabel(dateInput.value);
+            // 날짜 변경 이벤트 (change + input 둘 다 감지)
+            dateInput.addEventListener('change', function() {
+                updateDateRangeLabel(this.value);
+                if (typeof fetchDataByDate === 'function') fetchDataByDate(this.value);
+            });
+            dateInput.addEventListener('input', function() {
+                updateDateRangeLabel(this.value);
+            });
+        }
     }
 
     window.addEventListener('load', initialize);
