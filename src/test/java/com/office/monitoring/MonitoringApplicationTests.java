@@ -41,21 +41,19 @@ class MonitoringApplicationTests {
         memberRepository.deleteAll();
 
         memberRepository.save(Member.builder()
-            .loginId("user")
+            .username("user")
             .password(passwordEncoder.encode("user1234!"))
             .name("테스트 사용자")
-            .email("user@test.local")
+            .phone("010-2222-2222")
             .role(Role.FAMILY)
-            .enabled(true)
             .build());
 
         memberRepository.save(Member.builder()
-            .loginId("admin")
+            .username("admin")
             .password(passwordEncoder.encode("admin1234!"))
             .name("테스트 관리자")
-            .email("admin@test.local")
+            .phone("010-3333-3333")
             .role(Role.ADMIN)
-            .enabled(true)
             .build());
     }
 
