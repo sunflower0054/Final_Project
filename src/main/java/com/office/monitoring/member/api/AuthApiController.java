@@ -9,7 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
@@ -38,22 +39,13 @@ public class AuthApiController {
     }
 
     @DeleteMapping("/withdraw")
-    public WithdrawResponse withdraw(@AuthenticationPrincipal UserDetails principal,
-                                     HttpServletRequest request,
+    public WithdrawResponse withdraw(HttpServletRequest request,
                                      HttpServletResponse response) {
-        String username = extractUsername(principal);
+        WithdrawResponse result = memberService.withdraw();
 
-        WithdrawResponse result = memberService.withdraw(username);
-
-        new SecurityContextLogoutHandler().logout(request, response, null);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        new SecurityContextLogoutHandler().logout(request, response, authentication);
 
         return result;
-    }
-
-    private String extractUsername(UserDetails principal) {
-        if (principal == null || principal.getUsername().isBlank()) {
-            throw new IllegalStateException("현재 로그인한 사용자를 확인할 수 없습니다.");
-        }
-        return principal.getUsername();
     }
 }

@@ -62,4 +62,8 @@ public class Member {
         this.phone = phone.trim();
         this.purpose = purpose.trim();
     }
+
+    public void assignResident(Long residentId) {
+        this.residentId = residentId;
+    }
 }
