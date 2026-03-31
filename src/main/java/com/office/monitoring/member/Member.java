@@ -29,7 +29,7 @@ public class Member {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 30)
     private String phone;
 
     @Enumerated(EnumType.STRING)
@@ -39,7 +39,7 @@ public class Member {
     @Column(name = "birth_year")
     private Integer birthYear;
 
-    @Column(length = 255)
+    @Column
     private String purpose;
 
     @Column(name = "resident_id")
