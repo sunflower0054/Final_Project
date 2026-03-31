@@ -3,9 +3,11 @@ package com.office.monitoring.member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "members", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_members_login_id", columnNames = "login_id")
+@Table(name = "users", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_users_username", columnNames = "username")
 })
 @Getter
 @Setter
@@ -18,23 +20,38 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login_id", nullable = false, length = 50)
-    private String loginId;
+    @Column(name = "username", nullable = false, length = 50)
+    private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(nullable = false, length = 100)
-    private String email;
+    @Column(nullable = false, length = 20)
+    private String phone;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private boolean enabled = true;
+    @Column(name = "birth_year")
+    private Integer birthYear;
+
+    @Column(length = 255)
+    private String purpose;
+
+    @Column(name = "resident_id")
+    private Long residentId;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

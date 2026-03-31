@@ -25,21 +25,19 @@ public class DefaultMemberInitializer implements CommandLineRunner {
         }
 
         memberRepository.save(Member.builder()
-            .loginId("admin")
+            .username("admin")
             .password(passwordEncoder.encode("admin1234!"))
             .name("관리자")
-            .email("admin@office.local")
+            .phone("010-0000-0000")
             .role(Role.ADMIN)
-            .enabled(true)
             .build());
 
         memberRepository.save(Member.builder()
-            .loginId("user")
+            .username("user")
             .password(passwordEncoder.encode("user1234!"))
             .name("사용자")
-            .email("user@office.local")
+            .phone("010-1111-1111")
             .role(Role.FAMILY)
-            .enabled(true)
             .build());
 
         log.info("기본 계정(admin/user)을 생성했습니다. (profile: local/dev)");
