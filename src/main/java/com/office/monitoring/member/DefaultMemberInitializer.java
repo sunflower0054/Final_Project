@@ -38,7 +38,7 @@ public class DefaultMemberInitializer implements CommandLineRunner {
             .password(passwordEncoder.encode("user1234!"))
             .name("사용자")
             .email("user@office.local")
-            .role(Role.USER)
+            .role(Role.FAMILY)
             .enabled(true)
             .build());
 
