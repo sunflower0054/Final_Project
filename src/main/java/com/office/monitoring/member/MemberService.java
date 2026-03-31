@@ -1,0 +1,88 @@
+package com.office.monitoring.member;
+
+import com.office.monitoring.member.dto.MyInfoResponse;
+import com.office.monitoring.member.dto.RegisterRequest;
+import com.office.monitoring.member.dto.RegisterResponse;
+import com.office.monitoring.member.dto.UpdateMyInfoRequest;
+import com.office.monitoring.member.dto.WithdrawResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class MemberService {
+
+    private final MemberRepository memberRepository;
+    private final WithdrawnUserRepository withdrawnUserRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public boolean checkUsernameAvailable(String username) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("아이디는 필수입니다.");
+        }
+
+        String normalizedUsername = username.trim();
+        return memberRepository.findByUsername(normalizedUsername).isEmpty();
+    }
+
+    @Transactional
+    public RegisterResponse register(RegisterRequest request) {
+        String username = request.username().trim();
+
+        if (memberRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+        }
+
+        Member member = Member.builder()
+                .username(username)
+                .password(passwordEncoder.encode(request.password().trim()))
+                .name(request.name().trim())
+                .phone(request.phone().trim())
+                .purpose(request.purpose().trim())
+                .role(Role.FAMILY)
+                .build();
+
+        memberRepository.save(member);
+
+        return new RegisterResponse(true, "회원가입이 완료되었습니다.");
+    }
+
+    public MyInfoResponse getMyInfo(String username) {
+        return MyInfoResponse.from(getMemberByUsername(username));
+    }
+
+    @Transactional
+    public MyInfoResponse updateMyInfo(String username, UpdateMyInfoRequest request) {
+        Member member = getMemberByUsername(username);
+        member.updateMyInfo(
+                request.name(),
+                request.phone(),
+                request.purpose()
+        );
+        return MyInfoResponse.from(member);
+    }
+
+    @Transactional
+    public WithdrawResponse withdraw(String username) {
+        Member member = getMemberByUsername(username);
+
+        WithdrawnUser withdrawnUser = WithdrawnUser.from(member);
+        withdrawnUserRepository.save(withdrawnUser);
+
+        memberRepository.delete(member);
+
+        return new WithdrawResponse(true, "회원탈퇴가 완료되었습니다.");
+    }
+
+    private Member getMemberByUsername(String username) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalStateException("로그인한 사용자만 이용할 수 있습니다.");
+        }
+
+        return memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("현재 로그인한 사용자를 찾을 수 없습니다."));
+    }
+}

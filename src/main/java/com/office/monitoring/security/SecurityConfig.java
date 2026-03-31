@@ -3,9 +3,11 @@ package com.office.monitoring.security;
 import com.office.monitoring.member.CustomUserDetailsService;
 import com.office.monitoring.member.Member;
 import com.office.monitoring.member.MemberRepository;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,10 +16,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.HttpStatusAccessDeniedHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import java.nio.charset.StandardCharsets;
@@ -34,43 +36,64 @@ public class SecurityConfig {
         http
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf
-                        // TODO: POST /api/v1/events/receive 엔드포인트는 추후 API Key 또는 서버 간 인증 도입 검토 필요
                         .ignoringRequestMatchers(
                                 PathPatternRequestMatcher.withDefaults()
                                         .matcher(HttpMethod.POST, "/api/v1/auth/login"),
                                 PathPatternRequestMatcher.withDefaults()
                                         .matcher(HttpMethod.POST, "/api/v1/auth/logout"),
                                 PathPatternRequestMatcher.withDefaults()
-                                        .matcher(HttpMethod.POST, "/api/v1/events/receive")
+                                        .matcher(HttpMethod.POST, "/api/v1/events/receive"),
+                                PathPatternRequestMatcher.withDefaults()
+                                        .matcher(HttpMethod.POST, "/api/v1/daily-activity")
                         )
                 )
                 .authorizeHttpRequests(authorize -> authorize
+                        // 정적 리소스 + 공개 페이지
                         .requestMatchers(
                                 "/",
                                 "/index",
                                 "/index/**",
                                 "/member/login",
                                 "/member/register",
-                                "/api/v1/auth/**",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
                                 "/favicon.ico"
                         ).permitAll()
+
+                        // 회원 공개 API
+                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/check-username").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+
+                        // 내부 통신 공개 API
                         .requestMatchers(HttpMethod.POST, "/api/v1/events/receive").permitAll()
-                        .requestMatchers(
-                                "/setting/**",
-                                "/resident/edit",
-                                "/resident/register",
-                                "/api/v1/settings/**"
-                        ).hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/daily-activity").permitAll()
+
+                        // 관리자 전용
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // 로그인 필수 회원 API
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/auth/withdraw").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/my-info").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/my-info").authenticated()
+
+                        // 그 외 API는 로그인 필요
+                        .requestMatchers("/api/v1/**").authenticated()
+
+                        // 페이지 접근
                         .requestMatchers(
                                 "/camera/**",
                                 "/events/**",
                                 "/report/**",
                                 "/myinfo/**",
-                                "/resident/detail"
+                                "/resident/detail",
+                                "/resident/register",
+                                "/resident/edit",
+                                "/setting/**"
                         ).authenticated()
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -86,11 +109,26 @@ public class SecurityConfig {
                             String name = member != null ? member.getName() : username;
                             String role = member != null ? member.getRole().name() : "";
 
-                            // NOTE: Authentication is handled by the HTTP session (JSESSIONID).
-                            // `token` is returned as `null` only for response-contract compatibility.
+                            if (request.getSession(false) != null) {
+                                boolean jsessionAlreadySet = response.getHeaders(HttpHeaders.SET_COOKIE).stream()
+                                        .anyMatch(header -> header.startsWith("JSESSIONID="));
+
+                                if (!jsessionAlreadySet) {
+                                    Cookie sessionCookie = new Cookie("JSESSIONID", request.getSession(false).getId());
+                                    sessionCookie.setHttpOnly(true);
+                                    sessionCookie.setPath("/");
+                                    sessionCookie.setSecure(request.isSecure());
+                                    response.addCookie(sessionCookie);
+                                }
+                            }
+
                             response.getWriter().write("""
                                 {"success":true,"username":"%s","name":"%s","role":"%s","token":null,"message":"로그인 성공"}
-                                """.formatted(escapeJson(username), escapeJson(name), escapeJson(role)).trim());
+                                """.formatted(
+                                    escapeJson(username),
+                                    escapeJson(name),
+                                    escapeJson(role)
+                            ).trim());
                         })
                         .failureHandler((request, response, exception) -> {
                             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -109,7 +147,9 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/api/v1/auth/logout")
                         .addLogoutHandler((request, response, authentication) -> {
-                            Authentication current = authentication != null ? authentication : SecurityContextHolder.getContext().getAuthentication();
+                            Authentication current = authentication != null
+                                    ? authentication
+                                    : SecurityContextHolder.getContext().getAuthentication();
                             new SecurityContextLogoutHandler().logout(request, response, current);
                         })
                         .logoutSuccessHandler((request, response, authentication) -> {
