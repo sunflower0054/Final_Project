@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인</title>
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
 
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -201,9 +203,7 @@
             로그아웃되었습니다.
         </div>
 
-        <form method="post" action="/member/login">
-            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-
+        <form id="loginForm" method="post" action="/api/v1/auth/login">
             <div class="input-group">
                 <input type="text" class="input-box" name="username" placeholder="아이디" aria-label="아이디" required>
                 <input type="password" class="input-box" name="password" placeholder="비밀번호" aria-label="비밀번호" required>
@@ -226,5 +226,34 @@
 
 </div>
 
+<script>
+    const loginForm = document.getElementById('loginForm');
+
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(loginForm);
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+        const headers = {};
+
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
+        }
+
+        const response = await fetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers,
+            body: formData
+        });
+
+        if (response.ok) {
+            window.location.href = '/';
+            return;
+        }
+
+        window.location.href = '/member/login?error';
+    });
+</script>
 </body>
 </html>

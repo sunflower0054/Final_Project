@@ -30,9 +30,9 @@ Spring Boot 4.x / Java 17 / Thymeleaf / JPA 기반의 오피스 모니터링 프
 
 ### 로그인/로그아웃 경로
 - 로그인 페이지: `/member/login`
-- 로그인 처리: `POST /member/login`
-- 로그아웃: `/member/logout`
-- 로그인 성공 시 기본 이동 경로: `/`
+- 로그인 처리: `POST /api/v1/auth/login`
+- 로그아웃: `POST /api/v1/auth/logout`
+- 인증은 HTTP 세션(JSESSIONID) 기반으로 유지됩니다.
 
 ### 이번 단계 변경 사항
 - `build.gradle`에 Spring Security 의존성 추가
@@ -44,20 +44,22 @@ Spring Boot 4.x / Java 17 / Thymeleaf / JPA 기반의 오피스 모니터링 프
 
 ### 인증/권한 모델
 - `Member` 엔티티 추가
-- `Role` enum 도입: `USER`, `ADMIN`
-- `MemberRepository` 추가 (`findByLoginId`)
+- `Role` enum 사용: `FAMILY`, `ADMIN`
+- `MemberRepository` 조회 메서드: `findByUsername`
 - `CustomUserDetailsService` 추가
 
 ### 핵심 인증 필드
-`Member` 엔티티는 인증에 필요한 최소 필드를 포함합니다.
-- `loginId` (로그인 식별자)
+`Member` 엔티티는 `users` 테이블에 매핑되며 인증/회원 식별에 아래 필드를 사용합니다.
+- `username` (로그인 식별자)
 - `password` (암호화 저장)
-- `role` (권한: `USER` 또는 `ADMIN`)
-- `enabled` (계정 활성화 여부)
+- `name`
+- `phone`
+- `role` (`FAMILY` 또는 `ADMIN`)
+- `birth_year` / `purpose` / `resident_id` / `created_at` (부가 필드)
 
 ### Spring Security 회원 조회 방식 (요약)
 - 사용자가 `/member/login`으로 로그인하면, Spring Security가 `UserDetailsService`를 통해 회원을 조회합니다.
-- 이 프로젝트에서는 `CustomUserDetailsService`가 `MemberRepository.findByLoginId(...)`로 사용자를 조회합니다.
+- 이 프로젝트에서는 `CustomUserDetailsService`가 `MemberRepository.findByUsername(...)`로 사용자를 조회합니다.
 - 조회된 `Member` 정보를 `UserDetails`로 변환하여 인증에 사용합니다.
 
 ### 비밀번호 저장 방식
@@ -74,12 +76,12 @@ Spring Boot 4.x / Java 17 / Thymeleaf / JPA 기반의 오피스 모니터링 프
 
 ### 시드 동작 조건
 - `local` 또는 `dev` 프로파일에서만 동작합니다.
-- 애플리케이션 시작 시 `members` 테이블이 비어 있을 때만 계정을 생성합니다.
+- 애플리케이션 시작 시 `users` 테이블(회원 데이터)이 비어 있을 때만 계정을 생성합니다.
 - 이미 회원 데이터가 1건 이상 있으면 추가 생성하지 않습니다.
 
 ### 개발용 기본 계정
 - `admin / admin1234!` → 권한: `ADMIN`
-- `user / user1234!` → 권한: `USER`
+- `user / user1234!` → 권한: `FAMILY`
 
 ### 비밀번호 저장 방식
 - 위 기본 계정 비밀번호는 저장 전에 `BCryptPasswordEncoder`로 인코딩됩니다.
@@ -97,7 +99,7 @@ Spring Boot 4.x / Java 17 / Thymeleaf / JPA 기반의 오피스 모니터링 프
 
 | 구분 | 경로 |
 |---|---|
-| 공개 접근 가능 (`permitAll`) | `/`, `/index`, `/index/**`, `/member/login`, `/member/register`, `/css/**`, `/js/**`, `/images/**`, `/favicon.ico`, `POST /api/v1/events/receive` |
+| 공개 접근 가능 (`permitAll`) | `/`, `/index`, `/index/**`, `/member/login`, `/member/register`, `/api/v1/auth/**`, `/css/**`, `/js/**`, `/images/**`, `/favicon.ico`, `POST /api/v1/events/receive` |
 | 로그인 필요 (`authenticated`) | `/camera/**`, `/events/**`, `/report/**`, `/myinfo/**`, `/resident/detail` |
 | 관리자 전용 (`hasRole("ADMIN")`) | `/setting/**`, `/resident/edit`, `/resident/register`, `/api/v1/settings/**` |
 | 기본 정책 | 위 매핑 외 모든 요청은 인증 필요 |
@@ -118,20 +120,20 @@ Spring Boot 4.x / Java 17 / Thymeleaf / JPA 기반의 오피스 모니터링 프
 - 로그인 페이지 경로: `GET /member/login`
 - 로그인 폼 전송 방식:
   - `method="post"`
-  - `action="/member/login"`
+  - `action="/api/v1/auth/login"`
   - 아이디 필드: `name="username"`
   - 비밀번호 필드: `name="password"`
-- 로그인 실패 시: `/member/login?error` 로 이동하며 실패 메시지를 표시합니다.
-- 로그아웃 후: `/member/login?logout` 파라미터로 로그인 페이지 진입 시 완료 메시지를 표시합니다.
+- 로그인 실패 시: `401 JSON` 응답(`{"success":false,...}`)을 반환합니다.
+- 로그아웃 성공 시: `POST /api/v1/auth/logout` 에서 `200 JSON` 응답(`{"success":true,...}`)을 반환합니다.
 
 ### 보안 테스트
 `MockMvc` 기반 보안 테스트로 아래 시나리오를 검증합니다.
 
 1. 비로그인 사용자가 보호 페이지(`/myinfo`)에 접근하면 로그인 페이지(`/member/login`)로 리다이렉트
-2. USER 권한 계정이 관리자 페이지(`/setting`)에 접근하면 `403 Forbidden`
+2. FAMILY 권한 계정이 관리자 페이지(`/setting`)에 접근하면 `403 Forbidden`
 3. ADMIN 권한 계정이 관리자 페이지(`/setting`)에 접근하면 `200 OK`
-4. 로그인 성공 시 `/` 로 리다이렉트
-5. 로그인 실패 시 `/member/login?error` 로 리다이렉트
+4. 로그인 성공 시 `200 OK` + `JSESSIONID` + 성공 JSON 응답
+5. 로그인 실패 시 `401 Unauthorized` + 실패 JSON 응답
 
 ### 테스트 실행
 ```bash

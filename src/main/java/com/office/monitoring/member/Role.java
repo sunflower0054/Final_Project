@@ -1,6 +1,6 @@
 package com.office.monitoring.member;
 
 public enum Role {
-    USER,
+    FAMILY,
     ADMIN
 }
