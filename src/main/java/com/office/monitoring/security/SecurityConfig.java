@@ -6,6 +6,8 @@ import com.office.monitoring.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import jakarta.servlet.http.Cookie;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -85,6 +87,19 @@ public class SecurityConfig {
                             Member member = memberRepository.findByUsername(username).orElse(null);
                             String name = member != null ? member.getName() : username;
                             String role = member != null ? member.getRole().name() : "";
+
+                            if (request.getSession(false) != null) {
+                                boolean jsessionAlreadySet = response.getHeaders(HttpHeaders.SET_COOKIE).stream()
+                                        .anyMatch(header -> header.startsWith("JSESSIONID="));
+
+                                if (!jsessionAlreadySet) {
+                                    Cookie sessionCookie = new Cookie("JSESSIONID", request.getSession(false).getId());
+                                    sessionCookie.setHttpOnly(true);
+                                    sessionCookie.setPath("/");
+                                    sessionCookie.setSecure(request.isSecure());
+                                    response.addCookie(sessionCookie);
+                                }
+                            }
 
                             // NOTE: Authentication is handled by the HTTP session (JSESSIONID).
                             // `token` is returned as `null` only for response-contract compatibility.
