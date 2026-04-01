@@ -17,15 +17,13 @@
     --purple: #6f42c1; /* 폭행 의심 */
 
     /* Design Elements - 모던한 디테일 */
-    --bg-page: #ffffff; /* 깨끗한 페이지 배경 */
+    --bg-page: #f8f9fa; /* 깨끗한 페이지 배경 */
     --bg-card: #ffffff; /* 순백색 카드 */
-    --border-color: #B0B8C4; /* 아주 연한 경계선 */
+    --border-color: #dee2e6; /* 아주 연한 경계선 */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05); /* 부드러운 그림자 */
     --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.08); /* 강조 그림자 */
     --radius: 12px; /* 둥근 모서리 통합 */
     --transition: all 0.25s ease; /* 부드러운 애니메이션 */
-    --gray-100: #ffffff;
-    --gray-900: #0F172A;
 }
 
 /* ===== 2. Reset & Body ===== */
@@ -37,6 +35,7 @@
 
 body {
     font-family: 'Noto Sans KR', sans-serif;
+    background: var(--gray-100); color: var(--gray-900);
     padding: 20px; min-height: 100vh;
     display: flex; flex-direction: column; gap: 20px;
     overflow-y: auto;
@@ -166,9 +165,6 @@ svg {
     flex: 1;
     padding: 40px;
     overflow-y: auto;
-    max-width: 1100px;
-    margin: 0 auto;
-    width: 100%;
 }
 
 .page-header {
@@ -208,7 +204,7 @@ svg {
     background-color: var(--bg-card);
     border-radius: var(--radius);
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
     transition: var(--transition);
 }
@@ -294,17 +290,16 @@ svg {
     gap: 25px;
 }
 
- .content-card,
- .profile-card {
+.content-card {
     background-color: var(--bg-card);
     border-radius: var(--radius);
-    border: 1px solid var(--border-color);   /* 1px → 2px로 변경 */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);   /* index와 비슷한 그림자 */
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
 }
 
 .card-header {
     padding: 20px 25px;
-    border-bottom: 1px solid var(--border-color);   /* 1px → 2px */
+    border-bottom: 1px solid var(--border-color);
 }
 
 .card-title {

@@ -1,424 +1,288 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관제 시스템 - 거주자 상세</title>
-    <link rel="stylesheet" th:href="@{/css/myinfo.css}">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        .hidden { display: none; }
-        .badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin-right: 6px;
-            margin-bottom: 6px;
-        }
-
-        /* 생년월일 선택박스 컴팩트 */
-        .birth-row {
-            display: grid;
-            grid-template-columns: 1fr 0.75fr 0.75fr;
-            gap: 8px;
-            max-width: 260px;
-        }
-
-        .birth-row select {
-            font-size: 14.5px !important;
-            padding: 7px 8px !important;
-            height: 38px !important;
-            border-radius: 6px;
-        }
-
-        /* 성별 + 전화번호 한 줄 배치 */
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1.6fr;
-            gap: 20px;
-        }
-
-        /* 라벨 간격 */
-        .form-group label {
-            margin-bottom: 6px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
-<div th:replace="~{fragments/header :: header}"></div>
-
 <div class="main-container">
-    <main class="content-area">
-        <div class="page-header">
-            <h2 class="page-title" id="page-title">거주자 등록</h2>
-            <p class="page-subtitle" id="page-subtitle">새로운 거주자 정보를 입력해주세요.</p>
+
+    <header class="header-area">
+        <a href="/" class="brand-logo">
+            <div class="logo-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3" /></svg></div>
+            <span class="brand-name">골든노미스</span>
+        </a>
+        <div class="topbar-right">
+            <div class="system-time" id="currentTime">2026. 03. 29 15:30:12</div>
+
+            <!-- 알림 드롭다운 -->
+            <div class="dropdown-wrap">
+                <button class="icon-btn" id="notiBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    <div class="noti-dot"></div>
+                </button>
+                <div class="dropdown-menu" id="notiDropdown">
+                    <div class="dropdown-header">
+                        <span>알림</span>
+                        <span class="noti-count">1건</span>
+                    </div>
+                    <div class="noti-list">
+                        <div class="noti-item">
+                            <div class="noti-detail-title">낙상 후 활동량 추적</div>
+                            <div class="noti-detail-row"><span>최근 낙상</span><span class="value">3월 20일 07:22</span></div>
+                            <div class="noti-detail-row"><span>낙상 후 활동량</span><span class="value">평소 대비 23%</span></div>
+                            <div class="noti-alert-box">활동량이 현재저 감소했습니다.<br>병원 방문을 권장합니다.</div>
+                        </div>
+                    </div>
+                    <div class="dropdown-footer">
+                        <button class="btn-profile-detail" style="width: 100%;">모든 알림 보기</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 프로필 드롭다운 (네이버 ID 스타일) -->
+            <div class="dropdown-wrap">
+                <button class="icon-btn" id="profileBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </button>
+                <div class="dropdown-menu" id="profileDropdown">
+                    <div class="profile-header">
+                        <div class="avatar-container">
+                            <div class="profile-avatar-lg">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="user-name">홍길동</div>
+                        <div class="user-email">admin@goldennomis.com</div>
+                    </div>
+
+                    <div class="profile-menu">
+                        <a href="/myinfo/myinfo">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            내 프로필
+                        </a>
+                        <a href="/setting/setting">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            설정
+                        </a>
+                    </div>
+
+                    <div class="dropdown-footer">
+                        <button class="btn-profile-logout" style="width:100%;">로그아웃</button>
+                    </div>
+                </div>
+            </div>
         </div>
+    </header>
 
-        <div class="info-grid" style="grid-template-columns: 280px 1fr; gap: 24px;">
-
-            <!-- 프로필 카드 -->
-            <div class="profile-card">
-                <div class="profile-header">
-                    <div class="profile-avatar-xl" id="avatar"
-                         style="font-size: 48px; background: linear-gradient(135deg, #FFEBEE, #FFCDD2); color: #E53935;">
-                        ?
-                    </div>
-                    <h3 class="profile-name-lg" id="profile-name">신규 등록</h3>
-                    <p class="profile-email" id="profile-age-gender" style="margin-top: 4px; font-size: 15px;">정보를 입력해주세요</p>
-                </div>
-
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <div class="stat-value" id="reg-date">-</div>
-                        <div class="stat-label">등록일</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="last-fall" style="color:#E53935;">-</div>
-                        <div class="stat-label">최근 낙상</div>
-                    </div>
-                </div>
-
-                <div class="profile-actions" style="padding:20px; display:flex; gap:12px; flex-direction:column;">
-                    <button class="btn-profile-detail" id="btn-save" onclick="saveResident()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                            <polyline points="17 9 9 17 5 13"/>
-                        </svg>
-                        <span id="save-btn-text">등록하기</span>
+    <!-- ===== MAIN ===== -->
+    <div class="main-container">
+        <header class="header-area">
+            <div class="brand-logo">
+                <button class="icon-btn" onclick="history.back()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <h1 class="brand-name">거주자 상세</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="icon-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </button>
+                <div class="dropdown-wrap">
+                    <button class="icon-btn" id="profileBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     </button>
-                    <button class="btn-profile-detail" style="background:#757575; color:white;" onclick="history.back()">
-                        취소
-                    </button>
+                    <div class="dropdown-menu" id="profileDropdown">
+                        <div class="profile-header">
+                            <div class="profile-avatar-lg">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div>
+                                <div class="user-name">홍길동</div>
+                                <div class="user-email">관리자 · 스마트 관제 센터</div>
+                            </div>
+                        </div>
+                        <div class="profile-info-list">
+                            <div class="profile-info-row">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0160656c686f4172646274736875782f626e6c">[email&#160;protected]</a>
+                            </div>
+                            <div class="profile-info-row">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.39 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                010-1234-5678
+                            </div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="/myinfo/myinfo" class="btn-profile-detail">내 정보 상세보기</a>
+                            <button class="btn-profile-logout">로그아웃</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-container">
+
+            <!-- Top: Name & Status -->
+            <div class="content-card risk-score-section">
+                <div class="profile-avatar-lg" id="residentAvatar">-</div>
+                <div style="flex:1">
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <span class="user-name" id="residentName">거주자 정보 조회</span>
+                        <span class="status-badge badge-success">상세</span>
+                    </div>
+                    <div class="user-email" id="residentSummary">선택한 거주자 정보를 불러오는 중입니다.</div>
+                </div>
+                <button class="btn btn-success" style="padding:9px 18px;border-radius:7px;font-size:12px;width:auto;display:flex;align-items:center;gap:6px"
+                        onclick="location.href='/resident/edit'">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    정보 수정
+                </button>
+            </div>
+
+            <!-- Basic Info -->
+            <div class="content-card control-panel">
+                <div class="timeline-title">기본 정보</div>
+                <div class="event-stats-section">
+                    <div class="stat-card">
+                        <div class="stat-title">거주자 ID</div>
+                        <div class="noti-detail-title" id="detailId">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">이름</div>
+                        <div class="noti-detail-title" id="detailName">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">생년월일</div>
+                        <div class="noti-detail-title" id="detailBirthDate">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">전화번호</div>
+                        <div class="noti-detail-title" id="detailPhone">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">주소</div>
+                        <div class="noti-detail-title" id="detailAddress">-</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- 기본 정보 카드 -->
-            <div class="content-card">
-                <div class="card-header">
-                    <h3 class="card-title">기본 정보</h3>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label class="form-label">이름 <span style="color:red;">*</span></label>
-                        <input type="text" class="form-control" id="name" placeholder="이름을 입력하세요">
+            <!-- Medical Info -->
+            <div class="content-card control-panel">
+                <div class="timeline-title">건강 / 기저질환 정보</div>
+                <div class="event-stats-section">
+                    <div class="stat-card">
+                        <div class="stat-title">기저질환</div>
+                        <div class="noti-detail-title" id="detailDisease">-</div>
                     </div>
-
-                    <!-- 생년월일 -->
-                    <div class="form-group">
-                        <label class="form-label">생년월일 <span style="color:red;">*</span></label>
-                        <div class="birth-row">
-                            <select id="birthYear" class="form-control">
-                                <option value="">년도</option>
-                            </select>
-                            <select id="birthMonth" class="form-control">
-                                <option value="">월</option>
-                            </select>
-                            <select id="birthDay" class="form-control">
-                                <option value="">일</option>
-                            </select>
-                        </div>
-                        <input type="hidden" id="birthDate" value="">
-                    </div>
-
-                    <!-- 성별 + 전화번호 한 줄 배치 -->
-                    <div class="two-column">
-                        <div class="form-group">
-                            <label class="form-label">성별</label>
-                            <select class="form-control" id="gender">
-                                <option value="">선택하세요</option>
-                                <option value="남성">남성</option>
-                                <option value="여성">여성</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">전화번호</label>
-                            <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX">
-                        </div>
-                    </div>
-
-                    <!-- 주소 (Daum Postcode 적용) -->
-                    <div class="form-group">
-                        <label class="form-label">주소</label>
-                        <div style="display:flex; gap:8px; margin-bottom:8px;">
-                            <input type="text" id="postcode" class="form-control" placeholder="우편번호" readonly style="max-width:140px;">
-                            <button type="button" onclick="execDaumPostcode()"
-                                    style="padding:8px 16px; background:#1e3a5f; color:white; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">
-                                주소 검색
-                            </button>
-                        </div>
-                        <input type="text" id="address" class="form-control" placeholder="기본 주소" readonly style="margin-bottom:8px;">
-                        <input type="text" id="detailAddress" class="form-control" placeholder="상세 주소 (예: 2층, 301호)">
-                    </div>
-
                 </div>
             </div>
+
+            <!-- Location Info -->
+            <div class="content-card control-panel">
+                <div class="timeline-title">위치 정보</div>
+                <div class="event-stats-section">
+                    <div class="stat-card">
+                        <div class="stat-title">위도</div>
+                        <div class="noti-detail-title" id="detailLatitude">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">경도</div>
+                        <div class="noti-detail-title" id="detailLongitude">-</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-
-        <!-- 건강 / 기저질환 정보 -->
-        <div class="content-card" style="margin-top: 24px;">
-            <div class="card-header">
-                <h3 class="card-title">건강 / 기저질환 정보</h3>
-            </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label class="form-label">기저질환</label>
-                    <div id="underlying-diseases" style="display:flex; gap:8px; flex-wrap:wrap; padding:8px 0;">
-                        <label class="badge" style="background:#E3F2FD; color:#1976D2; padding:8px 14px; cursor:pointer;">
-                            <input type="checkbox" value="고혈압" style="margin-right:6px;"> 고혈압
-                        </label>
-                        <label class="badge" style="background:#E8F5E9; color:#388E3C; padding:8px 14px; cursor:pointer;">
-                            <input type="checkbox" value="당뇨" style="margin-right:6px;"> 당뇨
-                        </label>
-                        <label class="badge" style="background:#FFF3E0; color:#F57C00; padding:8px 14px; cursor:pointer;">
-                            <input type="checkbox" value="골다공증" style="margin-right:6px;"> 골다공증
-                        </label>
-                        <label class="badge" style="background:#F3E5F5; color:#7B1FA2; padding:8px 14px; cursor:pointer;">
-                            <input type="checkbox" value="관절염" style="margin-right:6px;"> 관절염
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">복용 약물</label>
-                    <input type="text" class="form-control" id="medications" placeholder="복용 중인 약물을 입력하세요">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">혈액형</label>
-                    <select class="form-control" id="bloodType">
-                        <option value="">선택하세요</option>
-                        <option value="A형">A형</option>
-                        <option value="B형">B형</option>
-                        <option value="AB형">AB형</option>
-                        <option value="O형">O형</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">특이사항</label>
-                    <textarea class="form-control" id="notes" rows="4" placeholder="특이사항을 입력하세요"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- 비상 연락처 -->
-        <div class="content-card" style="margin-top: 24px;">
-            <div class="card-header">
-                <h3 class="card-title">비상 연락처</h3>
-            </div>
-            <div class="card-body">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-                    <div class="form-group">
-                        <label class="form-label">보호자 이름</label>
-                        <input type="text" class="form-control" id="guardianName" placeholder="보호자 이름">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">보호자 연락처</label>
-                        <input type="tel" class="form-control" id="guardianPhone" placeholder="010-XXXX-XXXX">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
+    </div>
 </div>
 
-<script th:src="@{/js/dropdown.js}"></script>
-<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script>
-    let isEditMode = false;
-    let residentId = null;
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    const btn = document.getElementById('profileBtn');
+    const dropdown = document.getElementById('profileDropdown');
+    btn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('open'); });
+    document.addEventListener('click', () => dropdown.classList.remove('open'));
+    dropdown.addEventListener('click', e => e.stopPropagation());
 
-    function getUrlParameter(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const idParam = getUrlParameter('id');
-        initBirthDateSelects();
-
-        if (idParam && idParam !== 'new') {
-            residentId = idParam;
-            isEditMode = true;
-            document.getElementById('page-title').textContent = '거주자 상세 정보';
-            document.getElementById('page-subtitle').textContent = '거주자 정보를 확인 및 수정할 수 있습니다.';
-            document.getElementById('save-btn-text').textContent = '수정하기';
-            loadResidentData(residentId);
-        } else {
-            isEditMode = false;
-            document.getElementById('page-title').textContent = '거주자 등록';
-            document.getElementById('page-subtitle').textContent = '새로운 거주자 정보를 입력해주세요.';
-            document.getElementById('save-btn-text').textContent = '등록하기';
-            clearForm();
+    async function parseJsonResponse(response) {
+        const text = await response.text();
+        if (!text) return {};
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            return { message: text };
         }
-    });
-
-// ==================== 생년월일 ====================
-    function initBirthDateSelects() {
-        const yearSelect = document.getElementById('birthYear');
-        const monthSelect = document.getElementById('birthMonth');
-        const daySelect = document.getElementById('birthDay');
-        const currentYear = new Date().getFullYear();
-
-        for (let i = currentYear; i >= 1920; i--) {
-            const opt = document.createElement('option');
-            opt.value = i; opt.textContent = i + '년';
-            yearSelect.appendChild(opt);
-        }
-        for (let i = 1; i <= 12; i++) {
-            const opt = document.createElement('option');
-            opt.value = i < 10 ? '0' + i : i;
-            opt.textContent = i + '월';
-            monthSelect.appendChild(opt);
-        }
-        for (let i = 1; i <= 31; i++) {
-            const opt = document.createElement('option');
-            opt.value = i < 10 ? '0' + i : i;
-            opt.textContent = i + '일';
-            daySelect.appendChild(opt);
-        }
-
-        [yearSelect, monthSelect, daySelect].forEach(s => s.addEventListener('change', updateBirthDateHidden));
     }
 
-    function updateBirthDateHidden() {
-        const y = document.getElementById('birthYear').value;
-        const m = document.getElementById('birthMonth').value;
-        const d = document.getElementById('birthDay').value;
-        document.getElementById('birthDate').value = (y && m && d) ? `${y}-${m}-${d}` : '';
+    function setResidentFallback(message) {
+        document.getElementById('residentName').innerText = '거주자 정보 조회';
+        document.getElementById('residentAvatar').innerText = '-';
+        document.getElementById('residentSummary').innerText = message;
+        document.getElementById('detailId').innerText = '-';
+        document.getElementById('detailName').innerText = '-';
+        document.getElementById('detailBirthDate').innerText = '-';
+        document.getElementById('detailPhone').innerText = '-';
+        document.getElementById('detailAddress').innerText = '-';
+        document.getElementById('detailDisease').innerText = '-';
+        document.getElementById('detailLatitude').innerText = '-';
+        document.getElementById('detailLongitude').innerText = '-';
     }
 
-    // ==================== Daum 주소 검색 ====================
-    function execDaumPostcode() {
-        new daum.Postcode({
-            oncomplete: function(data) {
-                let addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
-
-                document.getElementById('postcode').value = data.zonecode;
-                document.getElementById('address').value = addr;
-                document.getElementById('detailAddress').focus();
-            }
-        }).open();
+    function bindResident(resident) {
+        const residentName = resident.name || '-';
+        document.getElementById('residentName').innerText = residentName;
+        document.getElementById('residentAvatar').innerText = residentName !== '-' ? residentName.charAt(0) : '-';
+        document.getElementById('residentSummary').innerText =
+            `거주자 ID: ${resident.id ?? '-'} · 위치 좌표: ${resident.latitude ?? '-'}, ${resident.longitude ?? '-'}`;
+        document.getElementById('detailId').innerText = resident.id ?? '-';
+        document.getElementById('detailName').innerText = residentName;
+        document.getElementById('detailBirthDate').innerText = resident.birthDate || '-';
+        document.getElementById('detailPhone').innerText = resident.phone || '-';
+        document.getElementById('detailAddress').innerText = resident.address || '-';
+        document.getElementById('detailDisease').innerText = resident.disease || '-';
+        document.getElementById('detailLatitude').innerText = resident.latitude ?? '-';
+        document.getElementById('detailLongitude').innerText = resident.longitude ?? '-';
     }
 
-    function loadResidentData(id) {
-        fetch(`/api/residents/${id}`)
-            .then(res => res.ok ? res.json() : Promise.reject('로드 실패'))
-            .then(data => {
-                document.getElementById('name').value = data.name || '';
-                document.getElementById('phone').value = data.phone || '';
-                document.getElementById('gender').value = data.gender || '';
-                document.getElementById('address').value = data.address || '';
-                document.getElementById('medications').value = data.medications || '';
-                document.getElementById('bloodType').value = data.bloodType || '';
-                document.getElementById('notes').value = data.notes || '';
-                document.getElementById('guardianName').value = data.guardianName || '';
-                document.getElementById('guardianPhone').value = data.guardianPhone || '';
+    async function loadResidentDetail() {
+        const params = new URLSearchParams(window.location.search);
+        const residentId = params.get('id');
 
-                if (data.birthDate) {
-                    const [y, m, d] = data.birthDate.split('-');
-                    document.getElementById('birthYear').value = y || '';
-                    document.getElementById('birthMonth').value = m || '';
-                    document.getElementById('birthDay').value = d || '';
-                    document.getElementById('birthDate').value = data.birthDate;
-                }
-
-                updateProfileUI(data);
-
-                if (data.underlyingDiseases) {
-                    document.querySelectorAll('#underlying-diseases input[type="checkbox"]').forEach(cb => {
-                        cb.checked = data.underlyingDiseases.includes(cb.value);
-                    });
-                }
-            })
-            .catch(err => alert('거주자 정보를 불러오는 데 실패했습니다.'));
-    }
-
-    function updateProfileUI(data) {
-        const name = data.name || '신규 등록';
-        document.getElementById('profile-name').textContent = name;
-        document.getElementById('avatar').textContent = name.charAt(0) || '?';
-
-        const ageGender = data.age ? `만 ${data.age}세 · ${data.gender || '미등록'}` : '정보를 입력해주세요';
-        document.getElementById('profile-age-gender').textContent = ageGender;
-
-        document.getElementById('reg-date').textContent = data.regDate || '-';
-        document.getElementById('last-fall').textContent = data.lastFallDate || '-';
-    }
-
-    function clearForm() {
-        document.querySelectorAll('input:not([type=hidden]), select, textarea').forEach(el => {
-            if (el.type === 'checkbox') el.checked = false;
-            else el.value = '';
-        });
-    }
-
-    function saveResident() {
-        updateBirthDateHidden();
-
-        const name = document.getElementById('name').value.trim();
-        if (!name) {
-            alert('이름은 필수입니다.');
-            document.getElementById('name').focus();
-            return;
-        }
-        if (!document.getElementById('birthDate').value) {
-            alert('생년월일을 선택해주세요.');
-            document.getElementById('birthYear').focus();
+        if (!residentId) {
+            const message = '선택된 거주자 ID가 없습니다.';
+            alert(message);
+            setResidentFallback(message);
             return;
         }
 
-        const underlyingDiseases = Array.from(
-            document.querySelectorAll('#underlying-diseases input[type="checkbox"]:checked')
-        ).map(cb => cb.value);
+        try {
+            const response = await fetch(`/api/v1/residents/${encodeURIComponent(residentId)}`, {
+                method: 'GET',
+                credentials: 'same-origin'
+            });
+            const result = await parseJsonResponse(response);
 
-        const data = {
-            name: name,
-            birthDate: document.getElementById('birthDate').value,
-            phone: document.getElementById('phone').value || null,
-            gender: document.getElementById('gender').value || null,
-            address: document.getElementById('address').value || null,
-            underlyingDiseases: underlyingDiseases,
-            medications: document.getElementById('medications').value || null,
-            bloodType: document.getElementById('bloodType').value || null,
-            notes: document.getElementById('notes').value || null,
-            guardianName: document.getElementById('guardianName').value || null,
-            guardianPhone: document.getElementById('guardianPhone').value || null
-        };
-
-        const url = isEditMode ? `/api/residents/${residentId}` : '/api/residents';
-        const method = isEditMode ? 'PUT' : 'POST';
-
-        fetch(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(res => res.ok ? res.json() : Promise.reject())
-        .then(result => {
-            alert(isEditMode ? '수정이 완료되었습니다.' : '등록이 완료되었습니다.');
-
-            // 등록/수정이 완료된 시점에 입력된 주소와 이름을 report.html로 전달
-            const reportUrl = `/report?address=${encodeURIComponent(data.address)}&name=${encodeURIComponent(data.name)}`;
-
-            // 지금 바로 이동할 게 아니라면, 나중에 신고가 발생했을 때
-            // 저 주소(reportUrl)를 호출하게 만들면 됩니다.
-            console.log("신고 페이지 링크:", reportUrl);
-
-            if (!isEditMode && result.id) {
-                location.href = `/resident/detail?id=${result.id}`;
-            } else {
-                loadResidentData(residentId);
+            if (!response.ok || result.success !== true || !result.resident) {
+                const message = result.message || '거주자 정보를 불러오지 못했습니다.';
+                alert(message);
+                setResidentFallback(message);
+                return;
             }
-        })
-        .catch(() => alert('저장에 실패했습니다. 다시 시도해주세요.'));
+
+            bindResident(result.resident);
+        } catch (e) {
+            const message = '거주자 상세 조회 중 오류가 발생했습니다.';
+            alert(message);
+            setResidentFallback(message);
+        }
     }
-</script>
 
-
-<script>
-    (function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e5403568d8930a3',t:'MTc3NTAwODk2MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
+    loadResidentDetail();
 </script>
 </body>
 </html>

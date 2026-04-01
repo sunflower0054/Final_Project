@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="referrer" content="unsafe-url" />
@@ -8,6 +9,75 @@
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet" />
         <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=05dea7c839bf99daaa3a652b70da85fe&libraries=services"></script>
 
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+          font-family: 'Noto Sans KR', sans-serif;
+          background: #F0F2F5;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 30px 16px;
+          min-height: 100vh;
+        }
+
+        h1 {
+          font-size: 20px;
+          font-weight: 900;
+          color: #1A1A2E;
+          margin-bottom: 20px;
+          letter-spacing: -0.5px;
+        }
+
+        /* 상태 배지 */
+        #status-box {
+          width: 100%;
+          max-width: 480px;
+          border-radius: 14px;
+          padding: 16px 20px;
+          font-size: 15px;
+          font-weight: 700;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          transition: all 0.3s ease;
+        }
+        #status-box.loading { background: #E3F2FD; color: #1565C0; border: 1.5px solid #90CAF9; }
+        #status-box.ok      { background: #E8F5E9; color: #1B5E20; border: 1.5px solid #A5D6A7; }
+        #status-box.error   { background: #FFEBEE; color: #B71C1C; border: 1.5px solid #EF9A9A; }
+
+        .status-icon { font-size: 20px; }
+
+        /* 지도 영역 */
+        #map-wrapper {
+          width: 100%;
+          max-width: 480px;
+          border-radius: 18px;
+          overflow: hidden;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+          background: #ddd;
+          margin-bottom: 20px;
+        }
+        #map { width: 100%; height: 360px; }
+
+        /* 결과 로그 */
+        #log-box {
+          width: 100%;
+          max-width: 480px;
+          background: #1A1A2E;
+          border-radius: 14px;
+          padding: 18px 20px;
+          color: #A0AEC0;
+          font-size: 13px;
+          line-height: 1.8;
+          font-family: 'Courier New', monospace;
+        }
+        #log-box .log-ok   { color: #68D391; }
+        #log-box .log-err  { color: #FC8181; }
+        #log-box .log-info { color: #63B3ED; }
+    </style>
 </head>
 <body>
 
