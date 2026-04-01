@@ -24,34 +24,13 @@ repositories {
 }
 
 dependencies {
-    // 웹 서버 (HTTP 요청 받기)
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-
-    // JPA (DB 연동)
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-    // Thymeleaf (HTML 화면)
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-
-    // MySQL 드라이버
-    runtimeOnly 'com.mysql:mysql-connector-j'
-
-    // Lombok (getter/setter 자동 생성)
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    // 개발 편의 도구 (서버 자동 재시작)
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
-    // 테스트
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-thymeleaf-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    //스프링에서 다른 서버로 HTTP 요청 보낼 때 쓰는 클라이언트
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
-    // 솔라피 SDK
-//    implementation 'net.nurigo:sdk:4.3.0'
 }
 
 tasks.named('test') {
