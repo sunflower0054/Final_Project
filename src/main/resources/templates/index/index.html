@@ -29,7 +29,10 @@
                 <p style="font-size:13px; margin-top:5px;">신뢰도 98% | 15:28:05</p>
             </div>
             <div class="btn-group">
-                <button class="btn btn-red">119 긴급 신고</button>
+                <!--<button class="btn btn-red">119 긴급 신고</button>-->
+                <button class="btn btn-red" onclick="goToManualReport(12)">
+                    🚨 119 수동 신고
+                </button>
                 <button class="btn btn-outline">보호자 비상 연락</button>
                 <button class="btn btn-success">상황 종료 및 복구</button>
             </div>
@@ -176,6 +179,19 @@
         </div>
     </section>
 </div>
+
+<script>
+    function goToManualReport(residentId) {
+        // 1. 실수 방지용 재확인 창 띄우기
+        const isConfirmed = confirm("🚨 정말 119에 수동으로 신고하시겠습니까?\n확인을 누르면 즉시 신고 페이지로 이동합니다.");
+
+        // 2. 사용자가 '확인'을 눌렀을 때만 이동
+        if (isConfirmed) {
+            location.href = `/report?type=manual&residentId=${residentId}`;
+        }
+        // '취소'를 누르면 아무 일도 일어나지 않음
+    }
+</script>
 
 <script th:inline="javascript">
     function updateClock() {
