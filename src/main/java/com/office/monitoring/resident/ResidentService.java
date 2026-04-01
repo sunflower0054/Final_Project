@@ -9,9 +9,12 @@ import com.office.monitoring.resident.dto.ResidentResponse;
 import com.office.monitoring.resident.dto.ResidentUpdateRequest;
 import com.office.monitoring.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +74,25 @@ public class ResidentService {
     public ResidentResponse getResident(Long residentId) {
         Resident resident = getAuthorizedResident(residentId);
         return ResidentResponse.from(resident);
+    }
+
+    public List<ResidentResponse> getResidents() {
+        Member currentMember = currentUserService.getCurrentMember();
+
+        if (currentMember.getRole() == Role.ADMIN) {
+            return residentRepository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream()
+                    .map(ResidentResponse::from)
+                    .toList();
+        }
+
+        if (currentMember.getResidentId() == null) {
+            return List.of();
+        }
+
+        return residentRepository.findById(currentMember.getResidentId())
+                .map(ResidentResponse::from)
+                .map(List::of)
+                .orElseGet(List::of);
     }
 
     private Resident getAuthorizedResident(Long residentId) {

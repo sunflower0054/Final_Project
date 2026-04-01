@@ -24,6 +24,14 @@ public class ResidentApiController {
         return new ResidentCreateResponse(true, residentId, "거주자 정보가 등록되었습니다.");
     }
 
+    @GetMapping
+    public Map<String, Object> getResidents() {
+        return Map.of(
+                "success", true,
+                "residents", residentService.getResidents()
+        );
+    }
+
     @PutMapping("/{id}")
     public Map<String, Object> updateResident(@PathVariable Long id,
                                               @Valid @RequestBody ResidentUpdateRequest request) {

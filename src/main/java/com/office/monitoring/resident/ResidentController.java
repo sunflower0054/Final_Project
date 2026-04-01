@@ -13,6 +13,11 @@ public class ResidentController {
         return "resident/resident_detail";
     }
 
+    @GetMapping("/list")
+    public String residentList() {
+        return "resident/resident_list";
+    }
+
     @GetMapping("/edit")
     public String residentEdit() {
         return "resident/resident_edit";
