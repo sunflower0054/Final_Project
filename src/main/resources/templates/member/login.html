@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인</title>
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
 
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -105,6 +107,26 @@
             border-color: var(--accent);
         }
 
+        .message {
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            padding: 10px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .message-error {
+            background: #FEF2F2;
+            color: #B91C1C;
+            border: 1px solid #FECACA;
+        }
+
+        .message-success {
+            background: #ECFDF5;
+            color: #047857;
+            border: 1px solid #A7F3D0;
+        }
+
         /* ══════════════════════════════════
            버튼 및 링크
         ══════════════════════════════════ */
@@ -174,12 +196,21 @@
 
     <div class="login-box">
 
-        <div class="input-group">
-            <input type="text" class="input-box" placeholder="아이디" aria-label="아이디">
-            <input type="password" class="input-box" placeholder="비밀번호" aria-label="비밀번호">
+        <div class="message message-error" th:if="${param.error}">
+            아이디 또는 비밀번호가 올바르지 않습니다.
+        </div>
+        <div class="message message-success" th:if="${param.logout}">
+            로그아웃되었습니다.
         </div>
 
-        <button class="login-btn">로그인</button>
+        <form id="loginForm" method="post" action="/api/v1/auth/login">
+            <div class="input-group">
+                <input type="text" class="input-box" name="username" placeholder="아이디" aria-label="아이디" required>
+                <input type="password" class="input-box" name="password" placeholder="비밀번호" aria-label="비밀번호" required>
+            </div>
+
+            <button type="submit" class="login-btn">로그인</button>
+        </form>
 
         <div class="login-links">
             <a href="#">비밀번호 찾기</a>
@@ -195,5 +226,34 @@
 
 </div>
 
+<script>
+    const loginForm = document.getElementById('loginForm');
+
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(loginForm);
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+        const headers = {};
+
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
+        }
+
+        const response = await fetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers,
+            body: formData
+        });
+
+        if (response.ok) {
+            window.location.href = '/';
+            return;
+        }
+
+        window.location.href = '/member/login?error';
+    });
+</script>
 </body>
 </html>

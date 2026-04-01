@@ -81,12 +81,35 @@
                 </div>
 
                 <div class="dropdown-footer">
-                    <button class="btn-profile-logout" style="width:100%;">로그아웃</button>
+                    <button type="button" class="btn-profile-logout js-logout-btn" style="width:100%;">로그아웃</button>
                 </div>
             </div>
         </div>
     </div>
 </header>
+
+<script th:inline="javascript">
+    document.addEventListener('click', async (event) => {
+        const logoutButton = event.target.closest('.js-logout-btn');
+        if (!logoutButton) {
+            return;
+        }
+
+        const response = await fetch('/api/v1/auth/logout', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (response.ok) {
+            window.location.href = '/member/login?logout';
+            return;
+        }
+
+        alert('로그아웃에 실패했습니다.');
+    });
+</script>
 
 </body>
 </html>
