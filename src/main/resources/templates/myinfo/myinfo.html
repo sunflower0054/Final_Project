@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>골든노미스 - 내 정보</title>
+    <link rel="stylesheet" th:href="@{/css/myinfo.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="main-container">
+    <main class="content-area">
+        <div class="page-header">
+            <h2 class="page-title">내 계정 설정</h2>
+            <p class="page-subtitle">개인 정보 및 시스템 알림 설정을 관리합니다.</p>
+        </div>
+
+        <div class="info-grid-3col">
+
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar-xl">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <h3 class="profile-name-lg">홍길동</h3>
+                    <p class="profile-email">gildong@example.com</p>
+                    <span class="badge badge-navy" style="margin-top: 10px;">시스템 관리자</span>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">관리 기기</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">이번달 알림</div>
+                    </div>
+                </div>
+
+                <div class="profile-actions" style="padding: 20px;">
+                    <button class="btn-profile-detail">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        프로필 사진 변경
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="card-title">기본 정보</h3>
+                    <button type="button" class="userInfoEditBtn" id="editInfoBtn"
+                            style="padding: 4px 12px; background: none; border: 1px dashed var(--gray-400); border-radius: 4px; color: var(--gray-600); font-size: 12px; cursor: pointer;">
+                        정보 수정
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">아이디</label>
+                        <input type="text" class="form-control" value="gildong" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">이름</label>
+                        <input type="text" class="form-control" value="홍길동" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">이메일</label>
+                        <input type="email" class="form-control userInfoInput" value="gildong@email.com" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">휴대폰 번호</label>
+                        <input type="tel" class="form-control userInfoInput" value="010-1234-5678" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">생년월일</label>
+                        <input type="text" class="form-control" value="1995년 05월 15일" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">성별</label>
+                        <input type="text" class="form-control" value="남성" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="card-title">알림 서비스 설정</h3>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-title">이메일 알림</div>
+                            <div class="setting-desc">중요 이벤트 발생 시 메일 발송</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" checked>
+                            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-title">SMS 긴급 알림</div>
+                            <div class="setting-desc">낙상 등 긴급 상황 시 즉시 문자</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox"> <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-title">시간 방해 금지</div>
+                            <div class="setting-desc">22:00 ~ 07:00 사이 일반 알림 제한</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox"> <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-navy" style="padding: 8px 16px; font-size: 13px;">설정 저장하기</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script th:inline="javascript">
+    // 헤더의 시계 기능
+    function updateClock() {
+        const now = new Date();
+        const str = now.getFullYear() + '. ' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '. ' +
+                    String(now.getDate()).padStart(2, '0') + ' ' +
+                    String(now.getHours()).padStart(2, '0') + ':' +
+                    String(now.getMinutes()).padStart(2, '0') + ':' +
+                    String(now.getSeconds()).padStart(2, '0');
+        const timeEl = document.getElementById('currentTime');
+        if(timeEl) timeEl.innerText = str;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 드롭다운 공통 로직
+    function setupDropdown(btnId, dropdownId) {
+        const btn = document.getElementById(btnId);
+        const dropdown = document.getElementById(dropdownId);
+        if (!btn || !dropdown) return;
+
+        btn.addEventListener('click', (e) => {
+            e.stopImmediatePropagation();
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.id !== dropdownId) menu.classList.remove('open');
+            });
+            dropdown.classList.toggle('open');
+        });
+    }
+
+    // 기본 정보 수정 버튼 로직 (예시)
+    function setupInfoEdit() {
+        const editBtn = document.getElementById('editInfoBtn');
+        const inputs = document.querySelectorAll('.userInfoInput');
+
+        if(!editBtn) return;
+
+        editBtn.addEventListener('click', () => {
+            if(editBtn.innerText === '정보 수정') {
+                inputs.forEach(input => {
+                    input.readOnly = false;
+                    input.style.backgroundColor = '#fff';
+                });
+                editBtn.innerText = '저장';
+                editBtn.style.borderStyle = 'solid';
+                editBtn.style.borderColor = 'var(--navy)';
+                editBtn.style.color = 'var(--navy)';
+                inputs[0].focus();
+            } else {
+                // 저장 로직 (ajax 등)
+                alert('정보가 저장되었습니다.');
+                inputs.forEach(input => {
+                    input.readOnly = true;
+                    input.style.backgroundColor = '';
+                });
+                editBtn.innerText = '정보 수정';
+                editBtn.style.borderStyle = 'dashed';
+                editBtn.style.borderColor = 'var(--gray-400)';
+                editBtn.style.color = 'var(--gray-600)';
+            }
+        });
+    }
+
+    window.addEventListener('load', () => {
+        // 헤더 프래그먼트 내 요소 ID 확인 필요
+        setupDropdown('notiBtn', 'notiDropdown');
+        setupDropdown('profileBtn', 'profileDropdown');
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown-wrap')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('open'));
+            }
+        });
+
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.addEventListener('click', e => e.stopImmediatePropagation());
+        });
+
+        // 정보 수정 기능 초기화
+        setupInfoEdit();
+    });
+</script>
+
+</body>
+</html>

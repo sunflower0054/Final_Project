@@ -49,6 +49,9 @@ dependencies {
 
     //스프링에서 다른 서버로 HTTP 요청 보낼 때 쓰는 클라이언트
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // 솔라피 SDK
+//    implementation 'net.nurigo:sdk:4.3.0'
 }
 
 tasks.named('test') {

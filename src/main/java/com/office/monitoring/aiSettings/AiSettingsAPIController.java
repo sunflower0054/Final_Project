@@ -11,7 +11,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/settings")
 @RequiredArgsConstructor
-public class AiSettingsController {
+public class AiSettingsAPIController {
 
     private final AiSettingsService aiSettingsService;
 
