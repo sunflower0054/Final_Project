@@ -88,9 +88,9 @@ public class EventService {
     private Integer extractInt(String metadata, String key) {
         try {
             if (metadata == null || !metadata.contains(key)) return null;
-            String after = metadata.split("'" + key + "'")[1];  // ': 2, ...'
-            String value = after.replaceAll("[^0-9]", "").trim();
-            String digits = value.split("\\s")[0];
+            // ': 2, ...' 에서 콜론 뒤 첫 번째 숫자만 추출
+            String after  = metadata.split("'" + key + "':\\s*")[1];  // '2, ...'
+            String digits = after.split("[^0-9]")[0];                  // '2' 만
             return Integer.parseInt(digits);
         } catch (Exception e) {
             return null;
@@ -100,8 +100,9 @@ public class EventService {
     private Double extractDouble(String metadata, String key) {
         try {
             if (metadata == null || !metadata.contains(key)) return null;
-            String after = metadata.split("'" + key + "'")[1];
-            String value = after.replaceAll("[^0-9.]", "").trim();
+            String after = metadata.split("'" + key + "':\\s*")[1];  // '0.11, ...'
+            String value = after.split(",")[0]                        // '0.11'
+                    .replaceAll("[^0-9.]", "").trim();
             return Double.parseDouble(value);
         } catch (Exception e) {
             return null;

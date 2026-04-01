@@ -53,7 +53,7 @@
                     <div class="slider-wrap">
                         <span style="font-size:12px;color:var(--gray-400);font-weight:600;min-width:24px">0.0</span>
                         <input type="range" id="fall-slider" class="slider-fall"
-                               min="0" max="1" step="0.05" value="0.7"
+                               min="0" max="1" step="0.1" value="0.7"
                                oninput="updateSlider(this,'fall-val','fall-impact',false)">
                         <span style="font-size:12px;color:var(--gray-400);font-weight:600;min-width:24px">1.0</span>
                     </div>
@@ -63,7 +63,7 @@
                     </div>
                 </div>
                 <div class="si-value-box">
-                    <div class="si-value" id="fall-val" style="color:var(--error)">0.70</div>
+                    <div class="si-value" id="fall-val" style="color:var(--error)">0.7</div>
                     <div class="si-unit">감도값</div>
                 </div>
             </div>
@@ -109,7 +109,7 @@
                     <div class="slider-wrap">
                         <span style="font-size:12px;color:var(--gray-400);font-weight:600;min-width:24px">0.0</span>
                         <input type="range" id="assault-slider" class="slider-assault"
-                               min="0" max="1" step="0.05" value="0.4"
+                               min="0" max="1" step="0.01" value="0.4"
                                oninput="updateSlider(this,'assault-val','assault-impact',false)">
                         <span style="font-size:12px;color:var(--gray-400);font-weight:600;min-width:24px">1.0</span>
                     </div>
@@ -119,7 +119,7 @@
                     </div>
                 </div>
                 <div class="si-value-box">
-                    <div class="si-value" id="assault-val" style="color:#D97706">0.40</div>
+                    <div class="si-value" id="assault-val" style="color:#D97706">0.4</div>
                     <div class="si-unit">임계값</div>
                 </div>
             </div>
@@ -337,7 +337,7 @@
 
     function updateSlider(el, valId, impactId, isInt) {
         const v = parseFloat(el.value);
-        const display = isInt ? Math.round(v) : v.toFixed(2);
+        const display = isInt ? Math.round(v) : Number(v.toFixed(2));
 
         // 값 표시 업데이트
         const valEl = document.getElementById(valId);
@@ -423,7 +423,7 @@
 
     async function loadSettings() {
       try {
-        const res = await fetch('/api/ai-settings');
+        const res = await fetch('/api/v1/settings');
         if (!res.ok) return;
         const data = await res.json();
         if (data.fallSensitivity !== undefined) {
@@ -448,7 +448,7 @@
       const payload = getPayload();
       showLoading(true);
       try {
-        const res = await fetch('/api/ai-settings', {
+        const res = await fetch('/api/v1/settings', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -471,7 +471,7 @@
     async function applyToPython() {
       const payload = getPayload();
       try {
-        await fetch('/api/ai-settings/apply', {
+        await fetch('/api/v1/settings/apply', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
