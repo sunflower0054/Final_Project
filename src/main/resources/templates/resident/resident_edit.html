@@ -7,6 +7,46 @@
     <link rel="stylesheet" th:href="@{/css/myinfo.css}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
+
+<style>
+    .hidden { display: none; }
+    .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+    }
+
+    /* 생년월일 선택박스 컴팩트 */
+    .birth-row {
+        display: grid;
+        grid-template-columns: 1fr 0.75fr 0.75fr;
+        gap: 8px;
+        max-width: 260px;
+    }
+
+    .birth-row select {
+        font-size: 14.5px !important;
+        padding: 7px 8px !important;
+        height: 38px !important;
+        border-radius: 6px;
+    }
+
+    /* 성별 + 전화번호 한 줄 배치 */
+    .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1.6fr;
+        gap: 20px;
+    }
+
+    /* 라벨 간격 */
+    .form-group label {
+        margin-bottom: 6px;
+    }
+</style>
+
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
@@ -28,7 +68,7 @@
             기존 정보를 불러왔습니다. 변경할 항목만 수정 후 저장해주세요.
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 960px;">
+        <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
 
             <!-- 기본 정보 수정 카드 -->
             <div class="content-card">
@@ -40,51 +80,37 @@
                         <label class="form-label">이름 <span style="color:#E53935;">*</span></label>
                         <input type="text" class="form-control" value="김영희">
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div class="form-group">
-                            <label class="form-label">성별</label>
-                            <select class="form-control" style="cursor:pointer;">
-                                <option selected>여성</option>
-                                <option>남성</option>
+                    <!-- 생년월일 -->
+                    <div class="form-group">
+                        <label class="form-label">생년월일 <span style="color:red;">*</span></label>
+                        <div class="birth-row">
+                            <select id="birthYear" class="form-control">
+                                <option value="">년도</option>
+                            </select>
+                            <select id="birthMonth" class="form-control">
+                                <option value="">월</option>
+                            </select>
+                            <select id="birthDay" class="form-control">
+                                <option value="">일</option>
                             </select>
                         </div>
-                        <!-- 생년월일 입력 영역 (교체용) -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
-                            <div class="form-group">
-                                <label class="form-label">생년월일 <span style="color:#E53935;">*</span></label>
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <input type="text" id="birthYear" class="form-control" value="1948" maxlength="4"
-                                           style="text-align: center; font-size: 16px;" placeholder="1948"
-                                           oninput="if(this.value.length === 4) document.getElementById('birthMonth').focus();">
-                                    <span style="color:#64748b; font-weight:500; font-size:15px;">년</span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">&nbsp;</label>
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <input type="text" id="birthMonth" class="form-control" value="3" maxlength="2"
-                                           style="text-align: center; font-size: 16px;" placeholder="3"
-                                           oninput="handleMonthDayInput(this, 'birthDay')">
-                                    <span style="color:#64748b; font-weight:500; font-size:15px;">월</span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">&nbsp;</label>
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <input type="text" id="birthDay" class="form-control" value="12" maxlength="2"
-                                           style="text-align: center; font-size: 16px;" placeholder="12"
-                                           oninput="handleMonthDayInput(this)">
-                                    <span style="color:#64748b; font-weight:500; font-size:15px;">일</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 서버로 실제 전송할 hidden 필드 -->
-                        <input type="hidden" id="birthDateHidden" name="birthDate" value="1948-03-12">
+                        <input type="hidden" id="birthDate" value="">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">전화번호 <span style="color:#E53935;">*</span></label>
-                        <input type="tel" class="form-control" value="010-9876-5432">
+
+                    <!-- 성별 + 전화번호 한 줄 배치 -->
+                    <div class="two-column">
+                        <div class="form-group">
+                            <label class="form-label">성별</label>
+                            <select class="form-control" id="gender">
+                                <option value="">선택하세요</option>
+                                <option value="남성">남성</option>
+                                <option value="여성">여성</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">전화번호</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">주소 <span style="color:#E53935;">*</span></label>
@@ -166,7 +192,7 @@
         </div>
 
         <!-- 저장/취소 버튼 영역 -->
-        <div style="margin-top: 32px; display: flex; justify-content: flex-end; gap: 12px; max-width: 960px;">
+        <div style="margin-top: 32px; display: flex; justify-content: flex-end; gap: 12px;">
             <button onclick="history.back()"
                     class="btn"
                     style="background:#f8f9fa; color:#475569; border:1px solid #dee2e6; padding:12px 28px; font-weight:600;">
@@ -187,87 +213,54 @@
 </div>
 
 <script>
-    // 월/일 입력 시 1자리 → 자동으로 앞에 0 붙여서 처리
-    function handleMonthDayInput(input, nextFieldId = null) {
-        let value = input.value.trim();
+    // ==================== 생년월일 ====================
+    function initBirthDateSelects() {
+        const yearSelect = document.getElementById('birthYear');
+        const monthSelect = document.getElementById('birthMonth');
+        const daySelect = document.getElementById('birthDay');
+        const currentYear = new Date().getFullYear();
 
-        // 숫자만 허용
-        value = value.replace(/[^0-9]/g, '');
-
-        // 1자리 입력 시 (예: 3 → 03)
-        if (value.length === 1 && value !== '0') {
-            value = '0' + value;
+        for (let i = currentYear; i >= 1920; i--) {
+            const opt = document.createElement('option');
+            opt.value = i; opt.textContent = i + '년';
+            yearSelect.appendChild(opt);
+        }
+        for (let i = 1; i <= 12; i++) {
+            const opt = document.createElement('option');
+            opt.value = i < 10 ? '0' + i : i;
+            opt.textContent = i + '월';
+            monthSelect.appendChild(opt);
+        }
+        for (let i = 1; i <= 31; i++) {
+            const opt = document.createElement('option');
+            opt.value = i < 10 ? '0' + i : i;
+            opt.textContent = i + '일';
+            daySelect.appendChild(opt);
         }
 
-        input.value = value;
-
-        // 자동 포커스 이동 (월 → 일)
-        if (nextFieldId && value.length === 2) {
-            document.getElementById(nextFieldId).focus();
-        }
-
-        updateBirthDate(); // hidden 필드 업데이트
+        [yearSelect, monthSelect, daySelect].forEach(s => s.addEventListener('change', updateBirthDateHidden));
     }
 
-    // hidden 필드에 YYYY-MM-DD 형식으로 자동 저장
-    function updateBirthDate() {
-        const year = document.getElementById('birthYear').value.padStart(4, '0');
-        let month = document.getElementById('birthMonth').value;
-        let day = document.getElementById('birthDay').value;
-
-        // 월/일이 한 자리면 0 자동 추가
-        if (month.length === 1) month = '0' + month;
-        if (day.length === 1) day = '0' + day;
-
-        const fullDate = `${year}-${month}-${day}`;
-        document.getElementById('birthDateHidden').value = fullDate;
+    function updateBirthDateHidden() {
+        const y = document.getElementById('birthYear').value;
+        const m = document.getElementById('birthMonth').value;
+        const d = document.getElementById('birthDay').value;
+        document.getElementById('birthDate').value = (y && m && d) ? `${y}-${m}-${d}` : '';
     }
-
-    // 입력 제한 및 이벤트 연결
-    document.addEventListener('DOMContentLoaded', () => {
-        const year = document.getElementById('birthYear');
-        const month = document.getElementById('birthMonth');
-        const day = document.getElementById('birthDay');
-
-        [year, month, day].forEach(input => {
-            input.addEventListener('input', () => {
-                // 숫자만 입력 허용
-                input.value = input.value.replace(/[^0-9]/g, '');
-            });
-            input.addEventListener('keypress', (e) => {
-                if (!/[0-9]/.test(e.key)) e.preventDefault();
-            });
-        });
-
-        // 초기 실행
-        updateBirthDate();
-    });
-</script>
-
-<script>
+    // ==================== Daum 주소 검색 ====================
     function execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function(data) {
+                let addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
 
-                let addr = '';
-
-                // 도로명 / 지번 선택
-                if (data.userSelectedType === 'R') {
-                    addr = data.roadAddress;
-                } else {
-                    addr = data.jibunAddress;
-                }
-
-                // 값 넣기
                 document.getElementById('postcode').value = data.zonecode;
                 document.getElementById('address').value = addr;
-
-                // 상세주소 포커스
                 document.getElementById('detailAddress').focus();
             }
         }).open();
     }
 </script>
+
 
 <script th:src="@{/js/dropdown.js}"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>

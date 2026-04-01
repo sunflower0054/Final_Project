@@ -3,8 +3,8 @@
     --success: #059669; --success-bg: #D1FAE5;
     --error: #DC2626; --error-bg: #FEE2E2;
     --warning: #D97706; --warning-bg: #FEF3C7;
-    --gray-50: #F8FAFC; --gray-100: #F1F5F9; --gray-200: #E2E8F0;
-    --gray-300: #CBD5E1; --gray-400: #94A3B8; --gray-500: #64748B; --gray-600: #475569;
+    --gray-50: #F8FAFC; --gray-100: #ffffff; --gray-200: #E2E8F0;
+    --gray-300: #B0B8C4; --gray-400: #94A3B8; --gray-500: #64748B; --gray-600: #475569;
     --gray-900: #0F172A;
     --radius: 16px;
 }
@@ -131,7 +131,7 @@ body {
 .top-row { display: grid; grid-template-columns: 1fr 360px; gap: 20px; min-height: 700px; }
 
 .content-card {
-    background: #fff; border: 2px solid var(--gray-300); border-radius: var(--radius);
+    background: #fff; border: 1px solid var(--gray-300); border-radius: var(--radius);
     box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden;
 }
 
