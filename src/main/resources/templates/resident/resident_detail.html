@@ -398,6 +398,14 @@
         .then(res => res.ok ? res.json() : Promise.reject())
         .then(result => {
             alert(isEditMode ? '수정이 완료되었습니다.' : '등록이 완료되었습니다.');
+
+            // 등록/수정이 완료된 시점에 입력된 주소와 이름을 report.html로 전달
+            const reportUrl = `/report?address=${encodeURIComponent(data.address)}&name=${encodeURIComponent(data.name)}`;
+
+            // 지금 바로 이동할 게 아니라면, 나중에 신고가 발생했을 때
+            // 저 주소(reportUrl)를 호출하게 만들면 됩니다.
+            console.log("신고 페이지 링크:", reportUrl);
+
             if (!isEditMode && result.id) {
                 location.href = `/resident/detail?id=${result.id}`;
             } else {
