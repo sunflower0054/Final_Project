@@ -109,7 +109,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">전화번호</label>
-                            <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX">
+                            <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX" oninput="formatPhone(this)">
                         </div>
                     </div>
                     <div class="form-group">
@@ -175,7 +175,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">보호자 연락처</label>
-                        <input type="tel" class="form-control" value="010-1234-9999">
+                        <input type="tel" class="form-control" value="010-1234-9999" oninput="formatPhone(this)">
                     </div>
                 </div>
             </div>
@@ -250,6 +250,19 @@
             }
         }).open();
     }
+
+<!--    =================================================-->
+<!--    ======= 전화번호 입력 시 자동으로 - 입력 ========-->
+<!--    =================================================-->
+    function formatPhone(el) {
+    let v = el.value.replace(/\D/g, '');
+    if (v.length > 3 && v.length <= 7) {
+        v = v.slice(0, 3) + '-' + v.slice(3);
+    } else if (v.length > 7) {
+        v = v.slice(0, 3) + '-' + v.slice(3, 7) + '-' + v.slice(7, 11);
+    }
+    el.value = v;
+}
 </script>
 
 

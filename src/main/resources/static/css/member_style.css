@@ -1,32 +1,38 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* 색상이 한층 연하고 부드러워진 네이비 톤 */
-  --navy:        #3B5B9D; 
-  --navy-mid:    #4E71B8;
-  --navy-light:  #F0F4FB;
-  --navy-subtle: #F6F8FC;
-  --accent:      #2563EB;
-  --accent-hover:#1D4ED8;
-  --accent-light:#DBEAFE;
-  --success:     #059669;
-  --success-bg:  #D1FAE5;
-  --error:       #DC2626;
-  --error-bg:    #FEE2E2;
-  --gray-50:  #F8FAFC;
-  --gray-100: #F1F5F9;
-  --gray-200: #E2E8F0;
-  --gray-300: #CBD5E1;
-  --gray-400: #94A3B8;
-  --gray-500: #64748B;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1E293B;
-  --gray-900: #0F172A;
+  /* 늘봄 테마 (노란빛 연두색) - 변수명 유지 */
+  --navy:        #94D05C;  /* 따뜻한 연두색 */
+  --navy-mid:    #A7D673;  /* 중간 연두색 */
+  --navy-light:  #F3F9E9;  /* 연한 연두색 배경 */
+  --navy-subtle: #F8FCF2;  /* 아주 연한 배경 */
+
+  /* Accent Colors - 강조용으로 더 선명하고 생동감 넘치는 라임색 */
+  --accent:      #A3E635;  /* 포인트 라임색 (기존 파란색 대체) */
+  --accent-hover:#84CC16;  /* 호버 시 조금 더 깊은 라임색 */
+  --accent-light:#ECFCCB;  /* 연한 라임색 배경 (체크박스 등) */
+
+  /* Status Colors (Source 2/3와 동일) */
+  --success:     #2A8F3D;
+  --success-bg:  #DCFCE7;
+  --error:       #E03131;
+  --error-bg:    #FFF5F5;
+
+  /* Gray Scale (Warm gray) */
+  --gray-50:  #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;
+  --gray-600: #4B5563;
+  --gray-700: #374151;
+  --gray-800: #1F2937;
+  --gray-900: #1C2919;
+
   --radius-sm: 8px;
   --radius:    12px;
   --radius-lg: 16px;
-  /* 네이버처럼 그림자를 제거하고 플랫하게 */
   --shadow-sm: none; 
   --shadow:    none;
 }
@@ -317,4 +323,152 @@ body {
 @media (max-width: 480px) {
   .card { border: none; padding: 20px 16px; border-radius: 0; }
   .step-container { padding: 0; }
+}
+
+
+/* =============================================
+   login.html 전용 스타일 (기존 코드 영향 없음)
+   ============================================= */
+
+.login-container {
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+}
+
+.logo {
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--navy);
+    margin-bottom: 30px;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+}
+
+.login-box {
+    background: #FFFFFF;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 40px 32px;
+}
+
+.input-group {
+    margin-top: 10px;
+}
+
+.input-box {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--gray-900);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.input-box::placeholder {
+    color: var(--gray-400);
+}
+
+.input-box:focus {
+    border-color: var(--accent);
+}
+
+.login-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.15s;
+    margin-top: 16px;
+}
+
+.login-btn:hover {
+    background: var(--navy-mid);
+}
+
+.login-links {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--gray-500);
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.login-links a {
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+
+.login-links .divider {
+    color: var(--gray-300);
+}
+
+.footer-text {
+    margin-top: 30px;
+    font-size: 12px;
+    color: var(--gray-500);
+    letter-spacing: -0.3px;
+}
+
+
+/* =============================================
+   login.html 전용 중앙 정렬 스타일 (member_style.css 안전하게 추가)
+   ============================================= */
+
+body.login-page {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    background: #f8fafc !important;     /* 부드러운 연한 배경 */
+    flex-direction: column !important;
+    gap: 0 !important;
+    overflow-y: auto;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+}
+
+/* 로그인 페이지 전용 간격 및 디자인 미세 조정 */
+.logo {
+    font-size: 42px;                    /* 조금 더 크게 조정 */
+    font-weight: 900;
+    color: var(--navy);
+    margin-bottom: 36px;
+    letter-spacing: -1.5px;
+}
+
+.login-box {
+    background: #ffffff;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 44px 36px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);   /* 부드러운 그림자 추가 */
+}
+
+.footer-text {
+    margin-top: 48px;
+    font-size: 12.5px;
+    color: var(--gray-500);
 }
