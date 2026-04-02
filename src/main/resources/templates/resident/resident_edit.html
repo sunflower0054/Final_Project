@@ -7,46 +7,6 @@
     <link rel="stylesheet" th:href="@{/css/myinfo.css}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-
-<style>
-    .hidden { display: none; }
-    .badge {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 14px;
-        margin-right: 6px;
-        margin-bottom: 6px;
-    }
-
-    /* 생년월일 선택박스 컴팩트 */
-    .birth-row {
-        display: grid;
-        grid-template-columns: 1fr 0.75fr 0.75fr;
-        gap: 8px;
-        max-width: 260px;
-    }
-
-    .birth-row select {
-        font-size: 14.5px !important;
-        padding: 7px 8px !important;
-        height: 38px !important;
-        border-radius: 6px;
-    }
-
-    /* 성별 + 전화번호 한 줄 배치 */
-    .two-column {
-        display: grid;
-        grid-template-columns: 1fr 1.6fr;
-        gap: 20px;
-    }
-
-    /* 라벨 간격 */
-    .form-group label {
-        margin-bottom: 6px;
-    }
-</style>
-
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
@@ -55,12 +15,12 @@
     <main class="content-area">
         <div class="page-header">
             <h2 class="page-title">거주자 정보 수정</h2>
-            <p class="page-subtitle">김영희 거주자님의 정보를 수정합니다. 변경 후 저장해주세요.</p>
+            <p class="page-subtitle">거주자 정보를 수정합니다. 변경 후 저장해주세요.</p>
         </div>
 
-        <!-- 안내 배너 (myinfo 스타일에 맞게 조정) -->
-        <div style="background:#FFF3E0; border:1px solid #FFE0B2; border-radius:12px; padding:14px 20px; display:flex; align-items:center; gap:10px; font-size:14px; color:#F57C00; margin-bottom:24px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <!-- 안내 배너: 주황색에서 연두색 톤으로 변경 -->
+        <div style="background:var(--primary-light); border:1px solid var(--primary-mid); border-radius:12px; padding:14px 20px; display:flex; align-items:center; gap:10px; font-size:14px; color:var(--text-main); margin-bottom:24px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--primary);">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="12" y1="8" x2="12" y2="12"/>
                 <line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -70,16 +30,18 @@
 
         <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
 
-            <!-- 기본 정보 수정 카드 -->
+            <!-- 기본 정보 카드 -->
             <div class="content-card">
                 <div class="card-header">
                     <h3 class="card-title">기본 정보</h3>
                 </div>
                 <div class="card-body">
                     <div class="form-group">
-                        <label class="form-label">이름 <span style="color:#E53935;">*</span></label>
-                        <input type="text" class="form-control" value="김영희">
+                        <!-- 필수 표시(*) 색상 통일 -->
+                        <label class="form-label">이름 <span style="color:var(--error);">*</span></label>
+                        <input type="text" class="form-control" id="name" value="김영희">
                     </div>
+
                     <!-- 생년월일 -->
                     <div class="form-group">
                         <label class="form-label">생년월일 <span style="color:red;">*</span></label>
@@ -97,101 +59,66 @@
                         <input type="hidden" id="birthDate" value="">
                     </div>
 
-                    <!-- 성별 + 전화번호 한 줄 배치 -->
-                    <div class="two-column">
-                        <div class="form-group">
-                            <label class="form-label">성별</label>
-                            <select class="form-control" id="gender">
-                                <option value="">선택하세요</option>
-                                <option value="남성">남성</option>
-                                <option value="여성">여성</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">전화번호</label>
-                            <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX" oninput="formatPhone(this)">
-                        </div>
-                    </div>
+                    <!-- 전화번호 -->
                     <div class="form-group">
-                        <label class="form-label">주소 <span style="color:#E53935;">*</span></label>
+                        <label class="form-label">전화번호</label>
+                        <input type="tel" class="form-control" id="phone" value="010-1234-5678" oninput="formatPhone(this)">
+                    </div>
 
-                        <div style="display:flex; gap:8px;">
+                    <!-- 주소 -->
+                    <div class="form-group address-group">
+                        <label class="form-label">주소 <span style="color:#E53935;">*</span></label>
+                        <div style="display:flex; gap:8px; margin-bottom:8px;">
                             <input type="text" id="postcode" class="form-control" placeholder="우편번호" readonly style="max-width:150px;">
                             <button type="button" onclick="execDaumPostcode()"
-                                    style="padding:8px 12px; background:#1e3a5f; color:white; border:none; border-radius:6px; cursor:pointer;">
+                                    style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">
                                 주소 검색
                             </button>
                         </div>
-
-                        <input type="text" id="address" class="form-control" placeholder="주소" readonly style="margin-top:8px;">
-                        <input type="text" id="detailAddress" class="form-control" placeholder="상세주소" style="margin-top:8px;">
-
-                        <span class="form-hint" style="font-size:13px; color:#64748b; margin-top:4px; display:block;">
-                            상세 주소까지 정확히 입력해주세요
-                        </span>
+                        <input type="text" id="address" class="form-control" placeholder="주소" readonly>
+                        <input type="text" id="detailAddress" class="form-control" placeholder="상세 주소 (예: 301호)" style="margin-top: 8px;">
                     </div>
                 </div>
             </div>
 
-            <!-- 건강 / 기저질환 정보 -->
+            <!-- 건강 정보 카드 (기저질환만 유지) -->
             <div class="content-card">
                 <div class="card-header">
-                    <h3 class="card-title">건강 / 기저질환 정보</h3>
+                    <h3 class="card-title">건강 정보</h3>
                 </div>
                 <div class="card-body">
                     <div class="form-group">
                         <label class="form-label">기저질환</label>
-                        <input type="text" class="form-control" value="고혈압, 당뇨, 골다공증">
-                        <span class="form-hint" style="font-size:13px; color:#64748b;">쉼표(,)로 구분하여 입력하세요</span>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div class="form-group">
-                            <label class="form-label">복용 약물</label>
-                            <input type="text" class="form-control" value="혈압약, 인슐린">
+                        <div id="underlying-diseases" class="underlying-diseases" style="display:flex; gap:8px; flex-wrap:wrap; padding:8px 0;">
+                            <label class="badge" style="background:#E3F2FD; color:#1976D2;">
+                                <input type="checkbox" value="고혈압" checked> 고혈압
+                            </label>
+                            <label class="badge" style="background:#E8F5E9; color:#388E3C;">
+                                <input type="checkbox" value="당뇨" checked> 당뇨
+                            </label>
+                            <label class="badge" style="background:#FFF3E0; color:#F57C00;">
+                                <input type="checkbox" value="골다공증"> 골다공증
+                            </label>
+                            <label class="badge" style="background:#F3E5F5; color:#7B1FA2;">
+                                <input type="checkbox" value="관절염"> 관절염
+                            </label>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">특이사항</label>
-                        <textarea class="form-control" style="height: 100px; resize: vertical;">낙상 이력 있음. 야간 이동 시 주의 필요.</textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 비상 연락처 -->
-            <div class="content-card">
-                <div class="card-header">
-                    <h3 class="card-title">비상 연락처</h3>
-                </div>
-                <div class="card-body">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div class="form-group">
-                            <label class="form-label">보호자 이름</label>
-                            <input type="text" class="form-control" value="김민수">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">관계</label>
-                            <input type="text" class="form-control" value="아들">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">보호자 연락처</label>
-                        <input type="tel" class="form-control" value="010-1234-9999" oninput="formatPhone(this)">
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <!-- 저장/취소 버튼 영역 -->
+        <!-- 저장 / 취소 버튼 -->
         <div style="margin-top: 32px; display: flex; justify-content: flex-end; gap: 12px;">
             <button onclick="history.back()"
                     class="btn"
-                    style="background:#f8f9fa; color:#475569; border:1px solid #dee2e6; padding:12px 28px; font-weight:600;">
+                    style="background:var(--secondary); color:var(--text-sub); border:1px solid var(--gray-300); padding:12px 28px; font-weight:600;">
                 취소
             </button>
-            <button onclick="alert('거주자 정보가 저장되었습니다.'); history.back()"
+            <button onclick="saveResident()"
                     class="btn btn-navy"
-                    style="padding:12px 32px; font-weight:600; display:flex; align-items:center; gap:8px;">
+                    style="padding:12px 32px; font-weight:600; display:flex; align-items:center; gap:8px; background:var(--primary);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
                     <polyline points="17 21 17 13 7 13 7 21"/>
@@ -203,25 +130,32 @@
     </main>
 </div>
 
+<script th:src="@{/js/dropdown.js}"></script>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 <script>
-    // ==================== 생년월일 ====================
+    // 생년월일 셀렉트 초기화
     function initBirthDateSelects() {
         const yearSelect = document.getElementById('birthYear');
         const monthSelect = document.getElementById('birthMonth');
         const daySelect = document.getElementById('birthDay');
         const currentYear = new Date().getFullYear();
 
+        // 년도
         for (let i = currentYear; i >= 1920; i--) {
             const opt = document.createElement('option');
-            opt.value = i; opt.textContent = i + '년';
+            opt.value = i;
+            opt.textContent = i + '년';
             yearSelect.appendChild(opt);
         }
+        // 월
         for (let i = 1; i <= 12; i++) {
             const opt = document.createElement('option');
             opt.value = i < 10 ? '0' + i : i;
             opt.textContent = i + '월';
             monthSelect.appendChild(opt);
         }
+        // 일
         for (let i = 1; i <= 31; i++) {
             const opt = document.createElement('option');
             opt.value = i < 10 ? '0' + i : i;
@@ -229,7 +163,9 @@
             daySelect.appendChild(opt);
         }
 
-        [yearSelect, monthSelect, daySelect].forEach(s => s.addEventListener('change', updateBirthDateHidden));
+        [yearSelect, monthSelect, daySelect].forEach(s =>
+            s.addEventListener('change', updateBirthDateHidden)
+        );
     }
 
     function updateBirthDateHidden() {
@@ -238,36 +174,81 @@
         const d = document.getElementById('birthDay').value;
         document.getElementById('birthDate').value = (y && m && d) ? `${y}-${m}-${d}` : '';
     }
-    // ==================== Daum 주소 검색 ====================
+
+    // 주소 검색 (Daum Postcode)
     function execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function(data) {
                 let addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
-
                 document.getElementById('postcode').value = data.zonecode;
                 document.getElementById('address').value = addr;
-                document.getElementById('detailAddress').focus();
             }
         }).open();
     }
 
-<!--    =================================================-->
-<!--    ======= 전화번호 입력 시 자동으로 - 입력 ========-->
-<!--    =================================================-->
+    // 전화번호 자동 하이픈
     function formatPhone(el) {
-    let v = el.value.replace(/\D/g, '');
-    if (v.length > 3 && v.length <= 7) {
-        v = v.slice(0, 3) + '-' + v.slice(3);
-    } else if (v.length > 7) {
-        v = v.slice(0, 3) + '-' + v.slice(3, 7) + '-' + v.slice(7, 11);
+        let v = el.value.replace(/\D/g, '');
+        if (v.length > 3 && v.length <= 7) {
+            v = v.slice(0, 3) + '-' + v.slice(3);
+        } else if (v.length > 7) {
+            v = v.slice(0, 3) + '-' + v.slice(3, 7) + '-' + v.slice(7, 11);
+        }
+        el.value = v;
     }
-    el.value = v;
-}
+
+    // 저장 함수 (DB 테이블에 맞춤)
+    function saveResident() {
+        updateBirthDateHidden();
+
+        const name = document.getElementById('name').value.trim();
+        const birthDate = document.getElementById('birthDate').value;
+        const phone = document.getElementById('phone').value.trim();
+        const address = document.getElementById('address').value.trim();
+
+        if (!name) {
+            alert('이름을 입력해주세요.');
+            document.getElementById('name').focus();
+            return;
+        }
+        if (!birthDate) {
+            alert('생년월일을 선택해주세요.');
+            return;
+        }
+        if (!address) {
+            alert('주소를 입력해주세요.');
+            return;
+        }
+
+        // 기저질환 체크된 값들을 쉼표로 연결
+        const diseases = Array.from(
+            document.querySelectorAll('#underlying-diseases input[type="checkbox"]:checked')
+        ).map(cb => cb.value).join(', ');
+
+        const data = {
+            name: name,
+            birthDate: birthDate,
+            phone: phone || null,
+            address: address,
+            disease: diseases || null
+            // latitude, longitude는 백엔드에서 주소 기반으로 처리 추천
+        };
+
+        // 실제로는 fetch로 PUT 요청 보내기
+        console.log("저장 데이터:", data);
+        alert("거주자 정보가 수정되었습니다.");
+        // history.back(); 또는 목록 페이지로 이동
+        // location.href = '/resident/list';
+    }
+
+    // 페이지 로드 시 초기화
+    window.addEventListener('load', () => {
+        initBirthDateSelects();
+
+        // 예시: 기존 데이터가 있다면 여기서 값 세팅 (실제로는 API 호출)
+        // loadResidentData();
+    });
 </script>
-
-
-<script th:src="@{/js/dropdown.js}"></script>
-<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 </body>
 </html>

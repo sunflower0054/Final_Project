@@ -140,23 +140,32 @@
             const residentId = urlParams.get('residentId'); // ★ ID만 받습니다.
 
 
-            // ==========================================
-            // [테스트 전용 로직] ID가 '999'일 경우 가짜 데이터 렌더링
-            // ==========================================
-            if (residentId === '999') {
-                const mockData = {
-                    type: typeParam,
-                    event: typeParam === 'auto' ? '낙상 의심 (10분 미확인 자동 신고)' : '낙상 감지 (관제 센터 수동 신고)',
-                    name: '테스트 거주자',
-                    age: 82,
-                    disease: '고혈압, 관절염',
-                    address: '서울 강남구 테헤란로 152', // 강남역 (인근 병원 검색 테스트용)
-                    reporter: typeParam === 'auto' ? '010-1234-5678 (스마트 관제 시스템)' : '010-1234-5678 (스마트 관제 센터)'
-                };
-                renderUI(mockData);
-                return; // 여기서 함수를 종료하여 아래 fetch(서버 요청)를 실행하지 않음
-            }
-            // ==========================================
+// ==========================================
+// [테스트 전용 로직] ID가 '999'일 경우 가짜 데이터 렌더링
+// ==========================================
+if (residentId === '999') {
+    // 1. URL에서 address 파라미터 값을 가져옵니다.
+    // (만약 함수 최상단에 이미 선언해두셨다면 이 두 줄은 생략하셔도 됩니다)
+    const urlParams = new URLSearchParams(window.location.search);
+    const addressParam = urlParams.get('address');
+
+    const mockData = {
+        type: typeParam,
+        event: typeParam === 'auto' ? '낙상 의심 (10분 미확인 자동 신고)' : '낙상 감지 (관제 센터 수동 신고)',
+        name: '테스트 거주자',
+        age: 82,
+        disease: '고혈압, 관절염',
+
+        // 2. 하드코딩된 주소 대신 addressParam을 사용하도록 수정합니다.
+        // URL에 값이 있으면 그 값을 사용하고, 없으면 뒤의 기본값(강남역)을 사용합니다.
+        address: addressParam || '서울 강남구 테헤란로 152',
+
+        reporter: typeParam === 'auto' ? '010-1234-5678 (스마트 관제 시스템)' : '010-1234-5678 (스마트 관제 센터)'
+    };
+    renderUI(mockData);
+    return; // 여기서 함수를 종료하여 아래 fetch(서버 요청)를 실행하지 않음
+}
+// ==========================================
 
 
             if (residentId) {
