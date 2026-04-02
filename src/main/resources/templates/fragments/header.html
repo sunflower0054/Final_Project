@@ -50,8 +50,8 @@
                             </svg>
                         </div>
                     </div>
-                    <div class="user-name">홍길동</div>
-                    <div class="user-email">admin@goldennomis.com</div>
+                    <div class="user-name" th:text="${currentUser.name}">미등록</div>
+                    <div class="user-email" th:text="${currentUser.username}">미등록</div>
                 </div>
 
                 <div class="profile-menu">
