@@ -1,5 +1,6 @@
 package com.office.monitoring.aiSettings;
 
+import com.office.monitoring.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,30 +12,47 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class AiSettingsService {
 
     private final AiSettingsRepository aiSettingsRepository;
+    private final CurrentUserService currentUserService;
 
-    private static final Long RESIDENT_ID = 1L;
     private static final String PYTHON_URL = "http://localhost:5005";
 
-    // 설정값 조회
     public AiSettings getSettings() {
-        return aiSettingsRepository.findByResidentId(RESIDENT_ID);
+        Long residentId = currentUserService.getResidentId();
+
+        AiSettings settings = aiSettingsRepository.findByResidentId(residentId);
+        if (settings == null) {
+            throw new IllegalStateException("해당 거주자의 AI 설정이 존재하지 않습니다.");
+        }
+
+        return settings;
     }
 
-    // 설정값 저장 + 파이썬으로 즉시 전달
     public AiSettings updateSettings(AiSettingsDto dto) {
+        Long residentId = currentUserService.getResidentId();
 
-        // 1. DB 저장
-        AiSettings settings = aiSettingsRepository.findByResidentId(RESIDENT_ID);
+        AiSettings settings = aiSettingsRepository.findByResidentId(residentId);
+
+        if (settings == null) {
+            settings = AiSettings.builder()
+                    .residentId(residentId)
+                    .fallSensitivity(0.1D)
+                    .noMotionThreshold(1800)
+                    .velocityThreshold(0.15D)
+                    .build();
+        }
+
         settings.setFallSensitivity(dto.getFallSensitivity());
         settings.setNoMotionThreshold(dto.getNoMotionThreshold());
         settings.setVelocityThreshold(dto.getVelocityThreshold());
+
         AiSettings saved = aiSettingsRepository.save(settings);
-        log.info("✅ 설정값 DB 저장 완료 | fall={} | motion={} | velocity={}",
+
+        log.info("설정값 DB 저장 완료 | residentId={} | fall={} | motion={} | velocity={}",
+                residentId,
                 saved.getFallSensitivity(),
                 saved.getNoMotionThreshold(),
                 saved.getVelocityThreshold());
 
-        // 2. 파이썬으로 즉시 POST 전달
         try {
             WebClient client = WebClient.create(PYTHON_URL);
             client.post()
@@ -43,10 +61,10 @@ public class AiSettingsService {
                     .retrieve()
                     .bodyToMono(String.class)
                     .subscribe(response ->
-                            log.info("✅ 파이썬 설정값 전달 완료: {}", response)
+                            log.info("파이썬 설정값 전달 완료: {}", response)
                     );
         } catch (Exception e) {
-            log.error("❌ 파이썬 설정값 전달 실패", e);
+            log.error("파이썬 설정값 전달 실패", e);
         }
 
         return saved;
