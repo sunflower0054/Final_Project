@@ -1,6 +1,6 @@
 /*
 // 1. 본인 프로젝트 경로에 맞게 패키지명을 꼭 넣어주세요. (예: package com.project.dto;)
-package ...;
+package com.office.monitoring.admin;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -39,4 +39,5 @@ public class AdminStatsDTO {
         private List<List<Object>> byStatus;
         private List<List<Object>> monthlyTrend;
     }
-}*/
+}
+*/

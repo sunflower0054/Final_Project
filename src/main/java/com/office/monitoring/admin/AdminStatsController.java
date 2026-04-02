@@ -1,4 +1,6 @@
 /*
+package com.office.monitoring.admin;
+
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
@@ -31,4 +33,5 @@ public class AdminStatsController {
             @RequestParam(required = false) Integer month) {
         return adminStatsService.getEventStats(year, month);
     }
-}*/
+}
+*/

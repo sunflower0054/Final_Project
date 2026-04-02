@@ -1,31 +1,32 @@
 /* ===== 1. Modern Design System & Variables ===== */
 :root {
-    /* Main Colors - 부드럽고 신뢰감 있는 컬러 */
-    --primary: #37517e; /* 신뢰감 있는 블루 그레이 */
-    --primary-light: #f0f4f8; /* 배경 및 영역 구분 */
-    --secondary: #e9ecef; /* 경계선 및 보조 배경 */
+    /* Main Colors - 늘봄 테마 */
+    --primary: #94D05C;       /* 따뜻한 봄빛 연두색 */
+    --primary-mid: #A7D673;   /* 부드러운 중간 연두색 (호버 등) */
+    --primary-light: #F3F9E9; /* 배경 및 영역 구분용 연한 연두색 */
+    --secondary: #F4F4F5;     /* 경계선 및 보조 배경 (Warm gray) */
 
-    /* Text Colors - 가독성 향상 */
-    --text-main: #2a354f; /* 짙은 네이비 */
-    --text-sub: #6c757d; /* 차분한 그레이 */
-    --text-muted: #adb5bd; /* 연한 그레이 */
+    /* Text Colors - 가독성을 위한 따뜻한 흑록색 */
+    --text-main: #1C2919;     /* 짙은 초록빛이 감도는 따뜻한 블랙 */
+    --text-sub: #52525B;      /* 따뜻한 회색 */
+    --text-muted: #A1A1AA;    /* 연한 회색 */
 
-    /* Semantic Colors - 상태 표시 */
-    --success: #198754; /* 안전, 정상 */
-    --error: #dc3545; /* 긴급, 낙상 */
-    --warning: #fd7e14; /* 주의, 무응답 */
-    --purple: #6f42c1; /* 폭행 의심 */
+    /* Semantic Colors - 상태 표시 (Source 2와 동일) */
+    --success: #2A8F3D;
+    --error: #E03131;
+    --warning: #F59E0B;
+    --purple: #7C3AED;        /* 보라색도 따뜻한 톤으로 */
 
-    /* Design Elements - 모던한 디테일 */
-    --bg-page: #ffffff; /* 깨끗한 페이지 배경 */
-    --bg-card: #ffffff; /* 순백색 카드 */
-    --border-color: #B0B8C4; /* 아주 연한 경계선 */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05); /* 부드러운 그림자 */
-    --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.08); /* 강조 그림자 */
-    --radius: 12px; /* 둥근 모서리 통합 */
-    --transition: all 0.25s ease; /* 부드러운 애니메이션 */
+    /* Design Elements */
+    --bg-page: #ffffff;
+    --bg-card: #ffffff;
+    --border-color: #E5E7EB;  /* 따뜻한 회색 경계선 */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.08);
+    --radius: 12px;
+    --transition: all 0.25s ease;
     --gray-100: #ffffff;
-    --gray-900: #0F172A;
+    --gray-900: #1C2919;
 }
 
 /* ===== 2. Reset & Body ===== */
@@ -46,13 +47,14 @@ svg {
     vertical-align: middle;
 }
 
-
-
 /* Header & Topbar */
 .header-area { display: flex; align-items: center; justify-content: space-between; padding: 0 10px; flex-shrink: 0; }
 .brand-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-.logo-box { width: 36px; height: 36px; background: var(--navy); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; }
-.brand-name { font-size: 24px; font-weight: 800; color: var(--navy); letter-spacing: -1px; }
+/* 수정됨: var(--navy) -> var(--primary) */
+.logo-box { width: 36px; height: 36px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; padding: 6px; }
+.brand-name { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
+.logo-image {max-width: 100%; max-height: 100%; object-fit: contain; vertical-align: middle; }
+
 
 .topbar-right { display: flex; align-items: center; gap: 14px; position: relative; }
 .system-time { font-size: 14px; font-weight: 600; color: var(--gray-500); margin-right: 8px; }
@@ -75,7 +77,7 @@ svg {
 
 .dropdown-footer { padding: 12px 24px; border-top: 1px solid var(--gray-100); background: var(--gray-50); }
 
-/* ==================== 알림 드롭다운 (완전 복원) ==================== */
+/* ==================== 알림 드롭다운 ==================== */
 #notiDropdown { width: 340px; }
 #notiDropdown .dropdown-header {
     justify-content: space-between;
@@ -107,7 +109,7 @@ svg {
     border-radius: 8px; font-size: 13.5px; line-height: 1.4; margin-top: 16px;
 }
 
-/* ==================== 프로필 드롭다운 (네이버 ID 스타일) ==================== */
+/* ==================== 프로필 드롭다운 ==================== */
 #profileDropdown { width: 320px; }
 .profile-header {
     padding: 24px 24px 16px; text-align: center; border-bottom: 1px solid var(--gray-100);
@@ -121,14 +123,6 @@ svg {
 
 .user-name { font-size: 20px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
 .user-email { font-size: 13px; color: #64748b; }
-
-
-.profile-menu { padding: 8px 0; }
-/*.profile-menu a {
-    display: block; padding: 14px 24px; font-size: 15px; color: var(--gray-900);
-    text-decoration: none; transition: 0.2s;
-}
-.profile-menu a:hover { background: var(--gray-100); }*/
 
 .profile-menu { padding: 8px 0; }
 .profile-menu a {
@@ -147,14 +141,14 @@ svg {
     flex-shrink: 0;
     transition: 0.2s;
 }
+/* 수정됨: 호버 시 var(--primary-light), var(--primary) 적용 */
 .profile-menu a:hover {
-    background: var(--navy-light);
-    color: var(--navy);
+    background: var(--primary-light);
+    color: var(--primary);
 }
 .profile-menu a:hover svg {
-    color: var(--navy);
+    color: var(--primary);
 }
-
 
 /* ===== 4. Content Area Layout & Typography ===== */
 .main-container {
@@ -191,19 +185,17 @@ svg {
 /* ===== 5. Modern Info Grid & Profile Card ===== */
 .info-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 1:1 비율로 두 개의 열 생성 */
-    gap: 24px; /* 카드 사이의 간격 */
-    align-items: start; /* 카드의 높이가 달라도 상단 정렬 */
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
 }
 
-/* 모바일 대응: 화면이 좁아지면 다시 세로로 배치 */
 @media (max-width: 1024px) {
     .info-grid {
         grid-template-columns: 1fr;
     }
 }
 
-/* Modern Profile Card */
 .profile-card {
     background-color: var(--bg-card);
     border-radius: var(--radius);
@@ -298,13 +290,13 @@ svg {
  .profile-card {
     background-color: var(--bg-card);
     border-radius: var(--radius);
-    border: 1px solid var(--border-color);   /* 1px → 2px로 변경 */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);   /* index와 비슷한 그림자 */
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .card-header {
     padding: 20px 25px;
-    border-bottom: 1px solid var(--border-color);   /* 1px → 2px */
+    border-bottom: 1px solid var(--border-color);
 }
 
 .card-title {
@@ -317,7 +309,6 @@ svg {
     padding: 25px;
 }
 
-/* Modern Form Elements */
 .form-group {
     margin-bottom: 20px;
 }
@@ -383,7 +374,6 @@ svg {
     margin-top: 2px;
 }
 
-/* Modern Toggle Switch */
 .toggle {
     display: inline-block;
     position: relative;
@@ -426,7 +416,6 @@ svg {
 }
 
 /* ===== 8. Buttons, Badges, & Footer ===== */
-/* Common Button Style */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -447,11 +436,10 @@ svg {
 }
 
 .btn-navy:hover {
-    background-color: #2c4165;
+    background-color: var(--primary-mid);
     transform: translateY(-1px);
 }
 
-/* Profile Photo Button */
 .btn-profile-detail {
     display: flex;
     align-items: center;
@@ -469,11 +457,13 @@ svg {
     transition: var(--transition);
 }
 
+/* 수정됨: 호버 시 var(--primary-mid) 적용 */
 .btn-profile-detail:hover {
-    background-color: var(--primary-light);
+    background-color: var(--gray-50);
+    color: var(--primary);
+    border-color: var(--primary-mid);
 }
 
-/* Modern Badges */
 .badge {
     display: inline-block;
     padding: 5px 12px;
@@ -499,123 +489,7 @@ svg {
     border-radius: 0 0 var(--radius) var(--radius);
 }
 
-
-
-/* =================================================
-   HEADER & TOPBAR STYLE
-   ================================================= */
-
-/* 레이아웃 공통 변수 (필요 시 유지) */
-:root {
-    --navy: #3B5B9D; --navy-mid: #4E71B8; --navy-light: #F0F4FB;
-    --error: #DC2626; --error-bg: #FEE2E2;
-    --gray-50: #F8FAFC; --gray-100: #F1F5F9; --gray-200: #E2E8F0;
-    --gray-300: #CBD5E1; --gray-400: #94A3B8; --gray-500: #64748B; --gray-600: #475569;
-    --gray-900: #0F172A;
-}
-
-/* 헤더 전체 영역 */
-.header-area {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    flex-shrink: 0;
-}
-
-/* 로고 섹션 */
-.brand-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-.logo-box {
-    width: 36px; height: 36px;
-    background: var(--navy);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff;
-}
-.brand-name {
-    font-size: 24px; font-weight: 800;
-    color: var(--navy);
-    letter-spacing: -1px;
-}
-
-/* 우측 상단 메뉴 바 */
-.topbar-right { display: flex; align-items: center; gap: 14px; position: relative; }
-.system-time { font-size: 14px; font-weight: 600; color: var(--gray-500); margin-right: 8px; }
-
-/* 공통 아이콘 버튼 */
-.icon-btn {
-    background: #fff; border: 1px solid var(--gray-300); cursor: pointer; color: var(--gray-600);
-    width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    position: relative; transition: 0.2s;
-}
-.noti-dot {
-    position: absolute; top: 10px; right: 10px;
-    width: 8px; height: 8px;
-    background: var(--error); border: 2px solid #fff; border-radius: 50%;
-}
-
-/* =================================================
-   DROPDOWN (COMMON & SPECIFIC)
-   ================================================= */
-
-/* 드롭다운 공통 */
-.dropdown-wrap { position: relative; }
-.dropdown-menu {
-    position: absolute; top: 52px; right: 0; background: #fff;
-    border: 1px solid var(--gray-300); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    display: none; flex-direction: column; z-index: 100; overflow: hidden;
-}
-.dropdown-menu.open { display: flex; }
-.dropdown-footer { padding: 12px 24px; border-top: 1px solid var(--gray-100); background: var(--gray-50); }
-
-/* 알림 드롭다운 상세 */
-#notiDropdown { width: 340px; }
-#notiDropdown .dropdown-header {
-    display: flex; justify-content: space-between;
-    padding: 16px 24px;
-}
-.noti-count {
-    background: #fff; border: 1px solid var(--gray-300); color: var(--gray-700);
-    font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 9999px;
-}
-.noti-list { max-height: 420px; overflow-y: auto; padding: 0; }
-.noti-item { padding: 20px; border-bottom: 1px solid var(--gray-100); }
-.noti-detail-title {
-    font-size: 15px; font-weight: 700; color: var(--gray-900); margin-bottom: 10px;
-    display: flex; align-items: center; gap: 6px;
-}
-.noti-detail-title::before { content: '●'; color: var(--error); font-size: 18px; line-height: 1; }
-.noti-detail-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 6px; }
-.noti-detail-row .value { font-weight: 600; color: var(--gray-900); }
-.noti-alert-box { background: #FEE2E2; color: var(--error); padding: 14px 16px; border-radius: 8px; font-size: 13.5px; line-height: 1.4; margin-top: 16px; }
-
-/* 프로필 드롭다운 상세 (네이버 스타일) */
-#profileDropdown { width: 320px; }
-.profile-header { padding: 24px 24px 16px; text-align: center; border-bottom: 1px solid var(--gray-100); }
-.avatar-container { position: relative; display: inline-block; margin-bottom: 12px; }
-.profile-avatar-lg {
-    width: 88px; height: 88px; background: #e5e7eb; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; margin: 0 auto;
-}
-.profile-avatar-lg svg { width: 48px; height: 48px; color: #6b7280; }
-.user-name { font-size: 20px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
-.user-email { font-size: 13px; color: #64748b; }
-
-.profile-menu { padding: 8px 0; }
-.profile-menu a {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 24px; font-size: 14px; font-weight: 600;
-    color: var(--gray-600); text-decoration: none; transition: 0.2s;
-}
-.profile-menu a svg { color: var(--gray-400); flex-shrink: 0; transition: 0.2s; }
-.profile-menu a:hover { background: var(--navy-light); color: var(--navy); }
-.profile-menu a:hover svg { color: var(--navy); }
-
-/* =================================================
-   BUTTONS IN DROPDOWN
-   ================================================= */
-
-/* 로그아웃 버튼 */
+/* 모던 로그아웃 버튼 스타일 */
 .btn-profile-logout {
     width: 100%; padding: 12px; margin-top: 8px;
     background-color: #fff; color: #E03131;
@@ -625,32 +499,19 @@ svg {
     transition: all 0.2s ease-in-out;
 }
 .btn-profile-logout:hover { background-color: #FFF5F5; border-color: #FFAFB0; transform: translateY(-1px); }
+.btn-profile-logout:active { background-color: #FFE3E3; transform: translateY(0); }
+.btn-profile-logout svg { transition: transform 0.2s ease; }
+.btn-profile-logout:hover svg { transform: translateX(2px); }
 
-/* 모든 알림 보기 버튼 */
-.btn-profile-detail {
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    width: 100%; padding: 10px;
-    background-color: #ffffff; color: var(--gray-600);
-    border: 1px solid var(--gray-200); border-radius: 8px;
-    font-size: 13px; font-weight: 600; cursor: pointer;
-    transition: all 0.2s ease;
-}
-.btn-profile-detail:hover { background-color: var(--gray-50); color: var(--navy); border-color: var(--navy-mid); }
-
-
-/* =================================================
-   3단 레이아웃 그리드 설정 (프로필 / 기본정보 / 알림설정)
-   ================================================= */
+/* 3단 레이아웃 그리드 설정 */
 .info-grid-3col {
     display: grid;
-    /* 왼쪽 프로필은 280px 고정, 나머지 두 카드는 남은 공간을 반씩(1fr) 차지 */
     grid-template-columns: 280px 1fr 1fr;
     gap: 24px;
     align-items: start;
     margin-top: 30px;
 }
 
-/* 태블릿 및 모바일 대응: 화면 폭이 1200px 이하일 때 세로로 한 줄 배치 */
 @media (max-width: 1200px) {
     .info-grid-3col {
         grid-template-columns: 1fr;

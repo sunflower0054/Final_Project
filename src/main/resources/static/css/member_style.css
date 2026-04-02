@@ -1,32 +1,38 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* 색상이 한층 연하고 부드러워진 네이비 톤 */
-  --navy:        #3B5B9D; 
-  --navy-mid:    #4E71B8;
-  --navy-light:  #F0F4FB;
-  --navy-subtle: #F6F8FC;
-  --accent:      #2563EB;
-  --accent-hover:#1D4ED8;
-  --accent-light:#DBEAFE;
-  --success:     #059669;
-  --success-bg:  #D1FAE5;
-  --error:       #DC2626;
-  --error-bg:    #FEE2E2;
-  --gray-50:  #F8FAFC;
-  --gray-100: #F1F5F9;
-  --gray-200: #E2E8F0;
-  --gray-300: #CBD5E1;
-  --gray-400: #94A3B8;
-  --gray-500: #64748B;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1E293B;
-  --gray-900: #0F172A;
+  /* 늘봄 테마 (노란빛 연두색) - 변수명 유지 */
+  --navy:        #94D05C;  /* 따뜻한 연두색 */
+  --navy-mid:    #A7D673;  /* 중간 연두색 */
+  --navy-light:  #F3F9E9;  /* 연한 연두색 배경 */
+  --navy-subtle: #F8FCF2;  /* 아주 연한 배경 */
+
+  /* Accent Colors - 강조용으로 더 선명하고 생동감 넘치는 라임색 */
+  --accent:      #A3E635;  /* 포인트 라임색 (기존 파란색 대체) */
+  --accent-hover:#84CC16;  /* 호버 시 조금 더 깊은 라임색 */
+  --accent-light:#ECFCCB;  /* 연한 라임색 배경 (체크박스 등) */
+
+  /* Status Colors (Source 2/3와 동일) */
+  --success:     #2A8F3D;
+  --success-bg:  #DCFCE7;
+  --error:       #E03131;
+  --error-bg:    #FFF5F5;
+
+  /* Gray Scale (Warm gray) */
+  --gray-50:  #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;
+  --gray-600: #4B5563;
+  --gray-700: #374151;
+  --gray-800: #1F2937;
+  --gray-900: #1C2919;
+
   --radius-sm: 8px;
   --radius:    12px;
   --radius-lg: 16px;
-  /* 네이버처럼 그림자를 제거하고 플랫하게 */
   --shadow-sm: none; 
   --shadow:    none;
 }
