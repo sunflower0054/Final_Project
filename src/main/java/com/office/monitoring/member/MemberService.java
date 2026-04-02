@@ -1,6 +1,10 @@
 package com.office.monitoring.member;
 
-import com.office.monitoring.member.dto.*;
+import com.office.monitoring.member.dto.MyInfoResponse;
+import com.office.monitoring.member.dto.RegisterRequest;
+import com.office.monitoring.member.dto.RegisterResponse;
+import com.office.monitoring.member.dto.UpdateMyInfoRequest;
+import com.office.monitoring.member.dto.WithdrawResponse;
 import com.office.monitoring.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +43,7 @@ public class MemberService {
                 .password(passwordEncoder.encode(request.password().trim()))
                 .name(request.name().trim())
                 .phone(request.phone().trim())
+                .purpose(request.purpose().trim())
                 .role(Role.FAMILY)
                 .build();
 
