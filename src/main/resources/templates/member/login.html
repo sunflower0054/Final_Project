@@ -49,6 +49,7 @@
 
 </div>
 
+<script th:src="@{/js/app-api.js}"></script>
 <script>
     const loginForm = document.getElementById('loginForm');
 
@@ -56,26 +57,14 @@
         event.preventDefault();
 
         const formData = new FormData(loginForm);
-        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-        const headers = {};
-
-        if (csrfToken && csrfHeader) {
-            headers[csrfHeader] = csrfToken;
-        }
-
-        const response = await fetch('/api/v1/auth/login', {
-            method: 'POST',
-            headers,
-            body: formData
-        });
-
-        if (response.ok) {
+        try {
+            await AppApi.post('/api/v1/auth/login', formData, {
+                redirectOn401: false
+            });
             window.location.href = '/';
-            return;
+        } catch (error) {
+            window.location.href = '/member/login?error';
         }
-
-        window.location.href = '/member/login?error';
     });
 </script>
 </body>
