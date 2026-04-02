@@ -47,12 +47,7 @@ public class ResidentService {
 
         currentMember.assignResident(savedResident.getId());
 
-        aiSettingsRepository.save(AiSettings.builder()
-                .residentId(savedResident.getId())
-                .fallSensitivity(0.1D)
-                .noMotionThreshold(1800)
-                .velocityThreshold(0.15D)
-                .build());
+        createDefaultAiSettingsIfAbsent(savedResident.getId());
 
         return savedResident.getId();
     }
@@ -119,5 +114,19 @@ public class ResidentService {
 
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private void createDefaultAiSettingsIfAbsent(Long residentId) {
+        // orphan 데이터 등으로 resident_id 기준 설정이 이미 있으면 중복 INSERT를 방지한다.
+        if (aiSettingsRepository.existsByResidentId(residentId)) {
+            return;
+        }
+
+        aiSettingsRepository.save(AiSettings.builder()
+                .residentId(residentId)
+                .fallSensitivity(0.1D)
+                .noMotionThreshold(1800)
+                .velocityThreshold(0.15D)
+                .build());
     }
 }
