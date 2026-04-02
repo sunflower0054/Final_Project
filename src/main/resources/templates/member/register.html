@@ -127,6 +127,7 @@
         <div class="section-title">기본 정보 입력</div>
         <div class="section-sub">가입에 필요한 정보를 입력해 주세요.</div>
 
+        <!-- 아이디 -->
         <div class="form-group">
             <label class="form-label">아이디 <span class="req">*</span></label>
             <div class="input-row">
@@ -137,6 +138,7 @@
             <div class="msg ok"  id="idOk">사용 가능한 아이디입니다.</div>
         </div>
 
+        <!-- 비밀번호 -->
         <div class="form-group">
             <label class="form-label">비밀번호 <span class="req">*</span></label>
             <div class="pw-wrap">
@@ -144,12 +146,15 @@
                 <button class="pw-toggle" type="button" onclick="togglePw('pw')">👁️</button>
             </div>
             <div class="pw-strength">
-                <div class="pw-bar" id="bar1"></div><div class="pw-bar" id="bar2"></div>
-                <div class="pw-bar" id="bar3"></div><div class="pw-bar" id="bar4"></div>
+                <div class="pw-bar" id="bar1"></div>
+                <div class="pw-bar" id="bar2"></div>
+                <div class="pw-bar" id="bar3"></div>
+                <div class="pw-bar" id="bar4"></div>
             </div>
             <div class="pw-hint" id="pwHint">비밀번호를 입력해주세요.</div>
         </div>
 
+        <!-- 비밀번호 확인 (다시 추가) -->
         <div class="form-group">
             <label class="form-label">비밀번호 확인 <span class="req">*</span></label>
             <div class="pw-wrap">
@@ -159,46 +164,24 @@
             <div class="msg err" id="pw2Err">비밀번호가 일치하지 않습니다.</div>
         </div>
 
-        <div class="form-divider"></div>
-
+        <!-- 이름 -->
         <div class="form-group">
             <label class="form-label">이름 <span class="req">*</span></label>
             <input class="form-input" id="userName" type="text" placeholder="실명을 입력해주세요">
         </div>
 
+        <!-- 휴대폰 번호 -->
         <div class="form-group">
-            <label class="form-label">이메일 <span class="req">*</span></label>
-            <div class="input-row">
-                <input class="form-input" id="email" type="email" placeholder="example@email.com">
-                <button class="btn-sub" onclick="sendVerify()">인증메일</button>
-            </div>
-            <div class="msg err" id="emailErr">올바른 이메일 형식이 아닙니다.</div>
-            <div class="msg ok"  id="emailOk">인증 메일을 발송했습니다.</div>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">휴대폰 번호</label>
+            <label class="form-label">휴대폰 번호 <span class="req">*</span></label>
             <input class="form-input" id="phone" type="tel" placeholder="010-0000-0000" oninput="formatPhone(this)">
         </div>
 
-        <div class="form-divider"></div>
-
+        <!-- 출생연도 -->
         <div class="form-group">
-            <label class="form-label">생년월일</label>
-            <div class="birth-row">
-                <select id="bYear"><option value="">년도</option></select>
-                <select id="bMonth"><option value="">월</option></select>
-                <select id="bDay"><option value="">일</option></select>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">성별</label>
-            <div class="gender-row">
-                <button class="gender-btn" id="gM" onclick="selectGender('M')">남성</button>
-                <button class="gender-btn" id="gF" onclick="selectGender('F')">여성</button>
-                <button class="gender-btn" id="gN" onclick="selectGender('N')">선택 안함</button>
-            </div>
+            <label class="form-label">출생연도</label>
+            <select id="bYear" class="form-input">
+                <option value="">출생연도를 선택하세요</option>
+            </select>
         </div>
 
         <button class="btn-primary" onclick="goStep3()" style="margin-top:16px;">가입하기</button>
@@ -270,16 +253,19 @@
       ALL.forEach(id=>document.getElementById(id).classList.toggle('checked',will));
       validate();
     }
+
     function sync(){
       const a=ALL.every(id=>document.getElementById(id).classList.contains('checked'));
       document.getElementById('allChk').classList.toggle('checked',a);
       document.getElementById('allAgreeRow').classList.toggle('checked',a);
     }
+
     function validate(){
       const ok=REQ.every(id=>document.getElementById(id).classList.contains('checked'));
       document.getElementById('step1Next').disabled=!ok;
       document.getElementById('termsBadge').classList.toggle('show',ok);
     }
+
     function goStep2(){
       document.getElementById('step1').style.display='none';
       document.getElementById('step2').style.display='flex'; // 래퍼 레이아웃 호환
@@ -293,12 +279,14 @@
       document.getElementById('idErr').classList.toggle('show',v.length>0&&!/^[a-zA-Z0-9]{6,20}$/.test(v));
       document.getElementById('idOk').classList.remove('show');
     }
+
     function checkDup(){
       const v=document.getElementById('userId').value;
       if(!/^[a-zA-Z0-9]{6,20}$/.test(v)){document.getElementById('idErr').classList.add('show');return;}
       document.getElementById('idErr').classList.remove('show');
       document.getElementById('idOk').classList.add('show');
     }
+
     function checkPw(){
       const v=document.getElementById('pw').value;
       const bars=['bar1','bar2','bar3','bar4'].map(id=>document.getElementById(id));
@@ -314,22 +302,27 @@
       hint.style.color=s>0?c[s-1]:'var(--gray-400)';
       checkPw2();
     }
+
     function checkPw2(){
       const v1=document.getElementById('pw').value, v2=document.getElementById('pw2').value;
       document.getElementById('pw2Err').classList.toggle('show',v2.length>0&&v1!==v2);
     }
+
     function togglePw(id){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';}
+
     function sendVerify(){
       const v=document.getElementById('email').value, ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
       document.getElementById('emailErr').classList.toggle('show',!ok);
       document.getElementById('emailOk').classList.toggle('show',ok);
     }
+
     function formatPhone(el){
       let v=el.value.replace(/\D/g,'');
       if(v.length>3&&v.length<=7)v=v.slice(0,3)+'-'+v.slice(3);
       else if(v.length>7)v=v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
       el.value=v;
     }
+
     function selectGender(g){['M','F','N'].forEach(id=>document.getElementById('g'+id).classList.toggle('selected',id===g));}
 
     (function(){
@@ -344,21 +337,36 @@
       document.getElementById('step1').style.display='flex';
       window.scrollTo({top:0,behavior:'smooth'});
     }
+
     function goStep3(){
-      const id=document.getElementById('userId').value.trim();
-      const pw=document.getElementById('pw').value;
-      const pw2=document.getElementById('pw2').value;
-      const name=document.getElementById('userName').value.trim();
-      const email=document.getElementById('email').value.trim();
-      if(!id||!pw||!pw2||!name||!email){alert('필수 항목을 모두 입력해주세요.');return;}
-      if(pw!==pw2){alert('비밀번호가 일치하지 않습니다.');return;}
-      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('이메일 형식이 올바르지 않습니다.');return;}
-      document.getElementById('doneUserName').textContent=name;
-      document.getElementById('step2').style.display='none';
-      document.getElementById('step3').style.display='flex';
-      document.getElementById('done1').innerHTML=chkSvg();
-      document.getElementById('done2').innerHTML=chkSvg();
-      window.scrollTo({top:0,behavior:'smooth'});
+        const username = document.getElementById('userId').value.trim();
+        const password = document.getElementById('pw').value;
+        const password2 = document.getElementById('pw2').value;
+        const name = document.getElementById('userName').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const birthYear = document.getElementById('bYear').value;
+
+        if(!username || !password || !password2 || !name || !phone){
+            alert('필수 항목을 모두 입력해주세요.');
+            return;
+        }
+        if(password.length < 8){
+            alert('비밀번호는 8자 이상이어야 합니다.');
+            return;
+        }
+        if(password !== password2){
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
+        // birthYear는 선택사항
+
+        document.getElementById('doneUserName').textContent = name;
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'flex';
+        document.getElementById('done1').innerHTML = chkSvg();
+        document.getElementById('done2').innerHTML = chkSvg();
+        window.scrollTo({top:0, behavior:'smooth'});
     }
 
     function chkSvg(){return`<svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;}
@@ -369,6 +377,7 @@
       document.getElementById('modalBody').innerHTML=(termsContent[key]||'내용 없음').replace(/\n/g,'<br>');
       document.getElementById('termsModal').classList.add('open');
     }
+
     function closeModal(){document.getElementById('termsModal').classList.remove('open');}
     document.getElementById('termsModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
@@ -376,7 +385,6 @@
         alert('로그인 페이지로 이동합니다.')
         location.href="/member/login";
     }
-
 
 </script>
 </body>

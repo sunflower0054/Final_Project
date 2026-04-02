@@ -127,7 +127,7 @@
                     <div class="two-column">
                         <div class="form-group">
                             <label class="form-label">전화번호</label>
-                            <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX">
+                            <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX" oninput="formatPhone(this)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">기저질환</label>
@@ -156,6 +156,67 @@
                             <label class="form-label">경도 <span style="color:red;">*</span></label>
                             <input type="number" step="any" class="form-control" id="longitude" placeholder="예: 126.9780">
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card" style="margin-top: 24px;">
+            <div class="card-header">
+                <h3 class="card-title">건강 / 기저질환 정보</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">기저질환</label>
+                    <div id="underlying-diseases" style="display:flex; gap:8px; flex-wrap:wrap; padding:8px 0;">
+                        <label class="badge" style="background:#E3F2FD; color:#1976D2; padding:8px 14px; cursor:pointer;">
+                            <input type="checkbox" value="고혈압" style="margin-right:6px;"> 고혈압
+                        </label>
+                        <label class="badge" style="background:#E8F5E9; color:#388E3C; padding:8px 14px; cursor:pointer;">
+                            <input type="checkbox" value="당뇨" style="margin-right:6px;"> 당뇨
+                        </label>
+                        <label class="badge" style="background:#FFF3E0; color:#F57C00; padding:8px 14px; cursor:pointer;">
+                            <input type="checkbox" value="골다공증" style="margin-right:6px;"> 골다공증
+                        </label>
+                        <label class="badge" style="background:#F3E5F5; color:#7B1FA2; padding:8px 14px; cursor:pointer;">
+                            <input type="checkbox" value="관절염" style="margin-right:6px;"> 관절염
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">복용 약물</label>
+                    <input type="text" class="form-control" id="medications" placeholder="복용 중인 약물을 입력하세요">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">혈액형</label>
+                    <select class="form-control" id="bloodType">
+                        <option value="">선택하세요</option>
+                        <option value="A형">A형</option>
+                        <option value="B형">B형</option>
+                        <option value="AB형">AB형</option>
+                        <option value="O형">O형</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">특이사항</label>
+                    <textarea class="form-control" id="notes" rows="4" placeholder="특이사항을 입력하세요"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card" style="margin-top: 24px;">
+            <div class="card-header">
+                <h3 class="card-title">비상 연락처</h3>
+            </div>
+            <div class="card-body">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+                    <div class="form-group">
+                        <label class="form-label">보호자 이름</label>
+                        <input type="text" class="form-control" id="guardianName" placeholder="보호자 이름">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">보호자 연락처</label>
+                        <input type="tel" class="form-control" id="guardianPhone" placeholder="010-XXXX-XXXX" oninput="formatPhone(this)">
                     </div>
                 </div>
             </div>
@@ -404,8 +465,12 @@
     }
 
     function clearForm() {
-        document.querySelectorAll('input:not([type=hidden]), select').forEach(element => {
-            element.value = '';
+        document.querySelectorAll('input:not([type=hidden]), select, textarea').forEach(element => {
+            if (element.type === 'checkbox') {
+                element.checked = false;
+            } else {
+                element.value = '';
+            }
         });
         document.getElementById('birthDate').value = '';
         updateProfileUI({});
@@ -566,6 +631,16 @@
         } catch (error) {
             alert(error.message || '저장에 실패했습니다. 다시 시도해주세요.');
         }
+    }
+
+    function formatPhone(el) {
+        let v = el.value.replace(/\D/g, '');
+        if (v.length > 3 && v.length <= 7) {
+            v = v.slice(0, 3) + '-' + v.slice(3);
+        } else if (v.length > 7) {
+            v = v.slice(0, 3) + '-' + v.slice(3, 7) + '-' + v.slice(7, 11);
+        }
+        el.value = v;
     }
 </script>
 </body>
