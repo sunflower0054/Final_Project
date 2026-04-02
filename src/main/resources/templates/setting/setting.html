@@ -210,6 +210,7 @@
     <div class="spinner"></div>
 </div>
 
+<script th:src="@{/js/app-api.js}"></script>
 <script>
     const DEFAULTS = { fall: 0.7, motion: 15, assault: 0.4 };
     let saved = { ...DEFAULTS };
@@ -300,11 +301,16 @@
       loadSettings();
     }
 
+    function getSettingsData(payload) {
+      if (!payload || typeof payload !== 'object') return {};
+      return payload.settings || payload.data || payload;
+    }
+
     async function loadSettings() {
       try {
-        const res = await fetch('/api/ai-settings');
-        if (!res.ok) return;
-        const data = await res.json();
+        const payload = await AppApi.get('/api/v1/settings');
+        const data = getSettingsData(payload);
+
         if (data.fallSensitivity !== undefined) {
           document.getElementById('fall-slider').value = data.fallSensitivity;
           updateSlider(document.getElementById('fall-slider'), 'fall-val', 'fall-impact', false);
@@ -327,38 +333,16 @@
       const payload = getPayload();
       showLoading(true);
       try {
-        const res = await fetch('/api/ai-settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('저장 실패');
-        const data = await res.json();
+        const responsePayload = await AppApi.put('/api/v1/settings', payload);
+        const data = getSettingsData(responsePayload);
         if (data.updatedAt) document.getElementById('footer-date').textContent = data.updatedAt;
 
-        await applyToPython();
-
-        showToast('✅ 설정이 저장되고 Python에 적용되었습니다.');
+        showToast('✅ 저장 후 서버 반영 완료');
         document.getElementById('last-sync').textContent = '방금 전';
       } catch(e) {
         showToast('설정이 저장되었습니다. (개발 모드)');
       } finally {
         showLoading(false);
-      }
-    }
-
-    async function applyToPython() {
-      const payload = getPayload();
-      try {
-        await fetch('/api/ai-settings/apply', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        showToast('Python 감지 서버에 적용되었습니다.');
-        document.getElementById('last-sync').textContent = '방금 전';
-      } catch(e) {
-        showToast('Python 적용 완료 (개발 모드)');
       }
     }
 
