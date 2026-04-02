@@ -210,6 +210,7 @@
     <div class="spinner"></div>
 </div>
 
+<script th:src="@{/js/app-api.js}"></script>
 <script>
     const DEFAULTS = { fall: 0.7, motion: 15, assault: 0.4 };
     let saved = { ...DEFAULTS };
@@ -307,9 +308,7 @@
 
     async function loadSettings() {
       try {
-        const res = await fetch('/api/v1/settings');
-        if (!res.ok) return;
-        const payload = await res.json();
+        const payload = await AppApi.get('/api/v1/settings');
         const data = getSettingsData(payload);
 
         if (data.fallSensitivity !== undefined) {
@@ -334,13 +333,7 @@
       const payload = getPayload();
       showLoading(true);
       try {
-        const res = await fetch('/api/v1/settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('저장 실패');
-        const responsePayload = await res.json().catch(() => ({}));
+        const responsePayload = await AppApi.put('/api/v1/settings', payload);
         const data = getSettingsData(responsePayload);
         if (data.updatedAt) document.getElementById('footer-date').textContent = data.updatedAt;
 
