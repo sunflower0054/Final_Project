@@ -161,12 +161,13 @@
 
             if (residentId) {
                 // 1. 전달받은 ID로 DB에서 거주자 정보 조회
-                fetch(`/api/residents/${residentId}`)
+                fetch(`/api/v1/residents/${residentId}`)
                     .then(response => {
                         if (!response.ok) throw new Error("데이터 조회 실패");
                         return response.json();
                     })
-                    .then(dbData => {
+                    .then(payload => {
+                        const dbData = payload?.resident || {};
                         // 2. 나이 계산
                         let calcAge = "미상";
                         if (dbData.birthDate) {
