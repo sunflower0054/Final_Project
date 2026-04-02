@@ -324,3 +324,151 @@ body {
   .card { border: none; padding: 20px 16px; border-radius: 0; }
   .step-container { padding: 0; }
 }
+
+
+/* =============================================
+   login.html 전용 스타일 (기존 코드 영향 없음)
+   ============================================= */
+
+.login-container {
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+}
+
+.logo {
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--navy);
+    margin-bottom: 30px;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+}
+
+.login-box {
+    background: #FFFFFF;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 40px 32px;
+}
+
+.input-group {
+    margin-top: 10px;
+}
+
+.input-box {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--gray-900);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.input-box::placeholder {
+    color: var(--gray-400);
+}
+
+.input-box:focus {
+    border-color: var(--accent);
+}
+
+.login-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.15s;
+    margin-top: 16px;
+}
+
+.login-btn:hover {
+    background: var(--navy-mid);
+}
+
+.login-links {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--gray-500);
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.login-links a {
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+
+.login-links .divider {
+    color: var(--gray-300);
+}
+
+.footer-text {
+    margin-top: 30px;
+    font-size: 12px;
+    color: var(--gray-500);
+    letter-spacing: -0.3px;
+}
+
+
+/* =============================================
+   login.html 전용 중앙 정렬 스타일 (member_style.css 안전하게 추가)
+   ============================================= */
+
+body.login-page {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    background: #f8fafc !important;     /* 부드러운 연한 배경 */
+    flex-direction: column !important;
+    gap: 0 !important;
+    overflow-y: auto;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+}
+
+/* 로그인 페이지 전용 간격 및 디자인 미세 조정 */
+.logo {
+    font-size: 42px;                    /* 조금 더 크게 조정 */
+    font-weight: 900;
+    color: var(--navy);
+    margin-bottom: 36px;
+    letter-spacing: -1.5px;
+}
+
+.login-box {
+    background: #ffffff;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 44px 36px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);   /* 부드러운 그림자 추가 */
+}
+
+.footer-text {
+    margin-top: 48px;
+    font-size: 12.5px;
+    color: var(--gray-500);
+}

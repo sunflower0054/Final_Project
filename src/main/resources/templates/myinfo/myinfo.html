@@ -18,7 +18,7 @@
             <p class="page-subtitle">개인 정보 및 시스템 알림 설정을 관리합니다.</p>
         </div>
 
-        <div class="info-grid-3col">
+        <div class="myinfo-layout">
 
             <div class="profile-card">
                 <div class="profile-header">
@@ -43,91 +43,95 @@
                     </div>
                 </div>
 
-                <div class="profile-actions" style="padding: 20px;">
+<!--                <div class="profile-actions" style="padding: 20px;">
                     <button class="btn-profile-detail">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
                         </svg>
                         프로필 사진 변경
                     </button>
-                </div>
+                </div>-->
             </div>
 
-            <div class="content-card">
-                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 class="card-title">기본 정보</h3>
-                    <button type="button" class="userInfoEditBtn" id="editInfoBtn"
-                            style="padding: 4px 12px; background: none; border: 1px dashed var(--gray-400); border-radius: 4px; color: var(--gray-600); font-size: 12px; cursor: pointer;">
-                        정보 수정
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label class="form-label">아이디</label>
-                        <input type="text" class="form-control" value="gildong" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">이름</label>
-                        <input type="text" class="form-control" value="홍길동" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">이메일</label>
-                        <input type="email" class="form-control userInfoInput" value="gildong@email.com" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">휴대폰 번호</label>
-                        <input type="tel" class="form-control userInfoInput" value="010-1234-5678" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">생년월일</label>
-                        <input type="text" class="form-control" value="1995년 05월 15일" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">성별</label>
-                        <input type="text" class="form-control" value="남성" readonly>
-                    </div>
-                </div>
-            </div>
+            <div class="myinfo-right-column">
 
-            <div class="content-card">
-                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 class="card-title">알림 서비스 설정</h3>
-                </div>
-                <div class="card-body" style="padding: 0;">
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <div class="setting-title">이메일 알림</div>
-                            <div class="setting-desc">중요 이벤트 발생 시 메일 발송</div>
-                        </div>
-                        <label class="toggle">
-                            <input type="checkbox" checked>
-                            <div class="toggle-track"><div class="toggle-thumb"></div></div>
-                        </label>
+                <!-- 기본 정보 카드 -->
+                <div class="content-card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="card-title">기본 정보</h3>
+                        <button type="button" class="userInfoEditBtn" id="editInfoBtn"
+                                style="padding: 4px 12px; background: none; border: 1px dashed var(--gray-400); border-radius: 4px; color: var(--gray-600); font-size: 12px; cursor: pointer;">
+                            정보 수정
+                        </button>
                     </div>
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <div class="setting-title">SMS 긴급 알림</div>
-                            <div class="setting-desc">낙상 등 긴급 상황 시 즉시 문자</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">아이디</label>
+                            <input type="text" class="form-control" value="gildong" readonly>
                         </div>
-                        <label class="toggle">
-                            <input type="checkbox"> <div class="toggle-track"><div class="toggle-thumb"></div></div>
-                        </label>
-                    </div>
-                    <div class="setting-row">
-                        <div class="setting-info">
-                            <div class="setting-title">시간 방해 금지</div>
-                            <div class="setting-desc">22:00 ~ 07:00 사이 일반 알림 제한</div>
+                        <div class="form-group">
+                            <label class="form-label">이름</label>
+                            <input type="text" class="form-control" value="홍길동" readonly>
                         </div>
-                        <label class="toggle">
-                            <input type="checkbox"> <div class="toggle-track"><div class="toggle-thumb"></div></div>
-                        </label>
+                        <div class="form-group">
+                            <label class="form-label">이메일</label>
+                            <input type="email" class="form-control userInfoInput" value="gildong@email.com" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">휴대폰 번호</label>
+                            <input type="tel" class="form-control userInfoInput" value="010-1234-5678" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">생년월일</label>
+                            <input type="text" class="form-control" value="1995년 05월 15일" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">성별</label>
+                            <input type="text" class="form-control" value="남성" readonly>
+                        </div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <button class="btn btn-navy" style="padding: 8px 16px; font-size: 13px;">설정 저장하기</button>
-                </div>
-            </div>
 
+                <!-- 알림 서비스 설정 카드 -->
+                <div class="content-card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="card-title">알림 서비스 설정</h3>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-title">이메일 알림</div>
+                                <div class="setting-desc">중요 이벤트 발생 시 메일 발송</div>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" checked>
+                                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-title">SMS 긴급 알림</div>
+                                <div class="setting-desc">낙상 등 긴급 상황 시 즉시 문자</div>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox"> <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-title">시간 방해 금지</div>
+                                <div class="setting-desc">22:00 ~ 07:00 사이 일반 알림 제한</div>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox"> <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-navy" style="padding: 8px 16px; font-size: 13px;">설정 저장하기</button>
+                    </div>
+                </div>
+            </div>   <!-- myinfo-right-column 끝 -->
         </div>
     </main>
 </div>
