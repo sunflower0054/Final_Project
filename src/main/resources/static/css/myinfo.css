@@ -506,4 +506,65 @@ svg {
     }
 }
 
+/* =============================================
+   Resident Detail & Edit 전용 스타일
+   (기존 스타일 최대한 유지하면서 추가)
+   ============================================= */
 
+.birth-row {
+    display: grid;
+    grid-template-columns: 1fr 0.75fr 0.75fr;
+    gap: 8px;
+    max-width: 260px;
+}
+
+.birth-row select {
+    font-size: 14.5px !important;
+    padding: 7px 8px !important;
+    height: 38px !important;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: #ffffff;
+}
+
+.birth-row select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* 기저질환 Badge 스타일 개선 */
+.underlying-diseases .badge {
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    color: var(--text-sub);
+    transition: all 0.2s ease;
+}
+
+.underlying-diseases .badge:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.underlying-diseases input[type="checkbox"] {
+    margin-right: 6px;
+}
+
+/* 주소 입력 필드 간격 조정 */
+.address-group .form-control {
+    margin-top: 8px;
+}
+
+.address-group .form-control:first-of-type {
+    margin-top: 0;
+}
+
+/* 상세 주소 입력란 스타일 */
+#detailAddress {
+    margin-top: 8px;
+}
+
+/* 폼 라벨 강조 */
+.form-label {
+    font-weight: 600;
+}
