@@ -224,6 +224,7 @@
     </main>
 </div>
 
+<script th:src="@{/js/app-api.js}"></script>
 <script th:src="@{/js/dropdown.js}"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=05dea7c839bf99daaa3a652b70da85fe&libraries=services"></script>
@@ -236,27 +237,6 @@
         return urlParams.get(name);
     }
 
-    function getCsrfHeaders() {
-        const tokenMeta = document.querySelector('meta[name="_csrf"]');
-        const headerMeta = document.querySelector('meta[name="_csrf_header"]');
-        if (!tokenMeta || !headerMeta) {
-            return {};
-        }
-        return { [headerMeta.content]: tokenMeta.content };
-    }
-
-    async function parseJsonResponse(response) {
-        const text = await response.text();
-        if (!text) {
-            return {};
-        }
-
-        try {
-            return JSON.parse(text);
-        } catch (error) {
-            return { message: text };
-        }
-    }
 
     document.addEventListener('DOMContentLoaded', async function() {
         initBirthDateSelects();
@@ -357,13 +337,9 @@
 
     async function loadDefaultResident() {
         try {
-            const response = await fetch('/api/v1/residents', {
-                method: 'GET',
-                credentials: 'same-origin'
-            });
-            const result = await parseJsonResponse(response);
+            const result = await AppApi.get('/api/v1/residents');
 
-            if (!response.ok || result.success !== true || !Array.isArray(result.residents) || result.residents.length === 0) {
+            if (result.success !== true || !Array.isArray(result.residents) || result.residents.length === 0) {
                 setCreateMode();
                 clearForm();
                 return;
@@ -381,13 +357,9 @@
 
     async function loadResidentData(id) {
         try {
-            const response = await fetch(`/api/v1/residents/${id}`, {
-                method: 'GET',
-                credentials: 'same-origin'
-            });
-            const result = await parseJsonResponse(response);
+            const result = await AppApi.get(`/api/v1/residents/${id}`);
 
-            if (!response.ok || result.success !== true || !result.resident) {
+            if (result.success !== true || !result.resident) {
                 throw new Error(result.message || '로드 실패');
             }
 
@@ -605,18 +577,11 @@
         const method = isEditMode ? 'PUT' : 'POST';
 
         try {
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...getCsrfHeaders()
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify(payload)
-            });
-            const result = await parseJsonResponse(response);
+            const result = method === 'PUT'
+                ? await AppApi.put(url, payload)
+                : await AppApi.post(url, payload);
 
-            if (!response.ok || result.success !== true) {
+            if (result.success !== true) {
                 throw new Error(result.message || '저장에 실패했습니다.');
             }
 
