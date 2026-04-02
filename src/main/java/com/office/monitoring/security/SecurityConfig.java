@@ -89,7 +89,6 @@ public class SecurityConfig {
                                 "/report/**",
                                 "/myinfo/**",
                                 "/resident/detail",
-                                "/resident/register",
                                 "/resident/edit",
                                 "/setting/**"
                         ).authenticated()
