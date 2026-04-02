@@ -26,12 +26,6 @@
             border-radius: 6px;
         }
 
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1.6fr;
-            gap: 20px;
-        }
-
         .coordinate-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -124,27 +118,23 @@
                         <input type="hidden" id="birthDate" value="">
                     </div>
 
-                    <div class="two-column">
-                        <div class="form-group">
-                            <label class="form-label">전화번호</label>
-                            <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX" oninput="formatPhone(this)">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">기저질환</label>
-                            <input type="text" class="form-control" id="disease" placeholder="기저질환을 입력하세요">
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">전화번호</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX" oninput="formatPhone(this)">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group address-group">
                         <label class="form-label">주소 <span style="color:red;">*</span></label>
                         <div style="display:flex; gap:8px; margin-bottom:8px;">
+                            <input type="text" id="postcode" class="form-control" placeholder="우편번호" readonly style="max-width:140px;">
                             <button type="button" onclick="execDaumPostcode()"
                                     style="padding:8px 16px; background:#1e3a5f; color:white; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">
                                 주소 검색
                             </button>
                         </div>
-                        <input type="text" id="address" class="form-control" placeholder="주소를 입력하세요">
-                        <span class="form-hint">주소 검색 또는 직접 입력 후 좌표를 확인해주세요.</span>
+                        <input type="text" id="address" class="form-control" placeholder="기본 주소 (도로명 또는 지번)">
+                        <input type="text" id="detailAddress" class="form-control" placeholder="상세 주소 (예: 301호, 2층)" style="margin-top: 8px;">
+                        <span class="form-hint">기본 주소와 상세 주소를 입력한 뒤 좌표를 확인해주세요.</span>
                     </div>
 
                     <div class="coordinate-row">
@@ -163,12 +153,12 @@
 
         <div class="content-card" style="margin-top: 24px;">
             <div class="card-header">
-                <h3 class="card-title">건강 / 기저질환 정보</h3>
+                <h3 class="card-title">건강 정보</h3>
             </div>
             <div class="card-body">
                 <div class="form-group">
                     <label class="form-label">기저질환</label>
-                    <div id="underlying-diseases" style="display:flex; gap:8px; flex-wrap:wrap; padding:8px 0;">
+                    <div id="underlying-diseases" class="underlying-diseases" style="display:flex; gap:8px; flex-wrap:wrap; padding:8px 0;">
                         <label class="badge" style="background:#E3F2FD; color:#1976D2; padding:8px 14px; cursor:pointer;">
                             <input type="checkbox" value="고혈압" style="margin-right:6px;"> 고혈압
                         </label>
@@ -182,42 +172,8 @@
                             <input type="checkbox" value="관절염" style="margin-right:6px;"> 관절염
                         </label>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">복용 약물</label>
-                    <input type="text" class="form-control" id="medications" placeholder="복용 중인 약물을 입력하세요">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">혈액형</label>
-                    <select class="form-control" id="bloodType">
-                        <option value="">선택하세요</option>
-                        <option value="A형">A형</option>
-                        <option value="B형">B형</option>
-                        <option value="AB형">AB형</option>
-                        <option value="O형">O형</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">특이사항</label>
-                    <textarea class="form-control" id="notes" rows="4" placeholder="특이사항을 입력하세요"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="content-card" style="margin-top: 24px;">
-            <div class="card-header">
-                <h3 class="card-title">비상 연락처</h3>
-            </div>
-            <div class="card-body">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-                    <div class="form-group">
-                        <label class="form-label">보호자 이름</label>
-                        <input type="text" class="form-control" id="guardianName" placeholder="보호자 이름">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">보호자 연락처</label>
-                        <input type="tel" class="form-control" id="guardianPhone" placeholder="010-XXXX-XXXX" oninput="formatPhone(this)">
-                    </div>
+                    <input type="hidden" id="disease" value="">
+                    <span class="form-hint">선택한 항목은 저장 시 기저질환 문자열로 합쳐집니다.</span>
                 </div>
             </div>
         </div>
@@ -237,10 +193,10 @@
         return urlParams.get(name);
     }
 
-
     document.addEventListener('DOMContentLoaded', async function() {
         initBirthDateSelects();
         bindAddressEvents();
+        bindDiseaseEvents();
 
         const idParam = getUrlParameter('id');
         if (idParam && idParam !== 'new') {
@@ -295,11 +251,22 @@
 
     function bindAddressEvents() {
         const addressInput = document.getElementById('address');
-        addressInput.addEventListener('input', clearCoordinates);
-        addressInput.addEventListener('blur', async function() {
-            if (addressInput.value.trim() && (!document.getElementById('latitude').value || !document.getElementById('longitude').value)) {
-                await resolveCoordinates(addressInput.value.trim());
-            }
+        const detailAddressInput = document.getElementById('detailAddress');
+
+        [addressInput, detailAddressInput].forEach(input => {
+            input.addEventListener('input', clearCoordinates);
+            input.addEventListener('blur', async function() {
+                const fullAddress = buildFullAddress();
+                if (fullAddress && (!document.getElementById('latitude').value || !document.getElementById('longitude').value)) {
+                    await resolveCoordinates(fullAddress);
+                }
+            });
+        });
+    }
+
+    function bindDiseaseEvents() {
+        document.querySelectorAll('#underlying-diseases input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', syncDiseaseInputFromCheckboxes);
         });
     }
 
@@ -314,8 +281,10 @@
         new daum.Postcode({
             oncomplete: async function(data) {
                 const address = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+                document.getElementById('postcode').value = data.zonecode || '';
                 document.getElementById('address').value = address;
-                await resolveCoordinates(address);
+                await resolveCoordinates(buildFullAddress());
+                document.getElementById('detailAddress').focus();
             }
         }).open();
     }
@@ -372,10 +341,12 @@
     function fillResidentForm(data) {
         document.getElementById('name').value = data.name || '';
         document.getElementById('phone').value = data.phone || '';
-        document.getElementById('disease').value = data.disease || '';
         document.getElementById('address').value = data.address || '';
+        document.getElementById('detailAddress').value = '';
+        document.getElementById('postcode').value = '';
         document.getElementById('latitude').value = data.latitude ?? '';
         document.getElementById('longitude').value = data.longitude ?? '';
+        setDiseaseCheckboxes(data.disease || '');
 
         if (data.birthDate) {
             const parts = data.birthDate.split('-');
@@ -445,6 +416,7 @@
             }
         });
         document.getElementById('birthDate').value = '';
+        document.getElementById('disease').value = '';
         updateProfileUI({});
     }
 
@@ -452,6 +424,12 @@
         document.getElementById('latitude').value = '';
         document.getElementById('longitude').value = '';
         document.getElementById('coord-status').textContent = '미입력';
+    }
+
+    function buildFullAddress() {
+        const baseAddress = document.getElementById('address').value.trim();
+        const detailAddress = document.getElementById('detailAddress').value.trim();
+        return [baseAddress, detailAddress].filter(Boolean).join(' ');
     }
 
     function getCoordinateValue(id) {
@@ -464,11 +442,33 @@
         return Number.isNaN(number) ? Number.NaN : number;
     }
 
+    function getSelectedDiseases() {
+        return Array.from(document.querySelectorAll('#underlying-diseases input[type="checkbox"]:checked'))
+            .map(checkbox => checkbox.value);
+    }
+
+    function syncDiseaseInputFromCheckboxes() {
+        document.getElementById('disease').value = getSelectedDiseases().join(', ');
+    }
+
+    function setDiseaseCheckboxes(diseaseText) {
+        const selected = String(diseaseText || '')
+            .split(',')
+            .map(value => value.trim())
+            .filter(Boolean);
+
+        document.querySelectorAll('#underlying-diseases input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = selected.includes(checkbox.value);
+        });
+        document.getElementById('disease').value = selected.join(', ');
+    }
+
     function getPayload() {
+        syncDiseaseInputFromCheckboxes();
         return {
             name: document.getElementById('name').value.trim(),
             birthDate: document.getElementById('birthDate').value,
-            address: document.getElementById('address').value.trim(),
+            address: buildFullAddress(),
             phone: document.getElementById('phone').value.trim() || null,
             disease: document.getElementById('disease').value.trim() || null,
             latitude: getCoordinateValue('latitude'),
@@ -563,9 +563,9 @@
     async function saveResident() {
         updateBirthDateHidden();
 
-        const address = document.getElementById('address').value.trim();
-        if (address && (!document.getElementById('latitude').value || !document.getElementById('longitude').value)) {
-            await resolveCoordinates(address);
+        const fullAddress = buildFullAddress();
+        if (fullAddress && (!document.getElementById('latitude').value || !document.getElementById('longitude').value)) {
+            await resolveCoordinates(fullAddress);
         }
 
         const payload = getPayload();
