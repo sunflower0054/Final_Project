@@ -15,6 +15,6 @@ public class ResidentController {
 
     @GetMapping("/edit")
     public String residentEdit() {
-        return "resident/resident_detail";
+        return "resident/resident_edit";
     }
 }
