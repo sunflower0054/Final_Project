@@ -132,35 +132,90 @@
 
 <script th:src="@{/js/dropdown.js}"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=05dea7c839bf99daaa3a652b70da85fe&libraries=services"></script>
 
 <script>
-    // 생년월일 셀렉트 초기화
+    let residentId = null;
+    let selectedLat = null; // 위도 저장용
+    let selectedLon = null; // 경도 저장용
+
+    // 1. URL에서 ID 파라미터 가져오기
+    function getUrlParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    // 2. 페이지 로드 시 초기화 및 기존 데이터 불러오기
+    document.addEventListener('DOMContentLoaded', function() {
+        initBirthDateSelects();
+
+        residentId = getUrlParameter('id');
+        if (residentId) {
+            loadResidentData(residentId); // 데이터 불러오기 실행
+        } else {
+            alert("잘못된 접근입니다. 거주자 ID가 없습니다.");
+            history.back();
+        }
+    });
+
+    // 3. 기존 거주자 정보 불러와서 화면에 채우기
+    function loadResidentData(id) {
+        fetch(`/api/residents/${id}`)
+            .then(res => res.ok ? res.json() : Promise.reject('로드 실패'))
+            .then(data => {
+                // 텍스트 필드 채우기
+                document.getElementById('name').value = data.name || '';
+                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('address').value = data.address || '';
+
+                // 기존 위경도를 전역 변수에 담아두기 (주소 안 바꿨을 때를 대비)
+                selectedLat = data.latitude || null;
+                selectedLon = data.longitude || null;
+
+                // 생년월일 채우기
+                if (data.birthDate) {
+                    const [y, m, d] = data.birthDate.split('-');
+                    document.getElementById('birthYear').value = y || '';
+                    document.getElementById('birthMonth').value = m || '';
+                    document.getElementById('birthDay').value = d || '';
+                    document.getElementById('birthDate').value = data.birthDate;
+                }
+
+                // 기저질환 체크박스 채우기
+                if (data.disease) {
+                    const diseaseArray = data.disease.split(',').map(item => item.trim());
+                    document.querySelectorAll('#underlying-diseases input[type="checkbox"]').forEach(cb => {
+                        cb.checked = diseaseArray.includes(cb.value);
+                    });
+                } else {
+                    document.querySelectorAll('#underlying-diseases input[type="checkbox"]').forEach(cb => {
+                        cb.checked = false;
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('거주자 정보를 불러오는 데 실패했습니다.');
+            });
+    }
+
+    // ==================== 생년월일 셀렉트 초기화 ====================
     function initBirthDateSelects() {
         const yearSelect = document.getElementById('birthYear');
         const monthSelect = document.getElementById('birthMonth');
         const daySelect = document.getElementById('birthDay');
         const currentYear = new Date().getFullYear();
 
-        // 년도
         for (let i = currentYear; i >= 1920; i--) {
-            const opt = document.createElement('option');
-            opt.value = i;
-            opt.textContent = i + '년';
-            yearSelect.appendChild(opt);
+            yearSelect.add(new Option(i + '년', i));
         }
-        // 월
         for (let i = 1; i <= 12; i++) {
-            const opt = document.createElement('option');
-            opt.value = i < 10 ? '0' + i : i;
-            opt.textContent = i + '월';
-            monthSelect.appendChild(opt);
+            const val = i < 10 ? '0' + i : i;
+            monthSelect.add(new Option(i + '월', val));
         }
-        // 일
         for (let i = 1; i <= 31; i++) {
-            const opt = document.createElement('option');
-            opt.value = i < 10 ? '0' + i : i;
-            opt.textContent = i + '일';
-            daySelect.appendChild(opt);
+            const val = i < 10 ? '0' + i : i;
+            daySelect.add(new Option(i + '일', val));
         }
 
         [yearSelect, monthSelect, daySelect].forEach(s =>
@@ -175,18 +230,34 @@
         document.getElementById('birthDate').value = (y && m && d) ? `${y}-${m}-${d}` : '';
     }
 
-    // 주소 검색 (Daum Postcode)
+    // ==================== 주소 검색 및 좌표 변환 ====================
     function execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function(data) {
                 let addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
                 document.getElementById('postcode').value = data.zonecode;
                 document.getElementById('address').value = addr;
+
+                // 주소를 좌표로 변환
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(addr, function(result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        selectedLat = result[0].y;
+                        selectedLon = result[0].x;
+                        console.log("새 좌표 획득 성공:", selectedLat, selectedLon);
+                    } else {
+                        alert("주소 좌표 변환에 실패했습니다. 다시 시도해주세요.");
+                        selectedLat = null;
+                        selectedLon = null;
+                    }
+                });
+
+                document.getElementById('detailAddress').focus();
             }
         }).open();
     }
 
-    // 전화번호 자동 하이픈
+    // ==================== 전화번호 자동 하이픈 ====================
     function formatPhone(el) {
         let v = el.value.replace(/\D/g, '');
         if (v.length > 3 && v.length <= 7) {
@@ -197,7 +268,7 @@
         el.value = v;
     }
 
-    // 저장 함수 (DB 테이블에 맞춤)
+    // ==================== 최종 수정 내용 서버로 전송 ====================
     function saveResident() {
         updateBirthDateHidden();
 
@@ -205,49 +276,50 @@
         const birthDate = document.getElementById('birthDate').value;
         const phone = document.getElementById('phone').value.trim();
         const address = document.getElementById('address').value.trim();
+        const detailAddress = document.getElementById('detailAddress') ? document.getElementById('detailAddress').value.trim() : '';
 
-        if (!name) {
-            alert('이름을 입력해주세요.');
-            document.getElementById('name').focus();
-            return;
-        }
-        if (!birthDate) {
-            alert('생년월일을 선택해주세요.');
-            return;
-        }
-        if (!address) {
-            alert('주소를 입력해주세요.');
+        if (!name) { alert('이름을 입력해주세요.'); document.getElementById('name').focus(); return; }
+        if (!birthDate) { alert('생년월일을 선택해주세요.'); return; }
+        if (!address) { alert('주소를 입력해주세요.'); return; }
+
+        if (!selectedLat || !selectedLon) {
+            alert('정확한 위치 정보(위도, 경도)가 없습니다. 주소를 다시 검색해주세요.');
             return;
         }
 
-        // 기저질환 체크된 값들을 쉼표로 연결
         const diseases = Array.from(
             document.querySelectorAll('#underlying-diseases input[type="checkbox"]:checked')
         ).map(cb => cb.value).join(', ');
+
+        const fullAddress = address + (detailAddress ? " " + detailAddress : "");
 
         const data = {
             name: name,
             birthDate: birthDate,
             phone: phone || null,
-            address: address,
-            disease: diseases || null
-            // latitude, longitude는 백엔드에서 주소 기반으로 처리 추천
+            address: fullAddress,
+            disease: diseases || null,
+            latitude: parseFloat(selectedLat),
+            longitude: parseFloat(selectedLon)
         };
 
-        // 실제로는 fetch로 PUT 요청 보내기
-        console.log("저장 데이터:", data);
-        alert("거주자 정보가 수정되었습니다.");
-        // history.back(); 또는 목록 페이지로 이동
-        // location.href = '/resident/list';
+        // PUT 메서드로 서버에 수정 요청 보내기
+        fetch(`/api/residents/${residentId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(res => {
+            if (res.ok) {
+                alert("거주자 정보가 성공적으로 수정되었습니다.");
+                // 수정 완료 후 목록이나 상세 페이지로 이동
+                location.href = `/resident/detail?id=${residentId}`;
+            } else {
+                return Promise.reject('수정 실패');
+            }
+        })
+        .catch(() => alert('수정에 실패했습니다. 잠시 후 다시 시도해주세요.'));
     }
-
-    // 페이지 로드 시 초기화
-    window.addEventListener('load', () => {
-        initBirthDateSelects();
-
-        // 예시: 기존 데이터가 있다면 여기서 값 세팅 (실제로는 API 호출)
-        // loadResidentData();
-    });
 </script>
 
 </body>
