@@ -145,6 +145,9 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/v1/auth/logout")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
                         .addLogoutHandler((request, response, authentication) -> {
                             Authentication current = authentication != null
                                     ? authentication
