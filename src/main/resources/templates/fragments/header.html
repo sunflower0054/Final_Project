@@ -108,6 +108,9 @@
 
                 <div class="dropdown-footer">
                     <button type="button" class="btn-profile-logout js-logout-btn" style="width:100%;">로그아웃</button>
+                    <form id="logoutForm" th:action="@{/api/v1/auth/logout}" method="post" style="display:none;">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    </form>
                 </div>
             </div>
         </div>
@@ -116,18 +119,17 @@
 
 <script th:src="@{/js/app-api.js}"></script>
 <script th:inline="javascript">
-    document.addEventListener('click', async (event) => {
-        const logoutButton = event.target.closest('.js-logout-btn');
-        if (!logoutButton) {
+    document.addEventListener('DOMContentLoaded', () => {
+        const logoutButton = document.querySelector('.js-logout-btn');
+        const logoutForm = document.getElementById('logoutForm');
+
+        if (!logoutButton || !logoutForm) {
             return;
         }
 
-        try {
-            await AppApi.post('/api/v1/auth/logout');
-            window.location.href = '/member/login?logout';
-        } catch (error) {
-            alert('로그아웃에 실패했습니다.');
-        }
+        logoutButton.addEventListener('click', () => {
+            logoutForm.submit();
+        });
     });
 </script>
 
