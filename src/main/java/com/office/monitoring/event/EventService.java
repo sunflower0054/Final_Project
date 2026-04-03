@@ -30,7 +30,7 @@ public class EventService {
     private String sep;
 
     @Transactional
-    public void receiveEvent(EventReceiveRequest req, MultipartFile frameImage) throws IOException {
+    public Event receiveEvent(EventReceiveRequest req, MultipartFile frameImage) throws IOException {
 
         Long   residentId = Long.parseLong(req.getResidentId());
         Double confidence = Double.parseDouble(req.getConfidence());
@@ -79,6 +79,8 @@ public class EventService {
 
             eventImageRepository.save(image);
         }
+
+        return event;
     }
 
     // ── metadata 파싱 헬퍼 ──────────────────────────────────────

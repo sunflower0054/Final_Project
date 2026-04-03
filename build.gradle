@@ -54,7 +54,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     // 솔라피 SDK
-//    implementation 'net.nurigo:sdk:4.3.0'
+    implementation 'net.nurigo:sdk:4.3.0'
+
 }
 
 tasks.named('test') {
