@@ -1,6 +1,7 @@
 package com.office.monitoring.member;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,11 +48,17 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(status().isOk())
                 .andReturn();
 
+        MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
+        assertThat(session).isNotNull();
+
         mockMvc.perform(post("/api/v1/auth/logout")
-                        .session((org.springframework.mock.web.MockHttpSession) loginResult.getRequest().getSession(false)))
+                        .session(session))
                 .andExpect(status().isOk())
+                .andExpect(cookie().maxAge("JSESSIONID", 0))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("로그아웃되었습니다."));
+
+        assertThat(session.isInvalid()).isTrue();
     }
 
     @Test
