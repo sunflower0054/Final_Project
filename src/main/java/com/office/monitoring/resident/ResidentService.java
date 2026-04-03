@@ -2,7 +2,9 @@ package com.office.monitoring.resident;
 
 import com.office.monitoring.aiSettings.AiSettings;
 import com.office.monitoring.aiSettings.AiSettingsRepository;
+import com.office.monitoring.event.EventRepository;
 import com.office.monitoring.member.Member;
+import com.office.monitoring.member.MemberRepository;
 import com.office.monitoring.member.Role;
 import com.office.monitoring.resident.dto.ResidentCreateRequest;
 import com.office.monitoring.resident.dto.ResidentResponse;
@@ -23,6 +25,9 @@ public class ResidentService {
 
     private final ResidentRepository residentRepository;
     private final AiSettingsRepository aiSettingsRepository;
+    private final EventRepository eventRepository;
+    private final MemberRepository memberRepository;
+    private final ResidentHistoryRepository residentHistoryRepository;
     private final CurrentUserService currentUserService;
 
     @Transactional
@@ -46,6 +51,7 @@ public class ResidentService {
         Resident savedResident = residentRepository.save(resident);
 
         currentMember.assignResident(savedResident.getId());
+        memberRepository.saveAndFlush(currentMember);
 
         createDefaultAiSettingsIfAbsent(savedResident.getId());
 
@@ -64,6 +70,19 @@ public class ResidentService {
                 request.latitude(),
                 request.longitude()
         );
+    }
+
+    @Transactional
+    public void deleteResident(Long residentId) {
+        Resident resident = getAuthorizedResident(residentId);
+
+        if (hasHistoryData(residentId)) {
+            throw new ResidentDeletionBlockedException("이력 데이터가 있어 삭제할 수 없습니다.");
+        }
+
+        memberRepository.clearResidentReference(residentId);
+        aiSettingsRepository.deleteByResidentId(residentId);
+        residentRepository.delete(resident);
     }
 
     public ResidentResponse getResident(Long residentId) {
@@ -128,5 +147,10 @@ public class ResidentService {
                 .noMotionThreshold(1800)
                 .velocityThreshold(0.15D)
                 .build());
+    }
+
+    private boolean hasHistoryData(Long residentId) {
+        return eventRepository.existsByResidentId(residentId)
+                || residentHistoryRepository.existsDailyActivityByResidentId(residentId);
     }
 }

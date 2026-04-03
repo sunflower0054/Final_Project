@@ -38,6 +38,7 @@ public class CurrentUserModelAdvice {
         model.put("name", display(member.getName()));
         model.put("phone", display(member.getPhone()));
         model.put("purpose", display(member.getPurpose()));
+        model.put("residentId", member.getResidentId());
         model.put("role", member.getRole() != null ? member.getRole().name() : NOT_REGISTERED);
         model.put("roleLabel", toRoleLabel(member.getRole()));
 
@@ -52,6 +53,7 @@ public class CurrentUserModelAdvice {
         model.put("name", NOT_REGISTERED);
         model.put("phone", NOT_REGISTERED);
         model.put("purpose", NOT_REGISTERED);
+        model.put("residentId", null);
         model.put("role", NOT_REGISTERED);
         model.put("roleLabel", NOT_REGISTERED);
 

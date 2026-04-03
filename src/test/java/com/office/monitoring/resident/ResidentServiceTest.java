@@ -1,6 +1,8 @@
 package com.office.monitoring.resident;
 
 import com.office.monitoring.aiSettings.AiSettingsRepository;
+import com.office.monitoring.event.EventRepository;
+import com.office.monitoring.member.MemberRepository;
 import com.office.monitoring.member.Member;
 import com.office.monitoring.member.Role;
 import com.office.monitoring.resident.dto.ResidentCreateRequest;
@@ -28,6 +30,15 @@ class ResidentServiceTest {
 
     @Mock
     private AiSettingsRepository aiSettingsRepository;
+
+    @Mock
+    private EventRepository eventRepository;
+
+    @Mock
+    private MemberRepository memberRepository;
+
+    @Mock
+    private ResidentHistoryRepository residentHistoryRepository;
 
     @Mock
     private CurrentUserService currentUserService;

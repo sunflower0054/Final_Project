@@ -3,4 +3,6 @@ package com.office.monitoring.event;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
+
+    boolean existsByResidentId(Long residentId);
 }

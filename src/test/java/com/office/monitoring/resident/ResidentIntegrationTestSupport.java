@@ -1,6 +1,7 @@
 package com.office.monitoring.resident;
 
 import com.office.monitoring.aiSettings.AiSettingsRepository;
+import com.office.monitoring.event.EventRepository;
 import com.office.monitoring.member.Member;
 import com.office.monitoring.member.MemberRepository;
 import com.office.monitoring.member.Role;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,14 +33,22 @@ abstract class ResidentIntegrationTestSupport {
     protected AiSettingsRepository aiSettingsRepository;
 
     @Autowired
+    protected EventRepository eventRepository;
+
+    @Autowired
     protected WithdrawnUserRepository withdrawnUserRepository;
+
+    @Autowired
+    protected JdbcTemplate jdbcTemplate;
 
     @Autowired
     protected PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
+        eventRepository.deleteAll();
         aiSettingsRepository.deleteAll();
+        clearDailyActivityTableIfExists();
         residentRepository.deleteAll();
         memberRepository.deleteAll();
         withdrawnUserRepository.deleteAll();
@@ -71,5 +81,27 @@ abstract class ResidentIntegrationTestSupport {
                 .purpose("거주자 등록 테스트")
                 .role(Role.FAMILY)
                 .build());
+    }
+
+    protected void createDailyActivityTableIfNeeded() {
+        jdbcTemplate.execute("""
+                create table if not exists daily_activity (
+                    id bigint auto_increment primary key,
+                    resident_id bigint not null,
+                    date date not null,
+                    motion_score int not null
+                )
+                """);
+    }
+
+    private void clearDailyActivityTableIfExists() {
+        Integer tableCount = jdbcTemplate.queryForObject(
+                "select count(*) from information_schema.tables where table_name = 'DAILY_ACTIVITY'",
+                Integer.class
+        );
+
+        if (tableCount != null && tableCount > 0) {
+            jdbcTemplate.execute("delete from daily_activity");
+        }
     }
 }
