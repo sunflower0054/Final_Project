@@ -283,17 +283,55 @@
     }
 
     /* STEP2 */
-    function checkId(){
-      const v=document.getElementById('userId').value;
-      document.getElementById('idErr').classList.toggle('show',v.length>0&&!/^[a-zA-Z0-9]{6,20}$/.test(v));
+    const usernameCheckState = {
+      checkedUsername: '',
+      available: false
+    };
+
+    function resetUsernameCheck(){
+      usernameCheckState.checkedUsername = '';
+      usernameCheckState.available = false;
       document.getElementById('idOk').classList.remove('show');
     }
 
-    function checkDup(){
-      const v=document.getElementById('userId').value;
-      if(!/^[a-zA-Z0-9]{6,20}$/.test(v)){document.getElementById('idErr').classList.add('show');return;}
+    function checkId(){
+      const v=document.getElementById('userId').value.trim();
+      const valid=/^[a-zA-Z0-9]{6,20}$/.test(v);
+      document.getElementById('idErr').classList.toggle('show',v.length>0&&!valid);
+      resetUsernameCheck();
+    }
+
+    async function checkDup(){
+      const v=document.getElementById('userId').value.trim();
+      if(!/^[a-zA-Z0-9]{6,20}$/.test(v)){
+        document.getElementById('idErr').textContent='영문, 숫자를 포함해 6~20자로 입력해주세요.';
+        document.getElementById('idErr').classList.add('show');
+        resetUsernameCheck();
+        return;
+      }
+
       document.getElementById('idErr').classList.remove('show');
-      document.getElementById('idOk').classList.add('show');
+
+      try{
+        const result = await AppApi.get(`/api/v1/auth/check-username?username=${encodeURIComponent(v)}`, {
+          redirectOn401: false
+        });
+        const success = result?.success === true;
+        const available = result?.available === true;
+        const message = result?.message || (available ? '사용 가능한 아이디입니다.' : '이미 사용 중인 아이디입니다.');
+
+        document.getElementById('idErr').textContent = message;
+        document.getElementById('idErr').classList.toggle('show',!(success&&available));
+        document.getElementById('idOk').classList.toggle('show',success&&available);
+
+        usernameCheckState.checkedUsername = v;
+        usernameCheckState.available = success && available;
+      }catch(error){
+        const message = error?.message || '아이디 중복확인에 실패했습니다.';
+        document.getElementById('idErr').textContent = message;
+        document.getElementById('idErr').classList.add('show');
+        resetUsernameCheck();
+      }
     }
 
     function checkPw(){
@@ -320,9 +358,14 @@
     function togglePw(id){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';}
 
     function sendVerify(){
-      const v=document.getElementById('email').value, ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-      document.getElementById('emailErr').classList.toggle('show',!ok);
-      document.getElementById('emailOk').classList.toggle('show',ok);
+      const emailEl = document.getElementById('email');
+      const emailErrEl = document.getElementById('emailErr');
+      const emailOkEl = document.getElementById('emailOk');
+      if(!emailEl || !emailErrEl || !emailOkEl) return;
+
+      const v=emailEl.value, ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      emailErrEl.classList.toggle('show',!ok);
+      emailOkEl.classList.toggle('show',ok);
     }
 
     function formatPhone(el){
@@ -332,7 +375,12 @@
       el.value=v;
     }
 
-    function selectGender(g){['M','F','N'].forEach(id=>document.getElementById('g'+id).classList.toggle('selected',id===g));}
+    function selectGender(g){
+      ['M','F','N'].forEach(id=>{
+        const el = document.getElementById('g'+id);
+        if(el) el.classList.toggle('selected',id===g);
+      });
+    }
 
     (function(){
       const y=document.getElementById('bYear'),c=new Date().getFullYear();
@@ -367,6 +415,10 @@
         }
         if(password !== password2){
             alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+        if(!(usernameCheckState.available && usernameCheckState.checkedUsername === username)){
+            alert('아이디 중복확인을 완료해주세요.');
             return;
         }
 
@@ -406,7 +458,10 @@
     }
 
     function closeModal(){document.getElementById('termsModal').classList.remove('open');}
-    document.getElementById('termsModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+    const termsModalEl = document.getElementById('termsModal');
+    if(termsModalEl){
+      termsModalEl.addEventListener('click',function(e){if(e.target===this)closeModal();});
+    }
 
     function submit_login_page() {
         alert('로그인 페이지로 이동합니다.')

@@ -130,6 +130,22 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    void 회원가입시_CSRF_없으면_403() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType("application/json")
+                        .content("""
+                    {
+                      "username": "no-csrf-user",
+                      "password": "pass-1234!",
+                      "name": "무토큰 사용자",
+                      "phone": "010-1234-5678",
+                      "purpose": "csrf 검증"
+                    }
+                    """))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void 로그인_API_성공시_HTTP세션_생성확인() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .param("username", "user")
