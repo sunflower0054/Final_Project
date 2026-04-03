@@ -114,7 +114,7 @@ public class SmsService {
     /** 단건 전송 — sms_log 저장 없음 (119 문자는 log 저장 안 함) */
     private boolean sendOnce(String text, String label) {
         // 119 전화번호 (실제 번호로 교체)
-        String target119 = "01083763942";
+        String target119 = "01034200339";
         try {
             sendMessage(target119, text);
             log.info("[SMS] {} 전송 성공", label);
