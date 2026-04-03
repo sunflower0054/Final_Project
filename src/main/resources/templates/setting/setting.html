@@ -302,7 +302,7 @@
 
     async function loadSettings() {
       try {
-        const res = await fetch('/api/ai-settings');
+        const res = await fetch('/api/v1/settings');
         if (!res.ok) return;
         const data = await res.json();
         if (data.fallSensitivity !== undefined) {
@@ -327,7 +327,7 @@
       const payload = getPayload();
       showLoading(true);
       try {
-        const res = await fetch('/api/ai-settings', {
+        const res = await fetch('/api/v1/settings', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -350,7 +350,7 @@
     async function applyToPython() {
       const payload = getPayload();
       try {
-        await fetch('/api/ai-settings/apply', {
+        await fetch('/api/v1/settings/apply', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
