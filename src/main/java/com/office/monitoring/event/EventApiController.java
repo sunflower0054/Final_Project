@@ -1,5 +1,6 @@
 package com.office.monitoring.event;
 
+import com.office.monitoring.sms.SmsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.io.IOException;
 public class EventApiController {
 
     private final EventService eventService;
+    private final SmsService smsService;
 
     // 파이썬 → 스프링: multipart/form-data (payload + 이미지)
     @PostMapping("/receive")
@@ -34,7 +36,8 @@ public class EventApiController {
         req.setMetadata(metadata);
 
         try {
-            eventService.receiveEvent(req, frameImage);
+            Event savedEvent = eventService.receiveEvent(req, frameImage);
+            smsService.sendFirstAlert(savedEvent);
             return ResponseEntity.ok("success");
         } catch (IOException e) {
             log.error("[EVENT 수신 오류]", e);
