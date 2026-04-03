@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/member_style.css}">
 </head>
@@ -176,6 +178,11 @@
             <input class="form-input" id="phone" type="tel" placeholder="010-0000-0000" oninput="formatPhone(this)">
         </div>
 
+        <div class="form-group">
+            <label class="form-label">사용 목적 <span class="req">*</span></label>
+            <input class="form-input" id="purpose" type="text" placeholder="예) 사무실 출입 모니터링">
+        </div>
+
         <!-- 출생연도 -->
         <div class="form-group">
             <label class="form-label">출생연도</label>
@@ -186,6 +193,7 @@
 
         <button class="btn-primary" onclick="goStep3()" style="margin-top:16px;">가입하기</button>
         <button class="btn-outline" onclick="goBack()">이전으로 돌아가기</button>
+        <div class="msg err" id="registerErr" style="margin-top:12px;"></div>
     </div>
 </div>
 
@@ -235,6 +243,7 @@
     </div>
 </div>
 
+<script th:src="@{/js/app-api.js}"></script>
 <script>
     // 기존 스크립트 그대로 유지 (구조와 ID를 맞췄기 때문에 정상 작동합니다)
     const termsContent = {
@@ -274,17 +283,55 @@
     }
 
     /* STEP2 */
-    function checkId(){
-      const v=document.getElementById('userId').value;
-      document.getElementById('idErr').classList.toggle('show',v.length>0&&!/^[a-zA-Z0-9]{6,20}$/.test(v));
+    const usernameCheckState = {
+      checkedUsername: '',
+      available: false
+    };
+
+    function resetUsernameCheck(){
+      usernameCheckState.checkedUsername = '';
+      usernameCheckState.available = false;
       document.getElementById('idOk').classList.remove('show');
     }
 
-    function checkDup(){
-      const v=document.getElementById('userId').value;
-      if(!/^[a-zA-Z0-9]{6,20}$/.test(v)){document.getElementById('idErr').classList.add('show');return;}
+    function checkId(){
+      const v=document.getElementById('userId').value.trim();
+      const valid=/^[a-zA-Z0-9]{6,20}$/.test(v);
+      document.getElementById('idErr').classList.toggle('show',v.length>0&&!valid);
+      resetUsernameCheck();
+    }
+
+    async function checkDup(){
+      const v=document.getElementById('userId').value.trim();
+      if(!/^[a-zA-Z0-9]{6,20}$/.test(v)){
+        document.getElementById('idErr').textContent='영문, 숫자를 포함해 6~20자로 입력해주세요.';
+        document.getElementById('idErr').classList.add('show');
+        resetUsernameCheck();
+        return;
+      }
+
       document.getElementById('idErr').classList.remove('show');
-      document.getElementById('idOk').classList.add('show');
+
+      try{
+        const result = await AppApi.get(`/api/v1/auth/check-username?username=${encodeURIComponent(v)}`, {
+          redirectOn401: false
+        });
+        const success = result?.success === true;
+        const available = result?.available === true;
+        const message = result?.message || (available ? '사용 가능한 아이디입니다.' : '이미 사용 중인 아이디입니다.');
+
+        document.getElementById('idErr').textContent = message;
+        document.getElementById('idErr').classList.toggle('show',!(success&&available));
+        document.getElementById('idOk').classList.toggle('show',success&&available);
+
+        usernameCheckState.checkedUsername = v;
+        usernameCheckState.available = success && available;
+      }catch(error){
+        const message = error?.message || '아이디 중복확인에 실패했습니다.';
+        document.getElementById('idErr').textContent = message;
+        document.getElementById('idErr').classList.add('show');
+        resetUsernameCheck();
+      }
     }
 
     function checkPw(){
@@ -311,9 +358,14 @@
     function togglePw(id){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';}
 
     function sendVerify(){
-      const v=document.getElementById('email').value, ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-      document.getElementById('emailErr').classList.toggle('show',!ok);
-      document.getElementById('emailOk').classList.toggle('show',ok);
+      const emailEl = document.getElementById('email');
+      const emailErrEl = document.getElementById('emailErr');
+      const emailOkEl = document.getElementById('emailOk');
+      if(!emailEl || !emailErrEl || !emailOkEl) return;
+
+      const v=emailEl.value, ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      emailErrEl.classList.toggle('show',!ok);
+      emailOkEl.classList.toggle('show',ok);
     }
 
     function formatPhone(el){
@@ -323,13 +375,16 @@
       el.value=v;
     }
 
-    function selectGender(g){['M','F','N'].forEach(id=>document.getElementById('g'+id).classList.toggle('selected',id===g));}
+    function selectGender(g){
+      ['M','F','N'].forEach(id=>{
+        const el = document.getElementById('g'+id);
+        if(el) el.classList.toggle('selected',id===g);
+      });
+    }
 
     (function(){
-      const y=document.getElementById('bYear'),m=document.getElementById('bMonth'),d=document.getElementById('bDay'),c=new Date().getFullYear();
+      const y=document.getElementById('bYear'),c=new Date().getFullYear();
       for(let i=c;i>=1924;i--){const o=document.createElement('option');o.value=i;o.textContent=i+'년';y.appendChild(o);}
-      for(let i=1;i<=12;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'월';m.appendChild(o);}
-      for(let i=1;i<=31;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'일';d.appendChild(o);}
     })();
 
     function goBack(){
@@ -338,15 +393,19 @@
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    function goStep3(){
+    async function goStep3(){
         const username = document.getElementById('userId').value.trim();
         const password = document.getElementById('pw').value;
         const password2 = document.getElementById('pw2').value;
         const name = document.getElementById('userName').value.trim();
         const phone = document.getElementById('phone').value.trim();
-        const birthYear = document.getElementById('bYear').value;
+        const purpose = document.getElementById('purpose').value.trim();
+        const registerErr = document.getElementById('registerErr');
 
-        if(!username || !password || !password2 || !name || !phone){
+        registerErr.classList.remove('show');
+        registerErr.textContent = '';
+
+        if(!username || !password || !password2 || !name || !phone || !purpose){
             alert('필수 항목을 모두 입력해주세요.');
             return;
         }
@@ -358,8 +417,28 @@
             alert('비밀번호가 일치하지 않습니다.');
             return;
         }
+        if(!(usernameCheckState.available && usernameCheckState.checkedUsername === username)){
+            alert('아이디 중복확인을 완료해주세요.');
+            return;
+        }
 
-        // birthYear는 선택사항
+        try {
+            await AppApi.post('/api/v1/auth/register', {
+                username,
+                password,
+                name,
+                phone,
+                purpose
+            }, {
+                redirectOn401: false
+            });
+        } catch (error) {
+            const message = error?.message || '회원가입에 실패했습니다.';
+            registerErr.textContent = message;
+            registerErr.classList.add('show');
+            alert(message);
+            return;
+        }
 
         document.getElementById('doneUserName').textContent = name;
         document.getElementById('step2').style.display = 'none';
@@ -379,7 +458,10 @@
     }
 
     function closeModal(){document.getElementById('termsModal').classList.remove('open');}
-    document.getElementById('termsModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+    const termsModalEl = document.getElementById('termsModal');
+    if(termsModalEl){
+      termsModalEl.addEventListener('click',function(e){if(e.target===this)closeModal();});
+    }
 
     function submit_login_page() {
         alert('로그인 페이지로 이동합니다.')
