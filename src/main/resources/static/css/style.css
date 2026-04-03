@@ -1,31 +1,42 @@
 :root {
-    /* Main Colors - 늘봄의 따뜻한 봄빛 연두색 */
-    --navy: #94D05C;         /* 노란빛 감도는 연두색 (따뜻한 메인 컬러) */
-    --navy-mid: #A7D673;     /* 부드러운 중간 톤 연두색 */
-    --navy-light: #F3F9E9;   /* 따뜻하고 연한 연두색 배경 */
+    /* Main Colors */
+    --navy: #94D05C;
+    --navy-mid: #A7D673;
+    --navy-light: #f6f7ea;   /* 베이스 컬러 적용 */
 
-    /* Status Colors - 따뜻한 테마에 맞춰 미세 조정 */
-    --success: #2A8F3D;      /* 부드러운 녹색 */
-    --success-bg: #DCFCE7;   /* 따뜻한 연녹색 배경 */
-    --error: #E03131;        /* 따뜻한 레드 (LIVE 표시) */
-    --error-bg: #FFF5F5;     /* 연한 레드 배경 */
-    --warning: #F59E0B;      /* 따뜻한 앰버/노란색 */
-    --warning-bg: #FEF3C7;   /* 연한 노란색 배경 */
+    /* Status Colors */
+    --success: #2A8F3D;
+    --success-bg: #DCFCE7;
+    --error: #E03131;
+    --error-bg: #FFF5F5;
+    --warning: #F59E0B;
+    --warning-bg: #FEF3C7;
 
-    /* Gray Scale - 따뜻한 톤의 회색 (Cool gray 대신 Warm gray) */
-    --gray-50: #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB;
-    --gray-300: #D1D5DB; --gray-400: #9CA3AF; --gray-500: #6B7280; --gray-600: #4B5563;
-    /* 텍스트용 아주 짙은 따뜻한 회색 */
+    /* Gray Scale - 베이스 컬러에 맞춰 웜톤으로 미세 조정 */
+    --gray-50: #fcfcf9;      /* 아주 연한 베이스 */
+    --gray-100: #f6f7ea;     /* 메인 베이스 컬러 */
+    --gray-200: #E1E3D3;     /* 베이스용 테두리 색상 */
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #5A626F;
+    --gray-600: #4B5563;
     --gray-900: #1C2919;
 
     --radius: 16px;
+
+    --chart-grid-line: #F1F5F9;
+    --chart-pie-green-1: #C5E1A5;
+    --chart-pie-green-2: #DCEDC8;
+    --chart-pie-yellow-1: #FBBF24;
+    --chart-pie-yellow-2: #FDE68A;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: 'Noto Sans KR', sans-serif;
-    background: var(--gray-100); color: var(--gray-900);
+    background: var(--gray-100) !important;
+    color: var(--gray-900);
     padding: 20px; min-height: 100vh;
     display: flex; flex-direction: column; gap: 20px;
     overflow-y: auto;
@@ -164,10 +175,10 @@ body {
 .btn-outline { background: #fff; border: 2px solid var(--gray-300); color: var(--gray-700); }
 .btn-success { background: var(--success); color: #fff; }
 
-.risk-score-section { padding: 24px; display: flex; align-items: center; gap: 30px; }
-.score-info { min-width: 180px; }
+.risk-score-section { padding: 24px; display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+.score-info { display: flex; flex-direction: column; min-width: 170px;  flex-shrink: 0; }
 .score-info .label { font-size: 14px; color: var(--gray-500); font-weight: 700; margin-bottom: 4px; }
-.score-info .val { font-size: 32px; font-weight: 900; }
+.score-info .val { font-size: 32px; font-weight: 900; line-height: 1 !important; margin-bottom: -4px !important; }
 .progress-container { flex: 1; height: 20px; background: var(--gray-200); border-radius: 20px; overflow: hidden; border: 1px solid var(--gray-300); }
 .progress-bar { height: 100%; transition: width 1s ease, background 0.5s ease; border-radius: 20px; }
 .safe { color: var(--success); background: linear-gradient(90deg, #10b981, #059669); }
@@ -457,4 +468,74 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 @keyframes pulse-fail {
     0%, 100% { opacity: 1; }
     50%       { opacity: 0.45; }
+}
+
+
+/* 비디오 로딩 레이어 */
+.video-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    color: var(--gray-400);
+}
+
+/* 푸터 스타일 */
+.service-footer {
+    margin-top: 40px;
+    padding: 40px 20px;
+    background: #fff;
+    border-top: 1px solid var(--gray-200);
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.footer-tagline {
+    font-size: 14px;
+    color: var(--gray-500);
+    margin-left: 10px;
+    font-weight: 500;
+}
+.footer-info {
+    text-align: right;
+    font-size: 13px;
+    color: var(--gray-400);
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   [최종] 모니터링 테두리 (이것만 style.css 맨 아래 남겨두세요)
+   ========================================================= */
+.monitoring-box {
+    position: relative;
+    background: #000;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 600px;
+    transition: all 0.3s ease;
+    border: 5px solid transparent;
+    box-sizing: border-box;
+}
+
+.monitoring-box.green-border {
+    border-color: var(--success);
+}
+
+.monitoring-box.red-border {
+    border-color: var(--error);
+    animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(224, 49, 49, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(224, 49, 49, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(224, 49, 49, 0); }
 }

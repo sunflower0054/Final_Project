@@ -129,218 +129,64 @@
     </div>
 </div>
 
-<script>
+<!--<script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. AJAX 통신으로 데이터 가져오기 (초기 로드 시 실행)
-        loadReportDataViaAjax();
+        // 1. Thymeleaf 모델에서 값을 가져와 변수에 할당
+        const residentAddress = [[${resident.address}]];
+        const residentName = [[${resident.name}]];
 
-        function loadReportDataViaAjax() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const typeParam = urlParams.get('type') || 'manual'; // 'auto' 또는 'manual'
-            const residentId = urlParams.get('residentId'); // ★ ID만 받습니다.
+        // 2. 만약 데이터가 있을 때만 지도를 그리도록 체크
+        if (residentAddress && residentName) {
+            // 외부 파일(map-utils.js)에 정의된 함수를 호출!
+            initMapAndHospitals(residentAddress, residentName);
+        } else {
+            console.error("거주자 정보가 부족하여 지도를 불러올 수 없습니다.");
+        }
+    });
+</script>-->
 
+<!-- 1. 외부 JS 파일 불러오기 (이름 오타 -로 수정 완료) -->
+<script th:src="@{/js/map_utils.js}"></script>
 
-// ==========================================
-// [테스트 전용 로직] ID가 '999'일 경우 가짜 데이터 렌더링
-// ==========================================
-if (residentId === '999') {
-    // 1. URL에서 address 파라미터 값을 가져옵니다.
-    // (만약 함수 최상단에 이미 선언해두셨다면 이 두 줄은 생략하셔도 됩니다)
-    const urlParams = new URLSearchParams(window.location.search);
-    const addressParam = urlParams.get('address');
+<!-- 2. 실행 스크립트 (하나로 통합) -->
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // [1] URL에서 테스트 파라미터 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const isTestMode = (urlParams.get('residentId') === '999');
+        const testAddress = urlParams.get('address');
 
-    const mockData = {
-        type: typeParam,
-        event: typeParam === 'auto' ? '낙상 의심 (10분 미확인 자동 신고)' : '낙상 감지 (관제 센터 수동 신고)',
-        name: '테스트 거주자',
-        age: 82,
-        disease: '고혈압, 관절염',
+        // [2] 데이터 가져오기 (?. 문법으로 에러 방지)
+        let finalAddress = [[${resident?.address}]];
+        let finalName = [[${resident?.name}]];
 
-        // 2. 하드코딩된 주소 대신 addressParam을 사용하도록 수정합니다.
-        // URL에 값이 있으면 그 값을 사용하고, 없으면 뒤의 기본값(강남역)을 사용합니다.
-        address: addressParam || '서울 강남구 테헤란로 152',
+        // [3] 테스트 모드(999)일 경우 가짜 데이터 채우기
+        if (isTestMode) {
+            console.log("🛠️ 테스트 모드 활성화 (ID: 999)");
+            finalAddress = testAddress || '서울 강남구 테헤란로 152'; // 주소 없으면 강남역
+            finalName = '테스트 거주자';
 
-        reporter: typeParam === 'auto' ? '010-1234-5678 (스마트 관제 시스템)' : '010-1234-5678 (스마트 관제 센터)'
-    };
-    renderUI(mockData);
-    return; // 여기서 함수를 종료하여 아래 fetch(서버 요청)를 실행하지 않음
-}
-// ==========================================
-
-
-            if (residentId) {
-                // 1. 전달받은 ID로 DB에서 거주자 정보 조회
-                fetch(`/api/residents/${residentId}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error("데이터 조회 실패");
-                        return response.json();
-                    })
-                    .then(dbData => {
-                        // 2. 나이 계산
-                        let calcAge = "미상";
-                        if (dbData.birthDate) {
-                            const birthYear = parseInt(dbData.birthDate.split('-')[0]);
-                            calcAge = new Date().getFullYear() - birthYear + 1;
-                        }
-
-                        // 3. 기저질환 배열 -> 문자열 변환
-                        let diseases = "없음";
-                        if (dbData.underlyingDiseases && dbData.underlyingDiseases.length > 0) {
-                            diseases = dbData.underlyingDiseases.join(", ");
-                        }
-
-                        // 4. 화면에 뿌려줄 데이터 최종 조립
-                        const reportData = {
-                            type: typeParam,
-                            event: typeParam === 'auto' ? '낙상 의심 (10분 미확인 자동 신고)' : '낙상 감지 (관제 센터 수동 신고)',
-                            name: dbData.name || '알 수 없음',
-                            age: calcAge,
-                            disease: diseases,
-                            address: dbData.address || '주소 정보 없음',
-                            reporter: typeParam === 'auto' ? '010-1234-5678 (스마트 관제 시스템)' : '010-1234-5678 (스마트 관제 센터)'
-                        };
-
-                        // 5. 화면 렌더링
-                        renderUI(reportData);
-                    })
-                    .catch(error => {
-                        console.error("API 연동 에러:", error);
-                        document.getElementById('sms-content').innerHTML = `<span style="color:red">거주자 정보를 불러오지 못했습니다. (ID: ${residentId})</span>`;
-                    });
-            } else {
-                document.getElementById('sms-content').innerHTML = `<span style="color:red">잘못된 접근입니다. (거주자 ID 누락)</span>`;
+            // 테스트용 UI 강제 업데이트
+            const smsContent = document.getElementById('sms-content');
+            if(smsContent) {
+                smsContent.innerHTML = `<strong>[테스트 신고]</strong>\n\n▪ <strong>대상자:</strong> ${finalName}\n▪ <strong>발생위치:</strong> ${finalAddress}`;
             }
-        }
-
-        // [테스트용 폴백 함수] API가 안 붙었을 때 화면 깨짐 방지
-        function renderTestUI(typeParam) {
-            const mockData = {
-                type: typeParam,
-                event: typeParam === 'auto' ? '낙상 의심 (10분 미확인)' : '낙상 감지',
-                name: '테스트환자',
-                age: '82',
-                disease: '고혈압, 관절염',
-                address: '서울 마포구 양화로 45',
-                reporter: '010-1234-5678'
-            };
-            renderUI(mockData);
-        }
-
-        // 2. 받아온 AJAX 데이터를 화면에 적용하는 함수
-        function renderUI(data) {
-            // --- UI 토글 처리 (수동 vs 자동) ---
             const manualBanner = document.getElementById('manual-banner');
-            const autoBanner = document.getElementById('auto-banner');
-            const emergencyCallCard = document.getElementById('emergency-call-card');
+            if(manualBanner) manualBanner.style.display = 'block';
+        }
 
-            if (data.type === 'auto') {
-                manualBanner.style.display = 'none';
-                autoBanner.style.display = 'block';
-                emergencyCallCard.style.display = 'block';
-                document.title = "관제 시스템 - 119 자동 신고 완료";
+        // [4] 최종 실행
+        if (finalAddress && finalName) {
+            console.log(`📍 지도 실행 주소: ${finalAddress}`);
+
+            // map-utils.js의 함수 호출
+            if (typeof initMapAndHospitals === 'function') {
+                initMapAndHospitals(finalAddress, finalName);
             } else {
-                manualBanner.style.display = 'block';
-                autoBanner.style.display = 'none';
-                emergencyCallCard.style.display = 'none';
-                document.title = "관제 시스템 - 119 신고 완료";
+                console.error("❌ 에러: map-utils.js 파일이 로드되지 않았거나 함수가 없습니다.");
             }
-
-            // --- SMS 문자 내용 세팅 ---
-            const reportTitle = data.type === 'auto' ? '[긴급 119 AI 자동 신고]' : '[긴급 119 관제센터 신고]';
-            const smsText = `<strong>${reportTitle}</strong>\n\n▪ <strong>감지내용:</strong> ${data.event}\n▪ <strong>대상자:</strong> ${data.name} (${data.age}세)\n▪ <strong>기저질환:</strong> ${data.disease}\n▪ <strong>발생위치:</strong> ${data.address}\n▪ <strong>신고자:</strong> ${data.reporter}`;
-            document.getElementById('sms-content').innerHTML = smsText;
-
-            // --- 지도 및 주변 병원 세팅 ---
-            initMapAndHospitals(data.address, data.name);
-        }
-
-        // 3. 카카오맵 및 병원 검색 (기존 로직 동일)
-        function initMapAndHospitals(targetAddress, targetName) {
-            kakao.maps.load(function () {
-                var mapContainer = document.getElementById('map');
-                var mapOption = { center: new kakao.maps.LatLng(37.566826, 126.978656), level: 5 };
-                var map = new kakao.maps.Map(mapContainer, mapOption);
-                var geocoder = new kakao.maps.services.Geocoder();
-
-                if (targetAddress) {
-                    geocoder.addressSearch(targetAddress, function(result, status) {
-                        if (status === kakao.maps.services.Status.OK) {
-                            var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                            map.setCenter(coords);
-
-                            var marker = new kakao.maps.Marker({ position: coords, map: map });
-                            var iw = new kakao.maps.InfoWindow({
-                                content: `<div style="padding:6px 12px; font-size:13px; font-weight:700; color:#DC2626; border-radius:6px;">${targetName}님 사고 위치</div>`
-                            });
-                            iw.open(map, marker);
-
-                            searchHospitals(coords, map);
-                        } else {
-                            document.getElementById('hospital-list').innerHTML = '<li style="padding:20px; text-align:center; color:var(--error);">주소를 찾을 수 없습니다.</li>';
-                        }
-                    });
-                }
-            });
-        }
-
-        function searchHospitals(center, map) {
-            var ps = new kakao.maps.services.Places();
-            var hospitalListEl = document.getElementById('hospital-list');
-
-            // 키워드를 '응급실'으로 하고, 카테고리를 병원(HP8)으로 지정
-            ps.keywordSearch('응급실', function(data, status) {
-                if (status === kakao.maps.services.Status.OK) {
-                    hospitalListEl.innerHTML = '';
-
-                    // ★ 핵심 필터링: 동물, 요양, 떡볶이, 치과, 한의원 등이 들어간 상호명은 제외
-                    var filteredData = data.filter(function(place) {
-                        var name = place.place_name;
-                        return !name.includes('동물') &&
-                               !name.includes('요양') &&
-                               !name.includes('떡볶이') &&
-                               !name.includes('한의원') &&
-                               !name.includes('청소') &&
-                               !name.includes('치과');
-                    });
-
-                    // 필터링 후 남은 병원이 없는 경우 처리
-                    if (filteredData.length === 0) {
-                        hospitalListEl.innerHTML = '<li style="padding:20px; text-align:center; color:var(--error);">조건에 맞는 주변 응급실을 찾을 수 없습니다.</li>';
-                        return;
-                    }
-
-                    // 필터링된 결과 중 최대 5개만 출력
-                    var limit = Math.min(filteredData.length, 5);
-
-                    for (var i = 0; i < limit; i++) {
-                        var place = filteredData[i];
-                        var distanceText = place.distance ? (place.distance / 1000).toFixed(1) + 'km' : '-';
-                        var phoneText = place.phone || '전화번호 없음';
-                        var phoneLink = place.phone ? 'tel:' + place.phone.replace(/-/g, '') : '#';
-
-                        var li = document.createElement('li');
-                        li.className = 'hospital-item';
-                        li.innerHTML = `
-                            <div class="h-info">
-                                <div class="h-name">${place.place_name} <span class="h-dist">${distanceText}</span></div>
-                                <div class="h-tel">${place.road_address_name || place.address_name}</div>
-                            </div>
-                            <a href="${phoneLink}" class="h-call-btn">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                                ${phoneText}
-                            </a>
-                        `;
-                        hospitalListEl.appendChild(li);
-                    }
-                } else {
-                    hospitalListEl.innerHTML = '<li style="padding:20px; text-align:center; color:var(--error);">주변 응급실 정보를 찾을 수 없습니다.</li>';
-                }
-            }, {
-                location: center,
-                radius: 5000,
-                sort: kakao.maps.services.SortBy.DISTANCE,
-
-            });
+        } else {
+            console.warn("⚠️ 표시할 주소가 없습니다. 테스트하려면 주소창 뒤에 ?residentId=999 를 붙이세요.");
         }
     });
 </script>

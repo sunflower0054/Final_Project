@@ -9,26 +9,47 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
     <style>
-        /* 대시보드 차트 레이아웃을 위한 간단한 그리드 추가 (style.css 훼손 방지) */
+
+        /* =========================================
+           2. 인라인 스타일을 CSS 클래스로 분리
+           ========================================= */
+        .header-area {
+            padding: 20px;
+            background: #fff;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 20px;
+        }
+
         .chart-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-top: 20px;
         }
+
         .chart-card {
             padding: 24px;
         }
+
         .chart-container {
             width: 100%;
             height: 300px;
             margin-top: 10px;
         }
+
+        /* 특정 차트용 개별 스타일 */
+        #userAgeChart {
+            background: var(--navy-light);
+        }
+        #monthlyTrendChart {
+            height: 350px;
+        }
     </style>
 </head>
 <body>
 
-<header class="header-area" style="padding: 20px; background: #fff; border-bottom: 1px solid var(--gray-200); margin-bottom: 20px;">
+<!-- 인라인 style 속성 제거 -->
+<header class="header-area">
     <div class="brand-logo">
         <div class="logo-box">A</div>
         <div class="brand-name">관리자 통계 (Admin Statistics)</div>
@@ -61,54 +82,71 @@
     <div class="chart-grid">
         <div class="content-card chart-card">
             <div class="section-title">
-                <span class="section-title-icon" style="background: var(--navy-light); color: var(--navy);">📊</span>
-                회원 연령대 분포
+                [ 회원 연령대 분포 ]
             </div>
+            <!-- 인라인 style 속성 제거 -->
             <div id="userAgeChart" class="chart-container"></div>
         </div>
 
         <div class="content-card chart-card">
             <div class="section-title">
-                <span class="section-title-icon" style="background: var(--navy-light); color: var(--navy);">🎯</span>
-                회원 가입 목적
+                [ 회원 가입 목적 ]
             </div>
             <div id="userPurposeChart" class="chart-container"></div>
         </div>
 
         <div class="content-card chart-card">
             <div class="section-title">
-                <span class="section-title-icon" style="background: var(--warning-bg); color: var(--warning);">👵</span>
-                독거노인 연령대 분포
+                [ 독거노인 연령대 분포 ]
             </div>
             <div id="residentAgeChart" class="chart-container"></div>
         </div>
 
         <div class="content-card chart-card">
             <div class="section-title">
-                <span class="section-title-icon" style="background: var(--error-bg); color: var(--error);">🚨</span>
-                이벤트 처리 상태 (오탐지율)
+                [ 이벤트 처리 상태 ]
             </div>
             <div id="eventStatusChart" class="chart-container"></div>
         </div>
 
+        <!-- 인라인 style 속성 제거 (grid-column 등) -->
         <div class="content-card chart-card" style="grid-column: 1 / -1;">
             <div class="section-title">
-                <span class="section-title-icon" style="background: var(--gray-200); color: var(--gray-600);">📈</span>
-                월별 이벤트 발생 추이
+                [ 월별 이벤트 발생 추이 ]
             </div>
-            <div id="monthlyTrendChart" class="chart-container" style="height: 350px;"></div>
+            <div id="monthlyTrendChart" class="chart-container"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // 구글 차트 패키지 로드
     google.charts.load('current', {'packages':['corechart', 'bar']});
     google.charts.setOnLoadCallback(fetchDataAndDrawCharts);
 
-    // API 명세서 기반의 더미 데이터 (실제 백엔드 API 연동 시 fetch로 교체)
+    // 전역 변수
+    let colors = {};
+    let charts = {}; // 차트 인스턴스 저장 (resize 시 재사용)
+
     function fetchDataAndDrawCharts() {
-        // [AD-01] 회원 통계 데이터 (Mock)
+        // CSS 변수 동적으로 읽어오기 (가장 먼저 실행)
+        const rootStyle = getComputedStyle(document.documentElement);
+        colors = {
+            primary: rootStyle.getPropertyValue('--navy').trim() || '#94D05C',
+            primaryMid: rootStyle.getPropertyValue('--navy-mid').trim() || '#A7D673',
+            primaryLight: rootStyle.getPropertyValue('--navy-light').trim() || '#f6f7ea',
+            success: rootStyle.getPropertyValue('--success').trim() || '#2A8F3D',
+            warning: rootStyle.getPropertyValue('--warning').trim() || '#F59E0B',
+            error: rootStyle.getPropertyValue('--error').trim() || '#E03131',
+            gray: rootStyle.getPropertyValue('--gray-400').trim() || '#9CA3AF',
+            dark: rootStyle.getPropertyValue('--gray-900').trim() || '#1C2919',
+            gridLine: rootStyle.getPropertyValue('--chart-grid-line').trim() || '#F1F5F9',
+            pieGreen1: rootStyle.getPropertyValue('--chart-pie-green-1').trim() || '#C5E1A5',
+            pieGreen2: rootStyle.getPropertyValue('--chart-pie-green-2').trim() || '#DCEDC8',
+            pieYellow1: rootStyle.getPropertyValue('--chart-pie-yellow-1').trim() || '#FBBF24',
+            pieYellow2: rootStyle.getPropertyValue('--chart-pie-yellow-2').trim() || '#FDE68A'
+        };
+
+        // ==================== 데이터 ====================
         const userData = {
             totalUsers: 1245,
             ageGroups: [
@@ -121,7 +159,6 @@
             ]
         };
 
-        // [AD-02] 독거노인 통계 데이터 (Mock)
         const residentData = {
             totalResidents: 412,
             averageAge: 76.4,
@@ -131,14 +168,13 @@
             ]
         };
 
-        // [AD-03] 이벤트 통계 데이터 (Mock)
         const eventData = {
             totalEvents: 3890,
             byStatus: [
                 ['상태', '건수'],
-                ['진행중(OPEN)', 150],
-                ['조치완료(RESOLVED)', 3100],
-                ['오탐지(CLOSED)', 640] // 오탐지율 지표
+                ['수동신고', 1500],
+                ['자동신고', 1650],
+                ['오탐지', 640]
             ],
             monthlyTrend: [
                 ['월', '낙상', '움직임 없음', '폭행'],
@@ -151,18 +187,17 @@
             ]
         };
 
-        // 1. 요약 카드 DOM 업데이트
+        // ==================== 숫자 업데이트 ====================
         document.getElementById('totalUsers').innerText = userData.totalUsers.toLocaleString() + '명';
         document.getElementById('totalResidents').innerText = residentData.totalResidents.toLocaleString() + '명';
         document.getElementById('avgAge').innerText = residentData.averageAge;
         document.getElementById('totalEvents').innerText = eventData.totalEvents.toLocaleString() + '건';
 
-        // 오탐지율 계산 (CLOSED 건수 / 전체 건수 * 100)
         const closedEvents = eventData.byStatus[3][1];
         const falseAlarmRate = ((closedEvents / eventData.totalEvents) * 100).toFixed(1);
         document.getElementById('falseAlarmRate').innerText = falseAlarmRate + '%';
 
-        // 2. 차트 그리기 실행
+        // ==================== 차트 그리기 ====================
         drawUserAgeChart(userData.ageGroups);
         drawUserPurposeChart(userData.purposes);
         drawResidentAgeChart(residentData.ageGroups);
@@ -170,89 +205,82 @@
         drawMonthlyTrendChart(eventData.monthlyTrend);
     }
 
-    // 공통 색상 (style.css 변수 참고)
-    const colors = {
-        navy: '#3B5B9D',
-        navyMid: '#4E71B8',
-        navyLight: '#F0F4FB',
-        success: '#059669',
-        warning: '#D97706',
-        error: '#DC2626',
-        gray: '#94A3B8'
-    };
-
-    // [AD-01] 회원 연령대 분포 (막대 차트)
+    // ==================== 차트 함수들 ====================
     function drawUserAgeChart(dataArray) {
         var data = google.visualization.arrayToDataTable(dataArray);
         var options = {
             legend: { position: 'none' },
-            colors: [colors.navyMid],
-            vAxis: { minValue: 0 },
-            animation: { startup: true, duration: 1000, easing: 'out' }
+            colors: [colors.primaryMid],
+            chartArea: { width: '80%', height: '70%' },
+            vAxis: { gridlines: { color: colors.gridLine }, textStyle: { color: colors.gray } },
+            hAxis: { textStyle: { color: colors.gray } },
+            animation: { startup: true, duration: 800, easing: 'out' }
         };
         var chart = new google.visualization.ColumnChart(document.getElementById('userAgeChart'));
         chart.draw(data, options);
     }
 
-    // [AD-01] 회원 가입 목적 (파이 차트)
     function drawUserPurposeChart(dataArray) {
         var data = google.visualization.arrayToDataTable(dataArray);
         var options = {
-            pieHole: 0, // 완전한 원형 파이 차트
-            colors: [colors.navy, colors.navyMid, '#7DA0FA', '#A9C3FD'],
+            pieHole: 0.5,
+            colors: [colors.primary, colors.primaryMid, colors.pieGreen1, colors.pieGreen2],
             chartArea: { width: '90%', height: '90%' },
-            legend: { position: 'right' }
+            legend: { position: 'right', textStyle: { color: colors.dark, fontSize: 12 } },
+            pieSliceBorderColor: "none"
         };
         var chart = new google.visualization.PieChart(document.getElementById('userPurposeChart'));
         chart.draw(data, options);
     }
 
-    // [AD-02] 독거노인 연령대 (도넛 차트 - 60대/70대/80대 이상 그룹핑)
     function drawResidentAgeChart(dataArray) {
         var data = google.visualization.arrayToDataTable(dataArray);
         var options = {
-            pieHole: 0.4, // 가운데 구멍을 뚫어 도넛 형태로
-            colors: [colors.warning, '#F59E0B', '#FCD34D'],
+            pieHole: 0.5,
+            colors: [colors.warning, colors.pieYellow1, colors.pieYellow2],
             chartArea: { width: '90%', height: '90%' },
-            legend: { position: 'right' }
+            legend: { position: 'right' },
+            pieSliceBorderColor: "none"
         };
         var chart = new google.visualization.PieChart(document.getElementById('residentAgeChart'));
         chart.draw(data, options);
     }
 
-    // [AD-03] 이벤트 처리 상태 - CLOSED 비율(오탐지율) 강조 (도넛 차트)
     function drawEventStatusChart(dataArray) {
         var data = google.visualization.arrayToDataTable(dataArray);
         var options = {
-            pieHole: 0.4,
-            // OPEN(회색), RESOLVED(녹색), CLOSED(빨간색 - 오탐지)
+            pieHole: 0.6,
             colors: [colors.gray, colors.success, colors.error],
             chartArea: { width: '90%', height: '90%' },
             legend: { position: 'right' },
-            pieSliceText: 'percentage'
+            pieSliceText: 'none'
         };
         var chart = new google.visualization.PieChart(document.getElementById('eventStatusChart'));
         chart.draw(data, options);
     }
 
-    // [AD-03] 이벤트 월별 추이 (선 그래프)
     function drawMonthlyTrendChart(dataArray) {
         var data = google.visualization.arrayToDataTable(dataArray);
         var options = {
-            curveType: 'function', // 부드러운 곡선
-            legend: { position: 'bottom' },
-            colors: [colors.error, colors.warning, colors.navy], // 낙상(빨강), 움직임(노랑), 폭행(파랑)
-            vAxis: { minValue: 0 },
-            animation: { startup: true, duration: 1000, easing: 'out' },
-            chartArea: { width: '85%', height: '70%' }
+            curveType: 'function',
+            lineWidth: 3,
+            legend: { position: 'bottom', textStyle: { color: colors.gray } },
+            colors: [colors.error, colors.warning, colors.primary],
+            vAxis: { minValue: 0, gridlines: { color: colors.gridLine } },
+            chartArea: { width: '85%', height: '70%' },
+            animation: { startup: true, duration: 800, easing: 'out' }
         };
         var chart = new google.visualization.LineChart(document.getElementById('monthlyTrendChart'));
         chart.draw(data, options);
     }
 
-    // 반응형 처리: 창 크기 조절 시 차트 다시 그리기
+    // ==================== Resize 최적화 ====================
+    let resizeTimer;
     window.addEventListener('resize', function() {
-        fetchDataAndDrawCharts();
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            fetchDataAndDrawCharts();
+        }, 250);   // 250ms 디바운스
     });
 </script>
 </body>

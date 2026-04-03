@@ -1,42 +1,44 @@
 /* ===== 1. Modern Design System & Variables ===== */
 :root {
     /* Main Colors - 늘봄 테마 */
-    --primary: #94D05C;       /* 따뜻한 봄빛 연두색 */
-    --primary-mid: #A7D673;   /* 부드러운 중간 연두색 (호버 등) */
-    --primary-light: #F3F9E9; /* 배경 및 영역 구분용 연한 연두색 */
-    --secondary: #F4F4F5;     /* 경계선 및 보조 배경 (Warm gray) */
+    --primary: #94D05C;
+    --primary-mid: #A7D673;
+    --primary-light: #f6f7ea; /* 베이스 컬러 적용 */
+    --secondary: #E1E3D3;     /* 베이스에 어울리는 보조 배경/경계선 */
 
-    /* Text Colors - 가독성을 위한 따뜻한 흑록색 */
-    --text-main: #1C2919;     /* 짙은 초록빛이 감도는 따뜻한 블랙 */
-    --text-sub: #52525B;      /* 따뜻한 회색 */
-    --text-muted: #A1A1AA;    /* 연한 회색 */
+    /* Text Colors */
+    --text-main: #1C2919;
+    --text-sub: #52525B;
+    --text-muted: #A1A1AA;
 
-    /* Semantic Colors - 상태 표시 (Source 2와 동일) */
+    /* Semantic Colors - 상태 표시 */
     --success: #2A8F3D;
     --error: #E03131;
     --warning: #F59E0B;
-    --purple: #7C3AED;        /* 보라색도 따뜻한 톤으로 */
+    --purple: #7C3AED;
 
     /* Design Elements */
-    --bg-page: #ffffff;
-    --bg-card: #ffffff;
-    --border-color: #E5E7EB;  /* 따뜻한 회색 경계선 */
+    --bg-page: #f6f7ea;       /* 전체 배경색을 베이스 컬러로 변경 */
+    --bg-card: #ffffff;       /* 카드는 구분을 위해 흰색 유지 */
+    --border-color: #E1E3D3;  /* 베이스에 맞춘 테두리 색상 */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.08);
     --radius: 12px;
     --transition: all 0.25s ease;
-    --gray-100: #ffffff;
-    --gray-900: #1C2919;
 
-    --navy: #94D05C;
-    --navy-light: #F3F9E9;
-    --gray-50: #F9FAFB;
-    --gray-200: #E5E7EB;
+    /* Gray Scale - 베이스 컬러에 맞춰 웜톤으로 미세 조정 */
+    --gray-50: #fcfcf9;       /* 아주 연한 베이스 */
+    --gray-100: #f6f7ea;      /* 메인 베이스 컬러 */
+    --gray-200: #E1E3D3;      /* 베이스용 테두리 색상 */
     --gray-300: #D1D5DB;
     --gray-400: #9CA3AF;
     --gray-500: #6B7280;
     --gray-600: #4B5563;
     --gray-700: #374151;
+    --gray-900: #1C2919;
+
+    --navy: #94D05C;
+    --navy-light: #f6f7ea;    /* 베이스 컬러 적용 */
 }
 
 /* ===== 2. Reset & Body ===== */
@@ -48,6 +50,7 @@
 
 body {
     font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg-page) !important;
     padding: 20px; min-height: 100vh;
     display: flex; flex-direction: column; gap: 20px;
     overflow-y: auto;
