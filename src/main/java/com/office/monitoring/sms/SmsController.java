@@ -91,16 +91,13 @@ public class SmsController {
         return ResponseEntity.ok("상황이 종료되었습니다.");
     }
 
-    // 자동신고 완료 페이지 (주소창에 직접 입력)
-// 예시: /report/auto/63
-    @GetMapping("/auto/{eventId}")
-    public String autoReport(@PathVariable Long eventId,
-                             HttpSession session,
-                             Model model) {
+    // 가장 최근 AUTO_REPORTED 이벤트 자동 조회
+    @GetMapping("/auto")
+    public String autoReport(HttpSession session, Model model) {
 
-        // 1) 이벤트 조회
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("이벤트 없음"));
+        // 1) 가장 최근 AUTO_REPORTED 이벤트 자동 조회
+        Event event = eventRepository.findTopByStatusOrderByCreatedAtDesc("AUTO_REPORTED")
+                .orElseThrow(() -> new IllegalArgumentException("자동신고 이벤트 없음"));
 
         // 2) 거주자 조회
         Resident resident = residentRepository.findById(event.getResidentId())
@@ -118,7 +115,7 @@ public class SmsController {
                         + "기저질환: %s\n"
                         + "주소: %s\n"
                         + "거주자 연락처: %s\n"
-                        + "보호자 연락처: %s",
+                        + "신고자 연락처: %s",
                 event.getEventType(),
                 resident.getName(), age,
                 resident.getDisease() != null ? resident.getDisease() : "없음",

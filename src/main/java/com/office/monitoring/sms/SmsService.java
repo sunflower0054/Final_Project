@@ -68,7 +68,7 @@ public class SmsService {
 
         String message = "[AIoT 관제] 119에 자동 신고되었습니다.\n"
                 + "아래 링크에서 확인하세요.\n"
-                + "http://localhost:8091/report?type=auto&residentId=" + event.getResidentId();
+                + "http://localhost:8091/report/auto";
 
         for (Member family : families) {
             sendWithRetry(event.getId(), family.getPhone(), message, "AUTO_REPORT", 3);
