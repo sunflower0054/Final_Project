@@ -102,37 +102,49 @@
     </div>
 
     <!-- 중간 통계 및 타임라인 영역은 기존 코드와 동일하게 유지 -->
-    <section class="content-card">
-        <div class="risk-score-section" style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
-            <div class="score-label-area" style="font-size: 14px; color: var(--gray-500); font-weight: 700; text-align: left;">
-                최근 7일 위험 지수 <span id="dateRangeLabel" style="font-size: 13px; font-weight: 500; color: var(--gray-400); margin-left: 8px;"></span>
-            </div>
-            <div class="score-data-area" style="display: flex; align-items: center; justify-content: space-between; gap: 24px; width: 100%;">
-                <div id="scoreText" class="val" style="font-size: 32px; font-weight: 900; line-height: 1; flex-shrink: 0; min-width: 140px;">
-                    130 <span class="total-val" style="font-size: 18px; color: var(--gray-400); font-weight: 600;">/ 200</span>
-                </div>
-                <div class="progress-container" style="flex: 1; height: 16px; background: var(--gray-200); border-radius: 20px; overflow: hidden; border: 1px solid var(--gray-300);">
-                    <div id="progressBar" class="progress-bar" style="width: 0%; height: 100%; transition: width 1s ease, background 0.5s ease; border-radius: 20px;"></div>
-                </div>
-                <div id="statusLabel" style="font-size: 16px; font-weight: 800; white-space: nowrap; flex-shrink: 0; min-width: 90px; text-align: right;">
-                    상태: 확인중
+    <!-- 수정된 SECTION 전체 코드 (index.html에서 기존 <section class="content-card"> ... </section> 부분을 통째로 아래 코드로 교체하세요) -->
+    <!--<section class="content-card">
+
+        &lt;!&ndash; 1번 + 5번 적용: 이벤트 타임라인 제목을 SECTION 상단에 배치 + 날짜 선택기를 제목 바로 옆으로 이동 &ndash;&gt;
+        <div class="timeline-header">
+            <h3 class="timeline-title">이벤트 타임라인</h3>
+            <div class="date-picker-wrapper">
+                <input type="date" id="eventDate" value="2026-03-25">
+                <div class="calendar-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 </div>
             </div>
         </div>
 
+        &lt;!&ndash; 2번 적용: 최근 7일 위험지수를 별도 테두리로 감쌈 (risk-wrapper) &ndash;&gt;
+        <div class="risk-wrapper">
+            <div class="risk-score-section" style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+                <div class="score-label-area" style="font-size: 14px; color: var(&#45;&#45;gray-500); font-weight: 700; text-align: left;">
+                    최근 7일 위험 지수 <span id="dateRangeLabel" style="font-size: 13px; font-weight: 500; color: var(&#45;&#45;gray-400); margin-left: 8px;"></span>
+                </div>
+                <div class="score-data-area" style="display: flex; align-items: center; justify-content: space-between; gap: 24px; width: 100%;">
+                    <div id="scoreText" class="val" style="font-size: 32px; font-weight: 900; line-height: 1; flex-shrink: 0; min-width: 140px;">
+                        130 <span class="total-val" style="font-size: 18px; color: var(&#45;&#45;gray-400); font-weight: 600;">/ 200</span>
+                    </div>
+                    <div class="progress-container" style="flex: 1; height: 16px; background: var(&#45;&#45;gray-200); border-radius: 20px; overflow: hidden; border: 1px solid var(&#45;&#45;gray-300);">
+                        <div id="progressBar" class="progress-bar" style="width: 0%; height: 100%; transition: width 1s ease, background 0.5s ease; border-radius: 20px;"></div>
+                    </div>
+                    <div id="statusLabel" style="font-size: 16px; font-weight: 800; white-space: nowrap; flex-shrink: 0; min-width: 90px; text-align: right;">
+                        상태: 확인중
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        &lt;!&ndash; 7번 적용: 위험지수 게이지와 필터/통계 영역 사이 간격 크게 띄움 &ndash;&gt;
         <div class="event-stats-section">
             <div class="stats-header">
+                &lt;!&ndash; 4번 적용: 필터 pill에 data-filter 추가 + 클릭 이벤트 준비 &ndash;&gt;
                 <div class="filter-pills">
-                    <span class="pill pill-blue">전체 3건</span>
-                    <span class="pill pill-pink">낙상 1건</span>
-                    <span class="pill pill-orange">무응답 1건</span>
-                    <span class="pill pill-purple">폭행 1건</span>
-                </div>
-                <div class="date-picker-wrapper">
-                    <input type="date" id="eventDate" value="2026-03-25">
-                    <div class="calendar-icon">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    </div>
+                    <span class="pill pill-blue active" data-filter="all">전체 3건</span>
+                    <span class="pill pill-pink" data-filter="fall">낙상 1건</span>
+                    <span class="pill pill-orange" data-filter="noresponse">무응답 1건</span>
+                    <span class="pill pill-purple" data-filter="assault">폭행 1건</span>
                 </div>
             </div>
             <div class="summary-cards">
@@ -142,11 +154,12 @@
             </div>
         </div>
 
-        <div class="timeline-section">
-            <h3 class="timeline-title">이벤트 타임라인 (최근 24시간)</h3>
+        &lt;!&ndash; 3번 적용: 타임라인과 위험지수 사이의 선(border-top) 완전 제거 &ndash;&gt;
+        <div class="timeline-section" style="border-top: none; padding-top: 0;">
             <div class="timeline-container">
-                <!-- 낙상 카드 -->
-                <div class="tl-item">
+                &lt;!&ndash; 4번 적용: 각 타임라인 항목에 data-type 추가 &ndash;&gt;
+                &lt;!&ndash; 낙상 카드 &ndash;&gt;
+                <div class="tl-item" data-type="fall">
                     <div class="tl-icon active">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 9v4m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 17c-.77 1.333.192 3 1.732 3z"/></svg>
                     </div>
@@ -176,8 +189,8 @@
                     </div>
                 </div>
 
-                <!-- 무응답 카드 -->
-                <div class="tl-item">
+                &lt;!&ndash; 무응답 카드 &ndash;&gt;
+                <div class="tl-item" data-type="noresponse">
                     <div class="tl-icon warning">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
@@ -208,8 +221,8 @@
                     </div>
                 </div>
 
-                <!-- 폭행 카드 -->
-                <div class="tl-item">
+                &lt;!&ndash; 폭행 카드 &ndash;&gt;
+                <div class="tl-item" data-type="assault">
                     <div class="tl-icon success">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
                     </div>
@@ -248,6 +261,108 @@
                 </div>
             </div>
         </div>
+    </section>-->
+
+
+
+    <section class="content-card">
+        <div class="wrap">
+            <div class="resident-name">김순자 어르신</div>
+            <div class="section-title">
+                이벤트 타임라인
+                <input type="date" class="date-input" value="2026-03-25">
+            </div>
+
+            <div class="risk-card">
+                <div class="risk-header">
+                    <div class="risk-label">최근 7일 위험 지수</div>
+                    <div class="risk-date-range">3/19 ~ 3/25</div>
+                </div>
+                <div class="risk-score-row">
+                    <span class="risk-badge">위험</span>
+                    <span class="risk-score-num">110점</span>
+                </div>
+                <div class="gauge-bg"><div class="gauge-fill"></div></div>
+                <div class="gauge-ends"><span>0</span><span>200</span></div>
+            </div>
+
+            <div class="summary-chips">
+                <span class="chip chip-all">전체 3건</span>
+                <span class="chip chip-fall">낙상 1건</span>
+                <span class="chip chip-nomotion">무응답 1건</span>
+                <span class="chip chip-fight">폭행 1건</span>
+            </div>
+
+            <div class="sort-row">
+                <select class="sort-select"><option>최신순</option><option>오래된순</option></select>
+            </div>
+
+            <!-- 전체 기간 조회 버튼 -->
+            <div class="all-btn-row">
+                <button class="all-btn all-btn-fall">낙상 전체 보기</button>
+                <button class="all-btn all-btn-nomotion">무응답 전체 보기</button>
+                <button class="all-btn all-btn-fight">폭행 전체 보기</button>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-line"></div>
+
+                <div class="event-item">
+                    <div class="event-dot dot-red"></div>
+                    <div class="event-card">
+                        <div class="event-card-top">
+                            <span class="tag tag-fall">낙상</span>
+                            <div class="event-time">07:22</div>
+                        </div>
+                        <div class="event-body">
+                            <div class="event-img"><span class="img-label">캡처사진</span></div>
+                            <div class="event-info">
+                                <div class="event-date-txt">2026-03-25</div>
+                                <div class="event-title">낙상 / 기절 감지</div>
+                                <div class="event-status">신고완료 (가족신고)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-dot dot-amber"></div>
+                    <div class="event-card">
+                        <div class="event-card-top">
+                            <span class="tag tag-nomotion">무응답</span>
+                            <div class="event-time">09:00</div>
+                        </div>
+                        <div class="event-body">
+                            <div class="event-img"><span class="img-label">캡처사진</span></div>
+                            <div class="event-info">
+                                <div class="event-date-txt">2026-03-25</div>
+                                <div class="event-title">장시간 무응답 감지</div>
+                                <div class="event-status">신고완료 (자동신고)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-dot dot-purple"></div>
+                    <div class="event-card">
+                        <div class="event-card-top">
+                            <span class="tag tag-fight">폭행</span>
+                            <div class="event-time">19:47</div>
+                        </div>
+                        <div class="event-body">
+                            <div class="event-img"><span class="img-label">캡처사진</span></div>
+                            <div class="event-info">
+                                <div class="event-date-txt">2026-03-25</div>
+                                <div class="event-title">폭행 의심 감지</div>
+                                <div class="event-status">정상확인 (이상없음)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </section>
 </div>
 
@@ -265,6 +380,35 @@
 </footer>
 
 <script th:inline="javascript">
+
+    function setupTimelineFilter() {
+        const pills = document.querySelectorAll('.filter-pills .pill');
+        const timelineItems = document.querySelectorAll('.timeline-container .tl-item');
+
+        pills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                // 모든 pill에서 active 제거
+                pills.forEach(p => p.classList.remove('active'));
+                // 클릭한 pill에 active 추가
+                pill.classList.add('active');
+
+                const filterType = pill.dataset.filter;
+
+                timelineItems.forEach(item => {
+                    if (filterType === 'all') {
+                        item.style.display = 'flex';
+                    } else {
+                        if (item.dataset.type === filterType) {
+                            item.style.display = 'flex';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+    }
+
     function goToManualReport(residentId) {
         const isConfirmed = confirm("🚨 정말 119에 수동으로 신고하시겠습니까?\n확인을 누르면 즉시 신고 페이지로 이동합니다.");
         if (isConfirmed) {
@@ -418,6 +562,7 @@
             setupDropdown('profileBtn', 'profileDropdown');
             document.addEventListener('click', closeDropdownsOnOutside);
             preventCloseInsideDropdown();
+            setupTimelineFilter();
 
             const dateInput = document.getElementById('eventDate');
             if (dateInput) {
