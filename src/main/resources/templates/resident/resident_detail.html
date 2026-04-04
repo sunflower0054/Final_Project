@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
     <title>관제 시스템 - 거주자 상세</title>
     <link rel="stylesheet" th:href="@{/css/myinfo.css}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -10,6 +12,7 @@
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
+<input type="hidden" id="current-user-resident-id" th:value="${currentUser.residentId}">
 
 <div class="main-container">
     <main class="content-area">
@@ -43,7 +46,7 @@
                 </div>
 
                 <div class="profile-actions" style="padding:20px; display:flex; gap:12px; flex-direction:column;">
-                    <button class="btn-profile-detail" id="btn-save" onclick="saveResident()">
+                    <button class="btn-profile-detail" id="btn-save" onclick="handlePrimaryAction()">
                         <!-- 기존 아이콘 생략 -->
                         <span id="save-btn-text">등록하기</span>
                     </button>
@@ -98,7 +101,7 @@
                         <label class="form-label">주소 <span style="color:red;">*</span></label>
                         <div style="display:flex; gap:8px; margin-bottom:8px;">
                             <input type="text" id="postcode" class="form-control" placeholder="우편번호" readonly style="max-width:140px;">
-                            <button type="button" onclick="execDaumPostcode()"
+                            <button type="button" id="address-search-btn" onclick="execDaumPostcode()"
                                     style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; cursor:pointer;">
                                 주소 검색
                             </button>
@@ -140,6 +143,7 @@
 </div>
 
 <script th:src="@{/js/dropdown.js}"></script>
+<script th:src="@{/js/app-api.js}"></script>
 <!-- 우편번호 서비스 -->
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <!-- 카카오맵 API (본인 JavaScript 키 입력, libraries=services 필수) -->
@@ -148,8 +152,6 @@
 <script>
     let isEditMode = false;
     let residentId = null;
-
-    // 전역 변수: 위도(latitude)와 경도(longitude) 저장용
     let selectedLat = null;
     let selectedLon = null;
 
@@ -158,33 +160,145 @@
         return urlParams.get(name);
     }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const idParam = getUrlParameter('id');
-            initBirthDateSelects();
+    function getCurrentUserResidentId() {
+        const value = document.getElementById('current-user-resident-id')?.value;
+        return value && value.trim() ? value.trim() : null;
+    }
 
-            if (idParam && idParam !== 'new') {
-                residentId = idParam;
-                isEditMode = true;
-                document.getElementById('page-title').textContent = '거주자 상세 정보';
-                document.getElementById('page-subtitle').textContent = '거주자 정보를 확인 및 수정할 수 있습니다.';
-                document.getElementById('save-btn-text').textContent = '수정하기';
+    function extractResident(payload) {
+        return payload?.resident || payload || {};
+    }
 
-                // --- 추가: 수정 모드일 때 삭제 버튼 표시 ---
-                document.getElementById('btn-delete').style.display = 'block';
+    function getErrorMessage(error, fallbackMessage) {
+        if (error?.message && error.message.trim()) {
+            return error.message;
+        }
 
-                loadResidentData(residentId);
-            } else {
-                isEditMode = false;
-                document.getElementById('page-title').textContent = '거주자 등록';
-                document.getElementById('page-subtitle').textContent = '새로운 거주자 정보를 입력해주세요.';
-                document.getElementById('save-btn-text').textContent = '등록하기';
+        if (error?.data?.message && error.data.message.trim()) {
+            return error.data.message;
+        }
 
-                // --- 추가: 등록 모드일 때 삭제 버튼 숨김 ---
-                document.getElementById('btn-delete').style.display = 'none';
+        return fallbackMessage;
+    }
 
-                clearForm();
-            }
+    function calculateAge(birthDate) {
+        if (!birthDate) {
+            return null;
+        }
+
+        const birth = new Date(birthDate);
+        if (Number.isNaN(birth.getTime())) {
+            return null;
+        }
+
+        const today = new Date();
+        let age = today.getFullYear() - birth.getFullYear();
+        const birthdayPassed =
+            today.getMonth() > birth.getMonth()
+            || (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate());
+
+        if (!birthdayPassed) {
+            age -= 1;
+        }
+
+        return age;
+    }
+
+    function updateProfileUI(resident) {
+        const name = resident.name || '신규 등록';
+        const age = calculateAge(resident.birthDate);
+
+        document.getElementById('profile-name').textContent = name;
+        document.getElementById('avatar').textContent = name.charAt(0) || '?';
+        document.getElementById('profile-age-gender').textContent =
+            age !== null ? `만 ${age}세` : '정보를 입력해주세요';
+        document.getElementById('reg-date').textContent = '-';
+        document.getElementById('last-fall').textContent = '-';
+    }
+
+    function syncDiseaseCheckboxes(disease) {
+        const selectedDiseases = new Set(
+            (disease || '')
+                .split(',')
+                .map(value => value.trim())
+                .filter(Boolean)
+        );
+
+        document.querySelectorAll('#underlying-diseases input[type="checkbox"]').forEach((checkbox) => {
+            checkbox.checked = selectedDiseases.has(checkbox.value);
         });
+    }
+
+    function setDetailViewMode(enabled) {
+        const isReadOnly = Boolean(enabled);
+
+        document.getElementById('name').readOnly = isReadOnly;
+        document.getElementById('phone').readOnly = isReadOnly;
+        document.getElementById('detailAddress').readOnly = isReadOnly;
+        document.getElementById('birthYear').disabled = isReadOnly;
+        document.getElementById('birthMonth').disabled = isReadOnly;
+        document.getElementById('birthDay').disabled = isReadOnly;
+        document.getElementById('address-search-btn').disabled = isReadOnly;
+
+        document.querySelectorAll('#underlying-diseases input[type="checkbox"]').forEach((checkbox) => {
+            checkbox.disabled = isReadOnly;
+        });
+    }
+
+    function handlePrimaryAction() {
+        if (isEditMode) {
+            window.location.href = `/resident/edit?id=${residentId}`;
+            return;
+        }
+
+        saveResident();
+    }
+
+    async function deleteResident() {
+        if (!isEditMode || !residentId) {
+            return;
+        }
+
+        if (!window.confirm('정말로 이 거주자 정보를 삭제하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            const result = await AppApi.del(`/api/v1/residents/${residentId}`);
+            alert(result?.message || '거주자 정보가 삭제되었습니다.');
+            window.location.href = '/resident/detail';
+        } catch (error) {
+            alert(getErrorMessage(error, '삭제에 실패했습니다.'));
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initBirthDateSelects();
+        const idParam = getUrlParameter('id');
+        const currentUserResidentId = getCurrentUserResidentId();
+        const resolvedResidentId = idParam && idParam !== 'new'
+            ? idParam
+            : currentUserResidentId;
+
+        if (resolvedResidentId) {
+            residentId = resolvedResidentId;
+            isEditMode = true;
+            document.getElementById('page-title').textContent = '거주자 상세 정보';
+            document.getElementById('page-subtitle').textContent = '거주자 정보를 확인하고 수정 화면으로 이동할 수 있습니다.';
+            document.getElementById('save-btn-text').textContent = '수정하기';
+            document.getElementById('btn-delete').style.display = 'block';
+            setDetailViewMode(true);
+            loadResidentData(residentId);
+        } else {
+            isEditMode = false;
+            document.getElementById('page-title').textContent = '거주자 등록';
+            document.getElementById('page-subtitle').textContent = '새로운 거주자 정보를 입력해주세요.';
+            document.getElementById('save-btn-text').textContent = '등록하기';
+            document.getElementById('btn-delete').style.display = 'none';
+            setDetailViewMode(false);
+            clearForm();
+        }
+    });
 
     // ==================== 생년월일 ====================
     function initBirthDateSelects() {
@@ -225,20 +339,18 @@
     function execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function(data) {
-                let addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+                const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
 
                 document.getElementById('postcode').value = data.zonecode;
                 document.getElementById('address').value = addr;
 
-                // 주소를 좌표로 변환하여 전역 변수에 저장
                 const geocoder = new kakao.maps.services.Geocoder();
                 geocoder.addressSearch(addr, function(result, status) {
                     if (status === kakao.maps.services.Status.OK) {
-                        selectedLat = result[0].y; // 위도
-                        selectedLon = result[0].x; // 경도
-                        console.log("좌표 획득 성공:", selectedLat, selectedLon);
+                        selectedLat = result[0].y;
+                        selectedLon = result[0].x;
                     } else {
-                        alert("주소 좌표 변환에 실패했습니다. 다시 시도해주세요.");
+                        alert('주소 좌표 변환에 실패했습니다. 주소를 다시 검색해주세요.');
                         selectedLat = null;
                         selectedLon = null;
                     }
@@ -249,123 +361,119 @@
         }).open();
     }
 
-    function loadResidentData(id) {
-        fetch(`/api/residents/${id}`)
-            .then(res => res.ok ? res.json() : Promise.reject('로드 실패'))
-            .then(data => {
-                document.getElementById('name').value = data.name || '';
-                document.getElementById('phone').value = data.phone || '';
-                document.getElementById('address').value = data.address || '';
+    async function loadResidentData(id) {
+        try {
+            const payload = await AppApi.get(`/api/v1/residents/${id}`);
+            const resident = extractResident(payload);
 
-                // --- 핵심: 기존 위경도를 불러와 전역 변수에 저장 (주소 미변경 시 유지용) ---
-                selectedLat = data.latitude || null;
-                selectedLon = data.longitude || null;
-                // ----------------------------------------------------------------------
+            document.getElementById('name').value = resident.name || '';
+            document.getElementById('phone').value = resident.phone || '';
+            document.getElementById('address').value = resident.address || '';
+            document.getElementById('detailAddress').value = '';
 
-                // 존재하지 않는 DOM 요소에 접근 시 에러가 나지 않도록 방어 코드 추가
-                if(document.getElementById('gender')) document.getElementById('gender').value = data.gender || '';
-                if(document.getElementById('medications')) document.getElementById('medications').value = data.medications || '';
-                if(document.getElementById('bloodType')) document.getElementById('bloodType').value = data.bloodType || '';
-                if(document.getElementById('notes')) document.getElementById('notes').value = data.notes || '';
-                if(document.getElementById('guardianName')) document.getElementById('guardianName').value = data.guardianName || '';
-                if(document.getElementById('guardianPhone')) document.getElementById('guardianPhone').value = data.guardianPhone || '';
+            selectedLat = resident.latitude ?? null;
+            selectedLon = resident.longitude ?? null;
 
-                if (data.birthDate) {
-                    const [y, m, d] = data.birthDate.split('-');
-                    document.getElementById('birthYear').value = y || '';
-                    document.getElementById('birthMonth').value = m || '';
-                    document.getElementById('birthDay').value = d || '';
-                    document.getElementById('birthDate').value = data.birthDate;
-                }
+            if (resident.birthDate) {
+                const [y, m, d] = resident.birthDate.split('-');
+                document.getElementById('birthYear').value = y || '';
+                document.getElementById('birthMonth').value = m || '';
+                document.getElementById('birthDay').value = d || '';
+                document.getElementById('birthDate').value = resident.birthDate;
+            } else {
+                document.getElementById('birthYear').value = '';
+                document.getElementById('birthMonth').value = '';
+                document.getElementById('birthDay').value = '';
+                document.getElementById('birthDate').value = '';
+            }
 
-                updateProfileUI(data);
-
-                if (data.underlyingDiseases) {
-                    document.querySelectorAll('#underlying-diseases input[type="checkbox"]').forEach(cb => {
-                        cb.checked = data.underlyingDiseases.includes(cb.value);
-                    });
-                }
-            })
-            .catch(err => alert('거주자 정보를 불러오는 데 실패했습니다.'));
-    }
-
-    function updateProfileUI(data) {
-        const name = data.name || '신규 등록';
-        document.getElementById('profile-name').textContent = name;
-        document.getElementById('avatar').textContent = name.charAt(0) || '?';
-
-        const ageGender = data.age ? `만 ${data.age}세 · ${data.gender || '미등록'}` : '정보를 입력해주세요';
-        document.getElementById('profile-age-gender').textContent = ageGender;
-
-        document.getElementById('reg-date').textContent = data.regDate || '-';
-        document.getElementById('last-fall').textContent = data.lastFallDate || '-';
+            syncDiseaseCheckboxes(resident.disease);
+            updateProfileUI(resident);
+        } catch (error) {
+            alert(getErrorMessage(error, '거주자 정보를 불러오는 데 실패했습니다.'));
+        }
     }
 
     function clearForm() {
-        document.querySelectorAll('input:not([type=hidden]), select, textarea').forEach(el => {
-            if (el.type === 'checkbox') el.checked = false;
-            else el.value = '';
+        document.querySelectorAll('input:not([type=hidden]), select, textarea').forEach((element) => {
+            if (element.type === 'checkbox') {
+                element.checked = false;
+                return;
+            }
+
+            element.value = '';
         });
+
         selectedLat = null;
         selectedLon = null;
+        updateProfileUI({});
     }
 
-    function saveResident() {
-        updateBirthDateHidden();
-
-        const name = document.getElementById('name').value.trim();
-        const address = document.getElementById('address').value;
-        const detailAddress = document.getElementById('detailAddress').value.trim();
-
-        if (!name) { alert('이름은 필수입니다.'); return; }
-        if (!document.getElementById('birthDate').value) { alert('생년월일을 선택해주세요.'); return; }
-        if (!address) { alert('주소를 입력해주세요.'); return; }
-
-        // 위경도 체크 (DB NOT NULL 대응)
-        if (!selectedLat || !selectedLon) {
-            alert('주소 검색을 통해 정확한 위치 정보(위도, 경도)를 가져와야 합니다.');
+    async function saveResident() {
+        if (isEditMode) {
+            alert('수정 기능은 2차 작업에서 진행합니다.');
             return;
         }
 
-        const diseases = Array.from(
+        updateBirthDateHidden();
+
+        const name = document.getElementById('name').value.trim();
+        const birthDate = document.getElementById('birthDate').value;
+        const address = document.getElementById('address').value.trim();
+        const detailAddress = document.getElementById('detailAddress').value.trim();
+        const latitude = Number.parseFloat(selectedLat);
+        const longitude = Number.parseFloat(selectedLon);
+
+        if (!name) {
+            alert('이름은 필수입니다.');
+            return;
+        }
+
+        if (!birthDate) {
+            alert('생년월일을 선택해주세요.');
+            return;
+        }
+
+        if (!address) {
+            alert('주소를 입력해주세요.');
+            return;
+        }
+
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+            alert('주소 검색을 완료해 좌표를 먼저 확보해주세요.');
+            return;
+        }
+
+        const disease = Array.from(
             document.querySelectorAll('#underlying-diseases input[type="checkbox"]:checked')
         ).map(cb => cb.value).join(', ');
 
-        const fullAddress = address + (detailAddress ? " " + detailAddress : "");
-
-        const data = {
-            name: name,
-            birthDate: document.getElementById('birthDate').value,
-            phone: document.getElementById('phone').value || null,
-            address: fullAddress,
-            disease: diseases || null,
-            latitude: parseFloat(selectedLat),
-            longitude: parseFloat(selectedLon)
+        const payload = {
+            name,
+            birthDate,
+            address: detailAddress ? `${address} ${detailAddress}` : address,
+            phone: document.getElementById('phone').value.trim() || null,
+            disease: disease || null,
+            latitude,
+            longitude
         };
 
-        const url = isEditMode ? `/api/residents/${residentId}` : '/api/residents';
-        const method = isEditMode ? 'PUT' : 'POST';
+        const successMessage = '등록이 완료되었습니다.';
+        const fallbackMessage = '저장에 실패했습니다.';
 
-        fetch(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(res => res.ok ? res.json() : Promise.reject())
-        .then(result => {
-            alert(isEditMode ? '수정이 완료되었습니다.' : '등록이 완료되었습니다.');
+        try {
+            const result = await AppApi.post('/api/v1/residents', payload);
+            const createdResidentId = result?.residentId;
 
-            // 좌표를 포함한 신고 페이지 링크 (테스트/확인용)
-            const reportUrl = `/report?address=${encodeURIComponent(data.address)}&name=${encodeURIComponent(data.name)}&lat=${data.latitude}&lon=${data.longitude}`;
-            console.log("신고 페이지 링크(좌표포함):", reportUrl);
-
-            if (!isEditMode && result.id) {
-                location.href = `/resident/detail?id=${result.id}`;
-            } else {
-                loadResidentData(residentId);
+            if (!createdResidentId) {
+                throw new Error('등록된 거주자 ID를 확인할 수 없습니다.');
             }
-        })
-        .catch(() => alert('저장에 실패했습니다. 다시 시도해주세요.'));
+
+            alert(successMessage);
+            window.location.href = `/resident/detail?id=${createdResidentId}`;
+        } catch (error) {
+            alert(getErrorMessage(error, fallbackMessage));
+        }
     }
 
     // ==================== 전화번호 포맷팅 ====================
@@ -377,30 +485,6 @@
             v = v.slice(0, 3) + '-' + v.slice(3, 7) + '-' + v.slice(7, 11);
         }
         el.value = v;
-    }
-
-    // ==================== 거주자 삭제 ====================
-    function deleteResident() {
-        if (!residentId) return;
-
-        // 실수로 삭제하는 것을 방지하기 위해 확인창 띄우기
-        if (!confirm('정말로 이 거주자 정보를 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.')) {
-            return;
-        }
-
-        fetch(`/api/residents/${residentId}`, {
-            method: 'DELETE',
-        })
-        .then(res => {
-            if (res.ok) {
-                alert('삭제가 완료되었습니다.');
-                // 삭제 후 목록 페이지로 이동 (본인의 목록 페이지 URL에 맞게 수정하세요)
-                location.href = '/resident/list';
-            } else {
-                return Promise.reject('삭제 실패');
-            }
-        })
-        .catch(err => alert('삭제 중 오류가 발생했습니다. 다시 시도해주세요.'));
     }
 </script>
 

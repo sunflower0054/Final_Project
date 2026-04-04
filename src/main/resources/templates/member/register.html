@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/member_style.css}">
 </head>
@@ -186,6 +188,7 @@
 
         <button class="btn-primary" onclick="goStep3()" style="margin-top:16px;">가입하기</button>
         <button class="btn-outline" onclick="goBack()">이전으로 돌아가기</button>
+        <div class="msg err" id="registerErr" style="margin-top:12px;"></div>
     </div>
 </div>
 
@@ -326,6 +329,7 @@
     </div>
 </div>
 
+<script th:src="@{/js/app-api.js}"></script>
 <script>
     // =============================================
     // 회원가입 전체 스크립트 (API 엔드포인트 완전 반영 버전)
@@ -398,68 +402,72 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* ==================== STEP2 : 정보 입력 ==================== */
-    async function checkDup() {
-        const v = document.getElementById('userId').value.trim();
-        const idErr = document.getElementById('idErr');
-        const idOk = document.getElementById('idOk');
+    /* STEP2 */
+    const usernameCheckState = {
+      checkedUsername: '',
+      available: false
+    };
 
-        if (!/^[a-zA-Z0-9]{6,20}$/.test(v)) {
-            idErr.classList.add('show');
-            idOk.classList.remove('show');
-            return;
-        }
-
-        idErr.classList.remove('show');
-        idOk.classList.remove('show');
-
-        try {
-            const response = await fetch(`/api/v1/auth/check-username?username=${encodeURIComponent(v)}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                // API 응답 예시: { "available": true } 또는 { "available": false }
-                if (data.available === true) {
-                    idOk.classList.add('show');
-                } else {
-                    idErr.textContent = data.message || '이미 사용 중인 아이디입니다.';
-                    idErr.classList.add('show');
-                }
-            } else {
-                idErr.textContent = '중복 확인에 실패했습니다.';
-                idErr.classList.add('show');
-            }
-        } catch (error) {
-            console.error('중복확인 API 오류:', error);
-            idErr.textContent = '네트워크 오류가 발생했습니다.';
-            idErr.classList.add('show');
-        }
+    function resetUsernameCheck(){
+      usernameCheckState.checkedUsername = '';
+      usernameCheckState.available = false;
+      document.getElementById('idOk').classList.remove('show');
     }
 
-    function checkId() {
-        const v = document.getElementById('userId').value;
-        document.getElementById('idErr').classList.toggle('show', v.length > 0 && !/^[a-zA-Z0-9]{6,20}$/.test(v));
-        document.getElementById('idOk').classList.remove('show');
+    function checkId(){
+      const v=document.getElementById('userId').value.trim();
+      const valid=/^[a-zA-Z0-9]{6,20}$/.test(v);
+      document.getElementById('idErr').classList.toggle('show',v.length>0&&!valid);
+      resetUsernameCheck();
     }
 
-    function checkPw() {
-        const v = document.getElementById('pw').value;
-        const bars = ['bar1','bar2','bar3','bar4'].map(id => document.getElementById(id));
-        const hint = document.getElementById('pwHint');
-        let s = 0;
-        if (v.length >= 8) s++;
-        if (/[A-Za-z]/.test(v)) s++;
-        if (/[0-9]/.test(v)) s++;
-        if (/[^A-Za-z0-9]/.test(v)) s++;
-        const c = ['#EF4444','#F97316','#EAB308','#22C55E'];
-        const l = ['매우 약함','약함','보통','강함'];
-        bars.forEach((b, i) => b.style.background = (i < s) ? c[s-1] : 'var(--gray-200)');
-        hint.textContent = v.length === 0 ? '비밀번호를 입력해주세요.' : `비밀번호 강도: ${l[s-1] || '매우 약함'}`;
-        hint.style.color = s > 0 ? c[s-1] : 'var(--gray-400)';
-        checkPw2();
+    async function checkDup(){
+      const v=document.getElementById('userId').value.trim();
+      if(!/^[a-zA-Z0-9]{6,20}$/.test(v)){
+        document.getElementById('idErr').textContent='영문, 숫자를 포함해 6~20자로 입력해주세요.';
+        document.getElementById('idErr').classList.add('show');
+        resetUsernameCheck();
+        return;
+      }
+
+      document.getElementById('idErr').classList.remove('show');
+
+      try{
+        const result = await AppApi.get(`/api/v1/auth/check-username?username=${encodeURIComponent(v)}`, {
+          redirectOn401: false
+        });
+        const success = result?.success === true;
+        const available = result?.available === true;
+        const message = result?.message || (available ? '사용 가능한 아이디입니다.' : '이미 사용 중인 아이디입니다.');
+
+        document.getElementById('idErr').textContent = message;
+        document.getElementById('idErr').classList.toggle('show',!(success&&available));
+        document.getElementById('idOk').classList.toggle('show',success&&available);
+
+        usernameCheckState.checkedUsername = v;
+        usernameCheckState.available = success && available;
+      }catch(error){
+        const message = error?.message || '아이디 중복확인에 실패했습니다.';
+        document.getElementById('idErr').textContent = message;
+        document.getElementById('idErr').classList.add('show');
+        resetUsernameCheck();
+      }
+    }
+
+    function checkPw(){
+      const v=document.getElementById('pw').value;
+      const bars=['bar1','bar2','bar3','bar4'].map(id=>document.getElementById(id));
+      const hint=document.getElementById('pwHint');
+      let s=0;
+      if(v.length>=8)s++;
+      if(/[A-Za-z]/.test(v))s++;
+      if(/[0-9]/.test(v))s++;
+      if(/[^A-Za-z0-9]/.test(v))s++;
+      const c=['#EF4444','#F97316','#EAB308','#22C55E'], l=['매우 약함','약함','보통','강함'];
+      bars.forEach((b,i)=>{b.style.background=i<s?c[s-1]:'var(--gray-200)';});
+      hint.textContent=v.length===0?'비밀번호를 입력해주세요.':`비밀번호 강도: ${l[s-1]||'매우 약함'}`;
+      hint.style.color=s>0?c[s-1]:'var(--gray-400)';
+      checkPw2();
     }
 
     function checkPw2() {
@@ -468,9 +476,17 @@
         document.getElementById('pw2Err').classList.toggle('show', v2.length > 0 && v1 !== v2);
     }
 
-    function togglePw(id) {
-        const el = document.getElementById(id);
-        el.type = el.type === 'password' ? 'text' : 'password';
+    function togglePw(id){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';}
+
+    function sendVerify(){
+      const emailEl = document.getElementById('email');
+      const emailErrEl = document.getElementById('emailErr');
+      const emailOkEl = document.getElementById('emailOk');
+      if(!emailEl || !emailErrEl || !emailOkEl) return;
+
+      const v=emailEl.value, ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      emailErrEl.classList.toggle('show',!ok);
+      emailOkEl.classList.toggle('show',ok);
     }
 
     function formatPhone(el) {
@@ -480,15 +496,16 @@
         el.value = v;
     }
 
-    (function() {
-        const y = document.getElementById('bYear');
-        const c = new Date().getFullYear();
-        for (let i = c; i >= 1924; i--) {
-            const o = document.createElement('option');
-            o.value = i;
-            o.textContent = i + '년';
-            y.appendChild(o);
-        }
+    function selectGender(g){
+      ['M','F','N'].forEach(id=>{
+        const el = document.getElementById('g'+id);
+        if(el) el.classList.toggle('selected',id===g);
+      });
+    }
+
+    (function(){
+      const y=document.getElementById('bYear'),c=new Date().getFullYear();
+      for(let i=c;i>=1924;i--){const o=document.createElement('option');o.value=i;o.textContent=i+'년';y.appendChild(o);}
     })();
 
     function goBack() {
@@ -497,14 +514,19 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function goStep3() {
+    async function goStep3(){
         const username = document.getElementById('userId').value.trim();
         const password = document.getElementById('pw').value;
         const password2 = document.getElementById('pw2').value;
         const name = document.getElementById('userName').value.trim();
         const phone = document.getElementById('phone').value.trim();
+        const purpose = document.getElementById('purpose').value.trim();
+        const registerErr = document.getElementById('registerErr');
 
-        if (!username || !password || !password2 || !name || !phone) {
+        registerErr.classList.remove('show');
+        registerErr.textContent = '';
+
+        if(!username || !password || !password2 || !name || !phone || !purpose){
             alert('필수 항목을 모두 입력해주세요.');
             return;
         }
@@ -514,6 +536,28 @@
         }
         if (password !== password2) {
             alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+        if(!(usernameCheckState.available && usernameCheckState.checkedUsername === username)){
+            alert('아이디 중복확인을 완료해주세요.');
+            return;
+        }
+
+        try {
+            await AppApi.post('/api/v1/auth/register', {
+                username,
+                password,
+                name,
+                phone,
+                purpose
+            }, {
+                redirectOn401: false
+            });
+        } catch (error) {
+            const message = error?.message || '회원가입에 실패했습니다.';
+            registerErr.textContent = message;
+            registerErr.classList.add('show');
+            alert(message);
             return;
         }
 
@@ -536,20 +580,11 @@
         document.getElementById('termsModal').classList.add('open');
     }
 
-    function closeModal() {
-        document.getElementById('termsModal').classList.remove('open');
+    function closeModal(){document.getElementById('termsModal').classList.remove('open');}
+    const termsModalEl = document.getElementById('termsModal');
+    if(termsModalEl){
+      termsModalEl.addEventListener('click',function(e){if(e.target===this)closeModal();});
     }
-    document.getElementById('termsModal').addEventListener('click', function(e) {
-        if (e.target === this) closeModal();
-    });
-
-    /* ==================== 최종 회원가입 (POST /api/v1/auth/register) ==================== */
-    async function submit_login_page() {
-        const submitBtn = document.getElementById('submitBtn');
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = '가입 처리 중...';
-        }
 
         // 가입경로 처리
         let finalPurpose = selectedPath || '미응답';
@@ -601,6 +636,7 @@
         // 성공 시 로그인 페이지 이동
         location.href = "/member/login";
     }
+
 </script>
 </body>
 </html>

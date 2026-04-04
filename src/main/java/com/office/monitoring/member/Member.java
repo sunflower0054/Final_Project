@@ -31,9 +31,9 @@ public class Member {
     @Column(nullable = false, length = 20)
     private String phone;
 
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false, length = 20)
-//    private Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role;
 
     @Column(name = "birth_year")
     private Integer birthYear;
@@ -47,23 +47,23 @@ public class Member {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-//    @PrePersist
-//    protected void onCreate() {
-//        if (role == null) {
-//            role = Role.FAMILY;
-//        }
-//        if (createdAt == null) {
-//            createdAt = LocalDateTime.now();
-//        }
-//    }
-//
-//    public void updateMyInfo(String name, String phone, String purpose) {
-//        this.name = name.trim();
-//        this.phone = phone.trim();
-//        this.purpose = purpose.trim();
-//    }
-//
-//    public void assignResident(Long residentId) {
-//        this.residentId = residentId;
-//    }
+    @PrePersist
+    protected void onCreate() {
+        if (role == null) {
+            role = Role.FAMILY;
+        }
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
+
+    public void updateMyInfo(String name, String phone, String purpose) {
+        this.name = name.trim();
+        this.phone = phone.trim();
+        this.purpose = purpose.trim();
+    }
+
+    public void assignResident(Long residentId) {
+        this.residentId = residentId;
+    }
 }

@@ -17,9 +17,4 @@ public class ResidentController {
     public String residentEdit() {
         return "resident/resident_edit";
     }
-
-    @GetMapping("/register")
-    public String residentRegister() {
-        return "resident/resident_register";
-    }
 }

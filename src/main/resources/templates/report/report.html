@@ -150,6 +150,8 @@
 
 <!-- 2. 실행 스크립트 (하나로 통합) -->
 <script th:inline="javascript">
+<script th:src="@{/js/app-api.js}"></script>
+<script>
     document.addEventListener("DOMContentLoaded", function() {
         // [1] URL에서 테스트 파라미터 가져오기
         const urlParams = new URLSearchParams(window.location.search);

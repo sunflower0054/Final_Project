@@ -27,34 +27,34 @@
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                         </svg>
                     </div>
-                    <h3 class="profile-name-lg">홍길동</h3>
-                    <span class="badge badge-navy" id="profileRole" style="margin-top: 10px;">가족 회원</span>
+                    <h3 class="profile-name-lg" th:text="${currentUser.name}">미등록</h3>
+                    <p class="profile-email" th:text="${currentUser.email}">미등록</p>
+                    <span class="badge badge-navy" style="margin-top: 10px;" th:text="${currentUser.roleLabel}">미등록</span>
                 </div>
 
                 <div class="profile-stats">
                     <div class="stat-item">
-                        <div class="stat-value">24</div>
+                        <div class="stat-value" th:text="${currentUser.managedDeviceCount}">미등록</div>
                         <div class="stat-label">관리 기기</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">12</div>
+                        <div class="stat-value" th:text="${currentUser.monthlyAlertCount}">미등록</div>
                         <div class="stat-label">이번달 알림</div>
                     </div>
                 </div>
 
-<!--                <div class="profile-actions" style="padding: 20px;">
-                    <button class="btn-profile-detail">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
-                        </svg>
-                        프로필 사진 변경
-                    </button>
-                </div>-->
+                <!--                <div class="profile-actions" style="padding: 20px;">
+                                    <button class="btn-profile-detail">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+                                        </svg>
+                                        프로필 사진 변경
+                                    </button>
+                                </div>-->
             </div>
 
             <div class="myinfo-right-column">
 
-                <!-- 기본 정보 카드 -->
                 <div class="content-card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <h3 class="card-title">기본 정보</h3>
@@ -66,30 +66,35 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label class="form-label">아이디</label>
-                            <input type="text" class="form-control" id="infoUsername" value="gildong" readonly>
+                            <input type="text" class="form-control" th:value="${currentUser.username}" readonly>
                         </div>
                         <div class="form-group">
                             <label class="form-label">이름</label>
-                            <input type="text" class="form-control" id="infoName" value="홍길동" readonly>
+                            <input type="text" class="form-control" th:value="${currentUser.name}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">이메일</label>
+                            <input type="email" class="form-control userInfoInput" th:value="${currentUser.email}" readonly>
                         </div>
                         <div class="form-group">
                             <label class="form-label">휴대폰 번호</label>
-                            <input type="tel" class="form-control userInfoInput" id="infoPhone" value="010-1234-5678" readonly>
+                            <input type="tel" class="form-control userInfoInput" th:value="${currentUser.phone}" readonly>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">출생연도</label>
-                            <input type="text" class="form-control" id="infoBirthYear" value="1976년" readonly>
+                            <label class="form-label">생년월일</label>
+                            <input type="text" class="form-control" th:value="${currentUser.birthDate}" readonly>
                         </div>
-
-                        <!-- 역할 (권한) 표시 -->
+                        <div class="form-group">
+                            <label class="form-label">성별</label>
+                            <input type="text" class="form-control" th:value="${currentUser.gender}" readonly>
+                        </div>
                         <div class="form-group">
                             <label class="form-label">계정 유형</label>
-                            <input type="text" class="form-control" id="infoRole" value="가족 회원" readonly>
+                            <input type="text" class="form-control" th:value="${currentUser.roleLabel}" readonly>
                         </div>
                     </div>
                 </div>
 
-                <!-- 알림 서비스 설정 카드 -->
                 <div class="content-card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <h3 class="card-title">알림 서비스 설정</h3>
@@ -111,7 +116,8 @@
                                 <div class="setting-desc">낙상 등 긴급 상황 시 즉시 문자</div>
                             </div>
                             <label class="toggle">
-                                <input type="checkbox"> <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                                <input type="checkbox">
+                                <div class="toggle-track"><div class="toggle-thumb"></div></div>
                             </label>
                         </div>
                         <div class="setting-row">
@@ -120,7 +126,8 @@
                                 <div class="setting-desc">22:00 ~ 07:00 사이 일반 알림 제한</div>
                             </div>
                             <label class="toggle">
-                                <input type="checkbox"> <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                                <input type="checkbox">
+                                <div class="toggle-track"><div class="toggle-thumb"></div></div>
                             </label>
                         </div>
                     </div>
@@ -128,13 +135,13 @@
                         <button class="btn btn-navy" style="padding: 8px 16px; font-size: 13px;">설정 저장하기</button>
                     </div>
                 </div>
-            </div>   <!-- myinfo-right-column 끝 -->
+
+            </div>
         </div>
     </main>
 </div>
 
 <script th:inline="javascript">
-    // 헤더의 시계 기능
     function updateClock() {
         const now = new Date();
         const str = now.getFullYear() + '. ' +
@@ -144,12 +151,11 @@
                     String(now.getMinutes()).padStart(2, '0') + ':' +
                     String(now.getSeconds()).padStart(2, '0');
         const timeEl = document.getElementById('currentTime');
-        if(timeEl) timeEl.innerText = str;
+        if (timeEl) timeEl.innerText = str;
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 드롭다운 공통 로직
     function setupDropdown(btnId, dropdownId) {
         const btn = document.getElementById(btnId);
         const dropdown = document.getElementById(dropdownId);
@@ -164,15 +170,14 @@
         });
     }
 
-    // 정보 수정 버튼 로직 업데이트 예시
     function setupInfoEdit() {
         const editBtn = document.getElementById('editInfoBtn');
-        const editableInputs = document.querySelectorAll('.userInfoInput'); // 휴대폰 번호만 editable로
+        const editableInputs = document.querySelectorAll('.userInfoInput');
 
-        if(!editBtn) return;
+        if (!editBtn) return;
 
         editBtn.addEventListener('click', () => {
-            if(editBtn.innerText === '정보 수정') {
+            if (editBtn.innerText === '정보 수정') {
                 editableInputs.forEach(input => {
                     input.readOnly = false;
                     input.style.backgroundColor = '#fff';
@@ -181,9 +186,10 @@
                 editBtn.style.borderStyle = 'solid';
                 editBtn.style.borderColor = 'var(--navy)';
                 editBtn.style.color = 'var(--navy)';
-                editableInputs[0].focus();
+                if (editableInputs.length > 0) {
+                    editableInputs[0].focus();
+                }
             } else {
-                // 여기서 실제 저장 AJAX 호출 예정
                 alert('정보가 저장되었습니다.');
                 editableInputs.forEach(input => {
                     input.readOnly = true;
@@ -198,7 +204,6 @@
     }
 
     window.addEventListener('load', () => {
-        // 헤더 프래그먼트 내 요소 ID 확인 필요
         setupDropdown('notiBtn', 'notiDropdown');
         setupDropdown('profileBtn', 'profileDropdown');
 
@@ -212,7 +217,6 @@
             menu.addEventListener('click', e => e.stopImmediatePropagation());
         });
 
-        // 정보 수정 기능 초기화
         setupInfoEdit();
     });
 </script>
