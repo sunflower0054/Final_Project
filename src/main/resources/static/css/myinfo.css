@@ -322,7 +322,7 @@ svg {
 }
 
 .stat-value {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--primary);
 }
@@ -794,4 +794,17 @@ svg {
     border-color: var(--error);
     transform: translateY(-1px); /* 살짝 떠오르는 효과 */
     box-shadow: 0 2px 5px rgba(224, 49, 49, 0.1); /* 은은한 그림자 */
+}
+
+/* 부드러운 삭제 버튼 스타일 (고스트 버튼) */
+.btn-profile-delete {
+    background-color: #ffffff !important;
+    color: var(--error) !important;       /* 차분한 톤다운 레드 */
+    border: 1px solid #FFE3E3 !important; /* 아주 연한 빨간색 테두리 */
+}
+
+/* 마우스를 올렸을 때 살짝 경고 느낌만 주기 */
+.btn-profile-delete:hover {
+    background-color: #FFF5F5 !important; /* 연한 핑크빛 배경 */
+    border-color: #FFAFB0 !important;
 }

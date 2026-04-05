@@ -52,12 +52,12 @@
                     </button>
 
                     <!-- ▼ 추가된 삭제 버튼 (기본 숨김) ▼ -->
-                    <button class="btn-profile-detail" id="btn-delete" style="background:#ff4d4f; color:white; display:none;" onclick="deleteResident()">
+                    <button class="btn-profile-detail btn-profile-delete" id="btn-delete" style="display:none;" onclick="deleteResident()">
                         삭제하기
                     </button>
 
                     <button class="btn-profile-detail" style="background:var(--secondary); color:var(--text-sub);" onclick="history.back()">
-                        취소
+                        뒤로가기
                     </button>
                 </div>
             </div>
@@ -197,18 +197,29 @@
         document.getElementById('profile-age-gender').textContent =
             age !== null ? `만 ${age}세` : '정보를 입력해주세요';
 
-        // 등록일 표시 (백엔드 변수명이 createdAt이라고 가정)
+        // 📅 등록일 표시 (연도를 두 자리로)
         if (resident.createdAt) {
             const dateObj = new Date(resident.createdAt);
-            const yyyy = dateObj.getFullYear();
+            // getFullYear()에서 문자열로 바꾼 뒤 뒤의 두 자리만 가져옵니다
+            const yy = String(dateObj.getFullYear()).slice(-2);
             const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
             const dd = String(dateObj.getDate()).padStart(2, '0');
-            document.getElementById('reg-date').textContent = `${yyyy}.${mm}.${dd}`;
+            document.getElementById('reg-date').textContent = `${yy}.${mm}.${dd}`;
         } else {
             document.getElementById('reg-date').textContent = '-';
         }
 
-        document.getElementById('last-fall').textContent = '-';
+        // 📅 최근 낙상일 표시 (백엔드 변수명이 lastFallDate라고 가정)
+        // 만약 변수명이 다르면 resident.lastFallDate 부분을 맞춰서 수정해주세요
+        if (resident.lastFallDate) {
+            const fallDateObj = new Date(resident.lastFallDate);
+            const fallYy = String(fallDateObj.getFullYear()).slice(-2);
+            const fallMm = String(fallDateObj.getMonth() + 1).padStart(2, '0');
+            const fallDd = String(fallDateObj.getDate()).padStart(2, '0');
+            document.getElementById('last-fall').textContent = `${fallYy}.${fallMm}.${fallDd}`;
+        } else {
+            document.getElementById('last-fall').textContent = '-';
+        }
     }
 
     function syncDiseaseCheckboxes(disease) {

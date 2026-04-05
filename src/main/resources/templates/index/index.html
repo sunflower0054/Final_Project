@@ -436,10 +436,11 @@
         });
     }
 
-    function goToManualReport(residentId) {
+    function goToManualReport(eventId) {
         const isConfirmed = confirm("🚨 정말 119에 수동으로 신고하시겠습니까?\n확인을 누르면 즉시 신고 페이지로 이동합니다.");
         if (isConfirmed) {
-            location.href = `/report?type=manual&residentId=${residentId}`;
+            // backend SmsController의 confirm 메서드와 정확히 맞춤
+            location.href = `/report/confirm?eventId=${eventId}`;
         }
     }
 

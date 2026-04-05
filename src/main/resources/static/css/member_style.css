@@ -305,14 +305,26 @@ body {
 /* 모달 (기존과 동일하게 유지하되 약간 다듬음) */
 .modal-overlay {
   display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-  z-index: 1000; align-items: flex-end; justify-content: center;
+  z-index: 1000;
+  align-items: center; /* flex-end에서 center로 변경하여 수직 중앙 정렬 */
+  justify-content: center;
 }
 .modal-overlay.open { display: flex; }
 .modal-card {
-  background: #fff; border-radius: 20px 20px 0 0;
-  width: 100%; max-width: 460px; max-height: 75vh;
+  background: #fff;
+  border-radius: 16px; /* 모든 모서리를 동일하게 둥글게 처리 */
+  width: 90%; /* 화면이 작아졌을 때 꽉 차지 않고 좌우 여백이 생기도록 조정 */
+  max-width: 460px;
+  max-height: 75vh;
   display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* PC 팝업 느낌을 위한 부드러운 그림자 추가 */
 }
+
+/* PC 팝업 스타일이므로 모바일용 드래그 핸들은 숨김 처리 */
+.modal-handle {
+  display: none;
+}
+
 /* ...나머지 모달 CSS는 기존과 동일하게 적용가능... */
 .modal-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--gray-300); margin: 12px auto; }
 .modal-topbar { padding: 10px 20px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gray-200); }
