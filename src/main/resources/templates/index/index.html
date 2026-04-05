@@ -85,185 +85,48 @@
         </section>
         <aside class="content-card control-panel">
             <h2 style="font-size: 14px; color: var(--gray-500); margin-bottom: 15px;">실시간 감지 정보</h2>
-            <div class="urgent-alert">
+
+            <!-- [추가된 부분] 에러 메시지가 있을 때 보여줄 안내창 -->
+            <div th:if="${errorMessage != null}" class="urgent-alert" style="background: var(--gray-100); border: 2px solid var(--gray-300);">
+                <p style="color: var(--gray-600); font-weight: 700; text-align: center;" th:text="${errorMessage}">
+                    회원정보를 불러올 수 없습니다.
+                </p>
+            </div>
+
+            <!-- 기존 알림창 (데이터가 있을 때만 보이도록 th:if 추가) -->
+            <div th:if="${resident != null}" class="urgent-alert">
                 <h3>🚨 낙상 발생</h3>
-                <p><b>김영희 (거실)</b></p>
+                <p><b th:text="${resident.name} + ' (거실)'">김영희 (거실)</b></p>
                 <p style="font-size:13px; margin-top:5px;">신뢰도 98% | 15:28:05</p>
             </div>
+
             <div class="btn-group">
-                <button class="btn btn-red" onclick="goToManualReport(12)">
+                <!-- 119 수동 신고 버튼 -->
+                <button class="btn btn-red" th:if="${resident != null}" th:onclick="|goToManualReport(${resident.id})|">
                     🚨 119 수동 신고
                 </button>
+
+                <!-- 시설 찾기 버튼: 데이터가 있을 때 정상 동작 -->
+                <button class="btn btn-info"
+                        th:if="${resident != null}"
+                        th:onclick="|location.href='/facility/search?residentId=' + ${resident.id}|"
+                        style="background-color: #3182ce; color: white;">
+                    📍 주변 안심 시설 찾기
+                </button>
+
+                <!-- 데이터가 없을 때의 버튼: 누르면 경고창 띄우기 -->
+                <button class="btn btn-info"
+                        th:unless="${resident != null}"
+                        onclick="alert('회원정보를 불러올 수 없어 해당 기능을 사용할 수 없습니다.')"
+                        style="background-color: var(--gray-400); color: white; cursor: not-allowed;">
+                    📍 주변 안심 시설 찾기
+                </button>
+
                 <button class="btn btn-outline">보호자 비상 연락</button>
-                <!-- 기존과 동일하게 클래스 유지 -->
                 <button class="btn btn-success">상황 종료 및 복구</button>
             </div>
         </aside>
     </div>
-
-    <!-- 중간 통계 및 타임라인 영역은 기존 코드와 동일하게 유지 -->
-    <!-- 수정된 SECTION 전체 코드 (index.html에서 기존 <section class="content-card"> ... </section> 부분을 통째로 아래 코드로 교체하세요) -->
-    <!--<section class="content-card">
-
-        &lt;!&ndash; 1번 + 5번 적용: 이벤트 타임라인 제목을 SECTION 상단에 배치 + 날짜 선택기를 제목 바로 옆으로 이동 &ndash;&gt;
-        <div class="timeline-header">
-            <h3 class="timeline-title">이벤트 타임라인</h3>
-            <div class="date-picker-wrapper">
-                <input type="date" id="eventDate" value="2026-03-25">
-                <div class="calendar-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                </div>
-            </div>
-        </div>
-
-        &lt;!&ndash; 2번 적용: 최근 7일 위험지수를 별도 테두리로 감쌈 (risk-wrapper) &ndash;&gt;
-        <div class="risk-wrapper">
-            <div class="risk-score-section" style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
-                <div class="score-label-area" style="font-size: 14px; color: var(&#45;&#45;gray-500); font-weight: 700; text-align: left;">
-                    최근 7일 위험 지수 <span id="dateRangeLabel" style="font-size: 13px; font-weight: 500; color: var(&#45;&#45;gray-400); margin-left: 8px;"></span>
-                </div>
-                <div class="score-data-area" style="display: flex; align-items: center; justify-content: space-between; gap: 24px; width: 100%;">
-                    <div id="scoreText" class="val" style="font-size: 32px; font-weight: 900; line-height: 1; flex-shrink: 0; min-width: 140px;">
-                        130 <span class="total-val" style="font-size: 18px; color: var(&#45;&#45;gray-400); font-weight: 600;">/ 200</span>
-                    </div>
-                    <div class="progress-container" style="flex: 1; height: 16px; background: var(&#45;&#45;gray-200); border-radius: 20px; overflow: hidden; border: 1px solid var(&#45;&#45;gray-300);">
-                        <div id="progressBar" class="progress-bar" style="width: 0%; height: 100%; transition: width 1s ease, background 0.5s ease; border-radius: 20px;"></div>
-                    </div>
-                    <div id="statusLabel" style="font-size: 16px; font-weight: 800; white-space: nowrap; flex-shrink: 0; min-width: 90px; text-align: right;">
-                        상태: 확인중
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        &lt;!&ndash; 7번 적용: 위험지수 게이지와 필터/통계 영역 사이 간격 크게 띄움 &ndash;&gt;
-        <div class="event-stats-section">
-            <div class="stats-header">
-                &lt;!&ndash; 4번 적용: 필터 pill에 data-filter 추가 + 클릭 이벤트 준비 &ndash;&gt;
-                <div class="filter-pills">
-                    <span class="pill pill-blue active" data-filter="all">전체 3건</span>
-                    <span class="pill pill-pink" data-filter="fall">낙상 1건</span>
-                    <span class="pill pill-orange" data-filter="noresponse">무응답 1건</span>
-                    <span class="pill pill-purple" data-filter="assault">폭행 1건</span>
-                </div>
-            </div>
-            <div class="summary-cards">
-                <div class="stat-card"><span class="stat-title">총 이벤트</span><span class="stat-value">3건</span></div>
-                <div class="stat-card"><span class="stat-title">신고횟수</span><span class="stat-value red">2건</span></div>
-                <div class="stat-card"><span class="stat-title">정상확인</span><span class="stat-value">1건</span></div>
-            </div>
-        </div>
-
-        &lt;!&ndash; 3번 적용: 타임라인과 위험지수 사이의 선(border-top) 완전 제거 &ndash;&gt;
-        <div class="timeline-section" style="border-top: none; padding-top: 0;">
-            <div class="timeline-container">
-                &lt;!&ndash; 4번 적용: 각 타임라인 항목에 data-type 추가 &ndash;&gt;
-                &lt;!&ndash; 낙상 카드 &ndash;&gt;
-                <div class="tl-item" data-type="fall">
-                    <div class="tl-icon active">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 9v4m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 17c-.77 1.333.192 3 1.732 3z"/></svg>
-                    </div>
-                    <div class="tl-content">
-                        <div class="tl-img">
-                            <img src="https://via.placeholder.com/100x60/FEE2E2/DC2626?text=FALL" alt="Fall">
-                        </div>
-                        <div class="tl-details">
-                            <div class="tl-header">
-                                <span class="tl-main-text">낙상 / 기절 감지</span>
-                                <span class="tl-time">07:22</span>
-                            </div>
-                            <div class="tl-meta-grid">
-                                <div class="tl-meta-block">
-                                    <span class="tl-meta-label">신뢰도</span>
-                                    <span class="tl-meta-value">0.88</span>
-                                </div>
-                                <div class="tl-meta-block">
-                                    <span class="tl-meta-label">처리</span>
-                                    <span class="tl-meta-value tl-val-danger">가족 신고</span>
-                                </div>
-                            </div>
-                            <div class="tl-badge-area">
-                                <span class="status-badge badge-danger">신고완료</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                &lt;!&ndash; 무응답 카드 &ndash;&gt;
-                <div class="tl-item" data-type="noresponse">
-                    <div class="tl-icon warning">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <div class="tl-content">
-                        <div class="tl-img">
-                            <img src="https://via.placeholder.com/100x60/FEF3C7/D97706?text=WARN" alt="Warning">
-                        </div>
-                        <div class="tl-details">
-                            <div class="tl-header">
-                                <span class="tl-main-text">장시간 무응답 감지</span>
-                                <span class="tl-time">09:00</span>
-                            </div>
-                            <div class="tl-meta-grid">
-                                <div class="tl-meta-block">
-                                    <span class="tl-meta-label">신뢰도</span>
-                                    <span class="tl-meta-value">0.81</span>
-                                </div>
-                                <div class="tl-meta-block">
-                                    <span class="tl-meta-label">처리</span>
-                                    <span class="tl-meta-value tl-val-warning">자동신고</span>
-                                </div>
-                            </div>
-                            <div class="tl-sub-note">마지막 움직임: 06:30 (2시간 30분 전)</div>
-                            <div class="tl-badge-area">
-                                <span class="status-badge badge-warning">자동신고</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                &lt;!&ndash; 폭행 카드 &ndash;&gt;
-                <div class="tl-item" data-type="assault">
-                    <div class="tl-icon success">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                    <div class="tl-content">
-                        <div class="tl-img">
-                            <img src="https://via.placeholder.com/100x60/D1FAE5/059669?text=SAFE" alt="Safe">
-                        </div>
-                        <div class="tl-details">
-                            <div class="tl-header">
-                                <span class="tl-main-text">폭행 의심 감지</span>
-                                <span class="tl-time">19:47</span>
-                            </div>
-                            <div class="tl-meta-grid tl-meta-grid-4">
-                                <div class="tl-meta-block">
-                                    <span class="tl-meta-label">신뢰도</span>
-                                    <span class="tl-meta-value">0.93</span>
-                                </div>
-                                <div class="tl-meta-block">
-                                    <span class="tl-meta-label">이동속도</span>
-                                    <span class="tl-meta-value">0.87</span>
-                                </div>
-                                <div class="tl-meta-block">
-                                    <span class="tl-meta-label">감지 인원</span>
-                                    <span class="tl-meta-value">2명</span>
-                                </div>
-                                <div class="tl-meta-block">
-                                    <span class="tl-meta-label">처리</span>
-                                    <span class="tl-meta-value tl-val-success">정상확인</span>
-                                </div>
-                            </div>
-                            <div class="tl-badge-area">
-                                <span class="status-badge badge-success">정상확인</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>-->
-
-
 
     <section class="content-card">
         <div class="wrap">
