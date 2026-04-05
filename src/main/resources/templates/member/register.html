@@ -18,17 +18,11 @@
 <div id="step1" class="step-container" style="display: flex;">
     <div class="card">
         <div class="step-bar-card">
-            <div class="step-item active" id="sb1i1">
-                <div class="step-num">1</div>
-                <div class="step-label">약관 동의</div>
-            </div>
-            <div class="step-item" id="sb1i2">
-                <div class="step-num">2</div>
-                <div class="step-label">정보 입력</div>
-            </div>
-            <div class="step-item" id="sb1i3">
-                <div class="step-num">3</div>
-                <div class="step-label">가입 완료</div>
+            <div class="step-bar-card">
+                <div class="step-item active" id="sb1i1"><div class="step-num">1</div><div class="step-label">약관 동의</div></div>
+                <div class="step-item" id="sb1i2"><div class="step-num">2</div><div class="step-label">정보 입력</div></div>
+                <div class="step-item" id="sb1i3"><div class="step-num">3</div><div class="step-label">추가 정보</div></div>
+                <div class="step-item" id="sb1i4"><div class="step-num">4</div><div class="step-label">가입 완료</div></div>
             </div>
         </div>
 
@@ -112,17 +106,11 @@
 <div id="step2" class="step-container">
     <div class="card">
         <div class="step-bar-card">
-            <div class="step-item done" id="sb2i1">
-                <div class="step-num">1</div>
-                <div class="step-label">약관 동의</div>
-            </div>
-            <div class="step-item active" id="sb2i2">
-                <div class="step-num">2</div>
-                <div class="step-label">정보 입력</div>
-            </div>
-            <div class="step-item" id="sb2i3">
-                <div class="step-num">3</div>
-                <div class="step-label">가입 완료</div>
+            <div class="step-bar-card">
+                <div class="step-item done" id="sb2i1"><div class="step-num">1</div><div class="step-label">약관 동의</div></div>
+                <div class="step-item active" id="sb2i2"><div class="step-num">2</div><div class="step-label">정보 입력</div></div>
+                <div class="step-item" id="sb2i3"><div class="step-num">3</div><div class="step-label">추가 정보</div></div>
+                <div class="step-item" id="sb2i4"><div class="step-num">4</div><div class="step-label">가입 완료</div></div>
             </div>
         </div>
 
@@ -192,21 +180,62 @@
     </div>
 </div>
 
-<div id="step3" class="step-container">
+<!-- ========== 새로운 3단계 : 가입 경로 설문조사 ========== -->
+<div id="step3" class="step-container" style="display: none;">
     <div class="card">
         <div class="step-bar-card">
-            <div class="step-item done">
-                <div class="step-num" id="done1">1</div>
-                <div class="step-label">약관 동의</div>
+            <div class="step-item done"><div class="step-num" id="done1">1</div><div class="step-label">약관 동의</div></div>
+            <div class="step-item done"><div class="step-num" id="done2">2</div><div class="step-label">정보 입력</div></div>
+            <div class="step-item active"><div class="step-num">3</div><div class="step-label">추가 정보</div></div>
+            <div class="step-item"><div class="step-num">4</div><div class="step-label">가입 완료</div></div>
+        </div>
+
+        <div class="survey-section" style="margin-top: 20px;">
+            <div class="section-title">잠깐만요! 어떻게 오셨나요?</div>
+            <div class="section-sub">알려주시면 더 좋은 서비스를 만드는 데 큰 도움이 됩니다!</div>
+
+            <div class="terms-panel">
+                <div class="terms-item path-item" onclick="selectPath(this, '가족/자녀의 권유')">
+                    <div class="terms-left"><div class="chk-box"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="terms-title">가족/자녀의 권유</span></div>
+                </div>
+                <div class="terms-item path-item" onclick="selectPath(this, '지인/이웃 추천')">
+                    <div class="terms-left"><div class="chk-box"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="terms-title">지인/이웃 추천</span></div>
+                </div>
+                <div class="terms-item path-item" onclick="selectPath(this, '복지관/관공서')">
+                    <div class="terms-left"><div class="chk-box"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="terms-title">복지관/관공서</span></div>
+                </div>
+                <div class="terms-item path-item" onclick="selectPath(this, 'TV/신문 광고')">
+                    <div class="terms-left"><div class="chk-box"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="terms-title">TV/신문 광고</span></div>
+                </div>
+                <div class="terms-item path-item" onclick="selectPath(this, '네이버 밴드')">
+                    <div class="terms-left"><div class="chk-box"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="terms-title">네이버 밴드</span></div>
+                </div>
+                <div class="terms-item path-item" onclick="selectPath(this, '카카오톡 광고')">
+                    <div class="terms-left"><div class="chk-box"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="terms-title">카카오톡 광고</span></div>
+                </div>
+                <div class="terms-item path-item" onclick="selectPath(this, '병원/약국')">
+                    <div class="terms-left"><div class="chk-box"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="terms-title">병원/약국</span></div>
+                </div>
+                <div class="terms-item path-item" onclick="selectPath(this, '기타')">
+                    <div class="terms-left"><div class="chk-box"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="terms-title">기타</span></div>
+                    <input type="text" id="otherInput" class="form-input" placeholder="직접 입력해주세요" style="display:none; width:220px; margin-left:12px;">
+                </div>
             </div>
-            <div class="step-item done">
-                <div class="step-num" id="done2">2</div>
-                <div class="step-label">정보 입력</div>
-            </div>
-            <div class="step-item active">
-                <div class="step-num">3</div>
-                <div class="step-label">가입 완료</div>
-            </div>
+        </div>
+
+        <button class="btn-primary" id="submitBtn" onclick="submit_login_page()" style="margin-top:24px;">가입 완료하기</button>
+        <button class="btn-outline" onclick="goBackToStep2()" style="margin-top:12px;">이전으로 돌아가기</button>
+    </div>
+</div>
+
+<!-- ========== 새로운 4단계 : 가입 환영 메시지 ========== -->
+<div id="step4" class="step-container" style="display: none;">
+    <div class="card">
+        <div class="step-bar-card">
+            <div class="step-item done"><div class="step-num">1</div><div class="step-label">약관 동의</div></div>
+            <div class="step-item done"><div class="step-num">2</div><div class="step-label">정보 입력</div></div>
+            <div class="step-item done"><div class="step-num" id="done3">3</div><div class="step-label">추가 정보</div></div>
+            <div class="step-item active"><div class="step-num">4</div><div class="step-label">가입 완료</div></div>
         </div>
 
         <div class="done-wrap">
@@ -221,99 +250,7 @@
                 이제 서비스의 모든 기능을 이용하실 수 있습니다.
             </div>
 
-            <!-- 가입경로 조사 영역 -->
-            <div class="survey-section">
-                <div class="section-title">잠깐만요! 어떻게 오셨나요?</div>
-                <div class="section-sub">알려주시면 더 좋은 서비스를 만드는 데 큰 도움이 됩니다!</div>
-
-                <div class="terms-panel">
-                    <div class="terms-item path-item" onclick="selectPath(this, '가족/자녀의 권유')">
-                        <div class="terms-left">
-                            <div class="chk-box">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                    <path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <span class="terms-title">가족/자녀의 권유</span>
-                        </div>
-                    </div>
-                    <div class="terms-item path-item" onclick="selectPath(this, '지인/이웃 추천')">
-                        <div class="terms-left">
-                            <div class="chk-box">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                    <path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <span class="terms-title">지인/이웃 추천</span>
-                        </div>
-                    </div>
-                    <div class="terms-item path-item" onclick="selectPath(this, '복지관/관공서')">
-                        <div class="terms-left">
-                            <div class="chk-box">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                    <path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <span class="terms-title">복지관/관공서</span>
-                        </div>
-                    </div>
-                    <div class="terms-item path-item" onclick="selectPath(this, 'TV/신문 광고')">
-                        <div class="terms-left">
-                            <div class="chk-box">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                    <path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <span class="terms-title">TV/신문 광고</span>
-                        </div>
-                    </div>
-                    <div class="terms-item path-item" onclick="selectPath(this, '네이버 밴드')">
-                        <div class="terms-left">
-                            <div class="chk-box">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                    <path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <span class="terms-title">네이버 밴드</span>
-                        </div>
-                    </div>
-                    <div class="terms-item path-item" onclick="selectPath(this, '카카오톡 광고')">
-                        <div class="terms-left">
-                            <div class="chk-box">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                    <path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <span class="terms-title">카카오톡 광고</span>
-                        </div>
-                    </div>
-                    <div class="terms-item path-item" onclick="selectPath(this, '병원/약국')">
-                        <div class="terms-left">
-                            <div class="chk-box">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                    <path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <span class="terms-title">병원/약국</span>
-                        </div>
-                    </div>
-                    <div class="terms-item path-item" onclick="selectPath(this, '기타')">
-                        <div class="terms-left">
-                            <div class="chk-box">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                    <path d="M1.5 5l2.5 2.5 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <span class="terms-title">기타</span>
-                        </div>
-                        <input type="text" id="otherInput" class="form-input" placeholder="직접 입력해주세요" style="display:none; width:220px; margin-left:12px;">
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn-primary" id="submitBtn" onclick="submit_login_page()" style="margin-top:24px;">
-                로그인하러 가기
-            </button>
+            <button class="btn-primary" onclick="location.href='/member/login'" style="margin-top:24px;">서비스 시작하기</button>
         </div>
     </div>
 </div>
@@ -344,23 +281,32 @@
       terms3:`위치기반서비스 이용약관\n\n제1조 (목적) 본 약관은 회사(이하 "회사")가 제공하는 위치기반서비스(이하 "서비스")의 이용과 관련하여 회사와 개인위치정보주체(이하 "이용자")간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.\n\n제2조 (이용약관의 효력 및 변경) 본 약관은 이용자가 온라인으로 동의함으로써 효력이 발생합니다.`
     };
 
-    /* ==================== 가입경로 조사 ==================== */
-    let selectedPath = '';
+/* ==================== 가입경로 조사 (복수 선택) ==================== */
+    let selectedPaths = []; // 여러 개를 담기 위해 배열로 변경
 
     function selectPath(item, value) {
-        document.querySelectorAll('.path-item .chk-box').forEach(box => box.classList.remove('checked'));
         const box = item.querySelector('.chk-box');
-        if (box) box.classList.add('checked');
 
-        selectedPath = value;
+        // 이미 선택된 상태라면 -> 해제
+        if (box.classList.contains('checked')) {
+            box.classList.remove('checked');
+            selectedPaths = selectedPaths.filter(path => path !== value);
+        }
+        // 선택되지 않은 상태라면 -> 추가
+        else {
+            box.classList.add('checked');
+            selectedPaths.push(value);
+        }
 
+        // '기타' 항목의 텍스트 입력칸 표시 여부
         const otherInput = document.getElementById('otherInput');
         if (otherInput) {
-            if (value === '기타') {
+            if (selectedPaths.includes('기타')) {
                 otherInput.style.display = 'block';
-                otherInput.focus();
+                if (box.classList.contains('checked')) otherInput.focus();
             } else {
                 otherInput.style.display = 'none';
+                otherInput.value = ''; // 숨길 때 입력값 초기화
             }
         }
     }
@@ -514,19 +460,25 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    async function goStep3(){
+    function goBackToStep2() {
+        document.getElementById('step3').style.display = 'none';
+        document.getElementById('step2').style.display = 'flex';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goStep3(){
         const username = document.getElementById('userId').value.trim();
         const password = document.getElementById('pw').value;
         const password2 = document.getElementById('pw2').value;
         const name = document.getElementById('userName').value.trim();
         const phone = document.getElementById('phone').value.trim();
-        const purpose = document.getElementById('purpose').value.trim();
         const registerErr = document.getElementById('registerErr');
 
         registerErr.classList.remove('show');
         registerErr.textContent = '';
 
-        if(!username || !password || !password2 || !name || !phone || !purpose){
+        // 1. 필수 항목 검사 (존재하지 않던 purpose 검사 제외)
+        if(!username || !password || !password2 || !name || !phone){
             alert('필수 항목을 모두 입력해주세요.');
             return;
         }
@@ -543,24 +495,7 @@
             return;
         }
 
-        try {
-            await AppApi.post('/api/v1/auth/register', {
-                username,
-                password,
-                name,
-                phone,
-                purpose
-            }, {
-                redirectOn401: false
-            });
-        } catch (error) {
-            const message = error?.message || '회원가입에 실패했습니다.';
-            registerErr.textContent = message;
-            registerErr.classList.add('show');
-            alert(message);
-            return;
-        }
-
+        // 2. 중복되던 회원가입 API 호출 부분은 삭제하고, 화면 전환만 수행
         document.getElementById('doneUserName').textContent = name;
         document.getElementById('step2').style.display = 'none';
         document.getElementById('step3').style.display = 'flex';
@@ -586,56 +521,84 @@
       termsModalEl.addEventListener('click',function(e){if(e.target===this)closeModal();});
     }
 
-    async function submit_login_page() {
-        // 가입경로 처리
-        let finalPurpose = selectedPath || '미응답';
-        const otherInput = document.getElementById('otherInput');
-        if (selectedPath === '기타' && otherInput && otherInput.value.trim() !== '') {
-            finalPurpose = '기타: ' + otherInput.value.trim();
+/* ==================== 가입 완료 및 API 전송 ==================== */
+    async function submit_login_page(isSkipped = false) {
+        let finalPurpose = '미응답';
+
+        // 건너뛰기를 누르지 않았다면 선택한 값들을 하나로 합침
+        if (!isSkipped && selectedPaths.length > 0) {
+            let purposes = [...selectedPaths];
+
+            // '기타'가 포함되어 있고 텍스트를 입력했다면 내용 수정
+            const otherIndex = purposes.indexOf('기타');
+            if (otherIndex !== -1) {
+                const otherInput = document.getElementById('otherInput');
+                if (otherInput && otherInput.value.trim() !== '') {
+                    purposes[otherIndex] = '기타: ' + otherInput.value.trim();
+                }
+            }
+            // 배열을 쉼표(,)로 연결
+            finalPurpose = purposes.join(', ');
         }
 
-        // API에 맞는 payload (password 포함)
+        // ✅ birth_year를 birthYear로 수정했습니다 (백엔드 DTO와 맞춤)
         const payload = {
             username:   document.getElementById('userId').value.trim(),
-            password:   document.getElementById('pw').value,           // 백엔드에서 BCrypt 해싱
+            password:   document.getElementById('pw').value,
             name:       document.getElementById('doneUserName').textContent,
             phone:      document.getElementById('phone').value.trim(),
-            birth_year: document.getElementById('bYear').value
+            birthYear:  document.getElementById('bYear').value
                          ? parseInt(document.getElementById('bYear').value) : null,
-            purpose:    finalPurpose                                   // 가입경로
+            purpose:    finalPurpose
         };
+
+        const submitBtn = document.getElementById('submitBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        if (submitBtn) submitBtn.disabled = true;
+        if (skipBtn) skipBtn.disabled = true;
+
+        // ✅ HTML 메타 태그에서 CSRF 토큰과 헤더 이름을 읽어옵니다.
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+        // ✅ 기본 헤더 설정 (CSRF 토큰이 있으면 추가합니다)
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
+        }
 
         try {
             const response = await fetch('/api/v1/auth/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                    // CSRF가 필요하다면 아래 추가
-                    // 'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || ''
-                },
+                headers: headers, // ✅ CSRF 토큰이 포함된 헤더를 전송합니다.
                 body: JSON.stringify(payload)
             });
 
             if (response.ok) {
-                console.log('✅ 회원가입 성공 (/api/v1/auth/register)');
-                console.log('전송 데이터:', payload);
-                alert('회원가입이 완료되었습니다!');
+                // 가입 성공 시 4단계 화면으로 이동
+                document.getElementById('step3').style.display = 'none';
+                document.getElementById('step4').style.display = 'flex';
+
+                document.getElementById('done3').innerHTML = chkSvg();
+                document.querySelectorAll('#step4 .step-item.done .step-num').forEach(el => {
+                    if(el.id !== 'done3') el.innerHTML = chkSvg();
+                });
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 const errorData = await response.json().catch(() => ({}));
-                console.warn('⚠️ 회원가입 실패:', response.status, errorData);
                 alert(errorData.message || '회원가입에 실패했습니다. 다시 시도해주세요.');
                 if (submitBtn) submitBtn.disabled = false;
-                return;
+                if (skipBtn) skipBtn.disabled = false;
             }
         } catch (error) {
             console.error('❌ 회원가입 API 오류:', error);
             alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
             if (submitBtn) submitBtn.disabled = false;
-            return;
+            if (skipBtn) skipBtn.disabled = false;
         }
-
-        // 성공 시 로그인 페이지 이동
-        location.href = "/member/login";
     }
 
 </script>
