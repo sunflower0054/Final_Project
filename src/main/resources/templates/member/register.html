@@ -586,6 +586,7 @@
       termsModalEl.addEventListener('click',function(e){if(e.target===this)closeModal();});
     }
 
+    async function submit_login_page() {
         // 가입경로 처리
         let finalPurpose = selectedPath || '미응답';
         const otherInput = document.getElementById('otherInput');
