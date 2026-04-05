@@ -1,7 +1,9 @@
 package com.office.monitoring.index;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import jakarta.servlet.http.HttpSession; // 세션 사용을 위해 필요
 
 @Controller
 public class IndexController {
@@ -11,13 +13,9 @@ public class IndexController {
         return "index/index";
     }
 
-    @GetMapping({"/camera", "/camera/camera"})
-    public String camera() {
-        return "camera/camera";
-    }
-
     @GetMapping({"/test"})
     public String test() {
         return "send_message/test";
     }
+
 }

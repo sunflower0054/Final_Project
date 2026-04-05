@@ -74,7 +74,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                         // 로그인 필수 회원 API
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/auth/withdraw").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/my-info").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/my-info").authenticated()

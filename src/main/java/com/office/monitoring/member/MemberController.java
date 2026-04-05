@@ -17,4 +17,9 @@ public class MemberController {
     public String register() {
         return "member/register";
     }
+
+    @GetMapping("/withdraw")
+    public String withdraw() {
+        return "member/withdraw";
+    }
 }

@@ -189,56 +189,43 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
-async function submitWithdraw() {
+    async function submitWithdraw() {
         const pw = document.getElementById('withdrawPw').value;
-        const selectedReason = document.querySelector('input[name="purpose"]:checked').value;
+        const selectedRadio = document.querySelector('input[name="purpose"]:checked'); // 체크된 요소 찾기
         const purposeEtc = document.getElementById('purposeEtc').value;
 
-        const finalPurpose = selectedReason === '기타' ? purposeEtc : selectedReason;
+        if (!selectedRadio) {
+            alert('탈퇴 사유를 선택해 주세요.');
+            return;
+        }
+
+        const finalPurpose = selectedRadio.value === '기타' ? purposeEtc : selectedRadio.value;
 
         if (!pw) {
             alert('비밀번호를 입력해 주세요.');
             return;
         }
 
-        // 1. 작성하신 백엔드 API로 비동기 요청 (Fetch)
-/*        try {
-            const response = await fetch('/api/v1/auth/withdraw', {
+        try {
+            // 백엔드 API 호출 시 Query String으로 전달 (자바 코드 미수정 시 가장 유력한 방식)
+            const response = await fetch(`/api/v1/auth/withdraw?purpose=${encodeURIComponent(finalPurpose)}&password=${encodeURIComponent(pw)}`, {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    password: pw,
-                    purpose: finalPurpose
-                })
+                headers: { 'Content-Type': 'application/json' }
             });
 
             const data = await response.json();
 
-            // 2. 백엔드에서 success: true 가 오면 다음 화면으로 이동
             if (response.ok && data.success) {
                 document.getElementById('step2').style.display = 'none';
                 document.getElementById('step3').style.display = 'flex';
                 window.scrollTo({top: 0, behavior: 'smooth'});
             } else {
-                alert(data.message || '비밀번호가 일치하지 않습니다.');
+                alert(data.message || '비밀번호가 일치하지 않거나 오류가 발생했습니다.');
             }
         } catch (error) {
             console.error('Error:', error);
             alert('탈퇴 처리 중 오류가 발생했습니다.');
-        } */
-
-        // UI 테스트용 강제 화면 전환 코드
-        document.getElementById('step2').style.display = 'none';
-        document.getElementById('step3').style.display = 'flex';
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    }
-
-    // 비밀번호 표시 토글
-    function togglePw(id) {
-        const el = document.getElementById(id);
-        el.type = el.type === 'password' ? 'text' : 'password';
+        }
     }
 </script>
 </body>
