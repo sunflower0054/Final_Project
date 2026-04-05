@@ -12,4 +12,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByStatusAndCreatedAtBefore(String status, LocalDateTime threshold);
 
     Optional<Event> findTopByStatusOrderByCreatedAtDesc(String status);
+
+    boolean existsByResidentId(Long residentId);
 }
