@@ -397,11 +397,29 @@ svg {
     box-shadow: 0 0 0 3px var(--primary-light);
 }
 
-.form-control[readonly] {
+/*.form-control[readonly] {
     background-color: var(--primary-light);
     color: var(--text-sub);
     cursor: default;
+}*/
+
+.form-control[readonly],
+.form-control:disabled {
+    background-color: var(--gray-50); /* 시선을 끌지 않는 깨끗한 연회색 (#fcfcf9) */
+    color: var(--gray-900); /* 텍스트 데이터는 선명하게 유지 */
+    border-color: var(--gray-200);
+    cursor: default;
 }
+
+/* 생년월일 select 박스(disabled 상태)도 일관성 있게 맞추기 위해 추가 */
+.birth-row select:disabled {
+    background-color: var(--gray-50) !important;
+    color: var(--gray-900);
+    border-color: var(--gray-200);
+    cursor: default;
+    appearance: none; /* 비활성화 시 화살표를 숨기고 싶다면 추가 */
+}
+
 
 /* ===== 7. Setting Row & Modern Toggle ===== */
 .setting-row {

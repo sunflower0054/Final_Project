@@ -99,7 +99,7 @@
                     <!-- 주소 -->
                     <div class="form-group address-group">
                         <label class="form-label">주소 <span style="color:red;">*</span></label>
-                        <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <div id="postcode-wrapper" style="display:flex; gap:8px; margin-bottom:8px;">
                             <input type="text" id="postcode" class="form-control" placeholder="우편번호" readonly style="max-width:140px;">
                             <button type="button" id="address-search-btn" onclick="execDaumPostcode()"
                                     style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; cursor:pointer;">
@@ -109,35 +109,19 @@
                         <input type="text" id="address" class="form-control" placeholder="기본 주소 (도로명 또는 지번)" readonly>
                         <input type="text" id="detailAddress" class="form-control" placeholder="상세 주소 (예: 301호, 2층)" style="margin-top: 8px;">
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- 건강 정보 카드 -->
-        <div class="content-card" style="margin-top: 24px;">
-            <div class="card-header">
-                <h3 class="card-title">건강 정보</h3>
-            </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label class="form-label">기저질환</label>
-                    <div id="underlying-diseases" class="underlying-diseases" style="display:flex; gap:8px; flex-wrap:wrap; padding:8px 0;">
-                        <label class="badge" style="background:#E3F2FD; color:#1976D2; padding:8px 14px; cursor:pointer;">
-                            <input type="checkbox" value="고혈압"> 고혈압
-                        </label>
-                        <label class="badge" style="background:#E8F5E9; color:#388E3C; padding:8px 14px; cursor:pointer;">
-                            <input type="checkbox" value="당뇨"> 당뇨
-                        </label>
-                        <label class="badge" style="background:#FFF3E0; color:#F57C00; padding:8px 14px; cursor:pointer;">
-                            <input type="checkbox" value="골다공증"> 골다공증
-                        </label>
-                        <label class="badge" style="background:#F3E5F5; color:#7B1FA2; padding:8px 14px; cursor:pointer;">
-                            <input type="checkbox" value="관절염"> 관절염
-                        </label>
+                    <!-- [추가] 기저질환 및 건강 상태 입력 -->
+                    <div class="form-group">
+                        <label class="form-label">기저질환 및 건강 상태</label>
+                        <textarea class="form-control" id="disease" rows="4"
+                                  placeholder="고혈압, 당뇨 등 기저질환이나 참고해야 할 건강 상태를 자유롭게 입력해주세요."
+                                  style="resize: vertical;"></textarea>
+                        <p style="font-size: 12px; color: var(--gray-500); margin-top: 6px;">※ 여러 질환이 있을 경우 줄바꿈(Enter)이나 쉼표(,)로 구분하여 입력해주세요.</p>
                     </div>
                 </div>
             </div>
         </div>
+
 
     </main>
 </div>
@@ -212,7 +196,18 @@
         document.getElementById('avatar').textContent = name.charAt(0) || '?';
         document.getElementById('profile-age-gender').textContent =
             age !== null ? `만 ${age}세` : '정보를 입력해주세요';
-        document.getElementById('reg-date').textContent = '-';
+
+        // 등록일 표시 (백엔드 변수명이 createdAt이라고 가정)
+        if (resident.createdAt) {
+            const dateObj = new Date(resident.createdAt);
+            const yyyy = dateObj.getFullYear();
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            document.getElementById('reg-date').textContent = `${yyyy}.${mm}.${dd}`;
+        } else {
+            document.getElementById('reg-date').textContent = '-';
+        }
+
         document.getElementById('last-fall').textContent = '-';
     }
 
@@ -229,20 +224,30 @@
         });
     }
 
-    function setDetailViewMode(enabled) {
+function setDetailViewMode(enabled) {
         const isReadOnly = Boolean(enabled);
 
         document.getElementById('name').readOnly = isReadOnly;
         document.getElementById('phone').readOnly = isReadOnly;
         document.getElementById('detailAddress').readOnly = isReadOnly;
+        document.getElementById('disease').readOnly = isReadOnly; // 기저질환 읽기 전용
+
         document.getElementById('birthYear').disabled = isReadOnly;
         document.getElementById('birthMonth').disabled = isReadOnly;
         document.getElementById('birthDay').disabled = isReadOnly;
         document.getElementById('address-search-btn').disabled = isReadOnly;
 
-        document.querySelectorAll('#underlying-diseases input[type="checkbox"]').forEach((checkbox) => {
-            checkbox.disabled = isReadOnly;
-        });
+        // 읽기 전용(상세 보기)일 때 불필요한 입력칸 숨기기
+        const postcodeWrapper = document.getElementById('postcode-wrapper');
+        const detailAddressInput = document.getElementById('detailAddress');
+
+        if (isReadOnly) {
+            if (postcodeWrapper) postcodeWrapper.style.display = 'none';
+            if (detailAddressInput) detailAddressInput.style.display = 'none';
+        } else {
+            if (postcodeWrapper) postcodeWrapper.style.display = 'flex';
+            if (detailAddressInput) detailAddressInput.style.display = 'block';
+        }
     }
 
     function handlePrimaryAction() {
@@ -387,7 +392,9 @@
                 document.getElementById('birthDate').value = '';
             }
 
-            syncDiseaseCheckboxes(resident.disease);
+            // 기저질환 textarea 값 바인딩
+            document.getElementById('disease').value = resident.disease || '';
+
             updateProfileUI(resident);
         } catch (error) {
             alert(getErrorMessage(error, '거주자 정보를 불러오는 데 실패했습니다.'));
@@ -423,6 +430,8 @@
         const detailAddress = document.getElementById('detailAddress').value.trim();
         const latitude = Number.parseFloat(selectedLat);
         const longitude = Number.parseFloat(selectedLon);
+        // textarea 기저질환 값 가져오기
+        const disease = document.getElementById('disease').value.trim();
 
         if (!name) {
             alert('이름은 필수입니다.');
@@ -444,16 +453,12 @@
             return;
         }
 
-        const disease = Array.from(
-            document.querySelectorAll('#underlying-diseases input[type="checkbox"]:checked')
-        ).map(cb => cb.value).join(', ');
-
         const payload = {
             name,
             birthDate,
             address: detailAddress ? `${address} ${detailAddress}` : address,
             phone: document.getElementById('phone').value.trim() || null,
-            disease: disease || null,
+            disease: disease || null, // 기저질환 값 저장
             latitude,
             longitude
         };
