@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+/** 애플리케이션 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class AiSettingsServiceTest {
 
     @Mock
@@ -25,6 +26,7 @@ class AiSettingsServiceTest {
     private AiSettingsService aiSettingsService;
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void save_기존_설정이_있으면_값을_갱신하고_updatedAt을_응답에_반영한다() {
         AiSettings existing = AiSettings.builder()
                 .id(1L)
@@ -52,6 +54,7 @@ class AiSettingsServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void save_기존_설정이_없으면_새_설정을_생성한다() {
         AiSettingsDto dto = new AiSettingsDto();
         dto.setFallSensitivity(0.4D);
@@ -74,6 +77,7 @@ class AiSettingsServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void get_저장된_설정을_조회하면_DTO로_매핑한다() {
         AiSettings settings = AiSettings.builder()
                 .residentId(3L)
@@ -94,6 +98,7 @@ class AiSettingsServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void get_updatedAt이_null이면_대시를_반환한다() {
         AiSettings settings = AiSettings.builder()
                 .residentId(4L)
@@ -111,6 +116,7 @@ class AiSettingsServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void get_설정이_없으면_예외를_던진다() {
         when(aiSettingsRepository.findByResidentId(99L)).thenReturn(Optional.empty());
 

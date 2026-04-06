@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
+/** 거주자 데이터 조회·등록·수정·삭제 흐름을 담당하는 구성 요소. */
 public record ResidentUpdateRequest(
         @NotBlank(message = "이름은 필수입니다.")
         @Size(max = 50, message = "이름은 50자 이하여야 합니다.")

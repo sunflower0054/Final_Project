@@ -10,9 +10,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** 거주자 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class ResidentListIntegrationTest extends ResidentIntegrationTestSupport {
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void FAMILY_연결된_거주자가_있으면_본인_거주자만_목록으로_조회한다() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("박순자")
@@ -38,6 +40,7 @@ class ResidentListIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void FAMILY_연결된_거주자가_없으면_빈_목록을_반환한다() throws Exception {
         mockMvc.perform(get("/api/v1/residents")
                         .with(user("new-user").roles("FAMILY")))
@@ -47,6 +50,7 @@ class ResidentListIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void FAMILY_회원에_연결ID만_남고_실제_거주자가_없어도_빈_목록을_반환한다() throws Exception {
         mockMvc.perform(get("/api/v1/residents")
                         .with(user("user").roles("FAMILY")))
@@ -56,6 +60,7 @@ class ResidentListIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void ADMIN은_전체_거주자_목록을_ID오름차순으로_조회한다() throws Exception {
         Resident first = residentRepository.save(Resident.builder()
                 .name("첫 번째")

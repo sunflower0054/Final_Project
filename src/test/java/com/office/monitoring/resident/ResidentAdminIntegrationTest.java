@@ -12,9 +12,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** 거주자 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class ResidentAdminIntegrationTest extends ResidentIntegrationTestSupport {
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void ADMIN은_임의의_거주자정보를_수정할_수_있다() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("수정 전")
@@ -56,6 +58,7 @@ class ResidentAdminIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void ADMIN은_연결관계와_무관하게_이력없는_거주자를_삭제할_수_있다() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("삭제 대상")

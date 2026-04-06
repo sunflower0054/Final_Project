@@ -13,9 +13,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** 회원 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class AuthIntegrationTest extends MemberIntegrationTestSupport {
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 로그인_API_성공시_세션생성_및_JSON응답() throws Exception {
         mockMvc.perform(post("/api/v1/auth/login")
                         .param("username", "user")
@@ -31,6 +33,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 로그인_API_실패시_401_JSON응답() throws Exception {
         mockMvc.perform(post("/api/v1/auth/login")
                         .param("username", "user")
@@ -41,6 +44,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 로그아웃_API_호출시_성공_JSON응답() throws Exception {
         MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
                         .param("username", "user")
@@ -62,6 +66,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 인증없어도_auth_endpoint_접근가능() throws Exception {
         mockMvc.perform(post("/api/v1/auth/login")
                         .param("username", "missing-user")
@@ -70,6 +75,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void checkUsername_중복아닌경우_available_true() throws Exception {
         mockMvc.perform(get("/api/v1/auth/check-username")
                         .param("username", "new-user"))
@@ -80,6 +86,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void checkUsername_공백만_보내면_400() throws Exception {
         mockMvc.perform(get("/api/v1/auth/check-username")
                         .param("username", "   "))
@@ -89,6 +96,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 회원가입시_username_앞뒤공백을_제거한_후_중복검사한다() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
@@ -109,6 +117,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 회원가입_성공시_username_name_phone_purpose는_trim되어_저장된다() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
@@ -134,6 +143,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void checkUsername_중복인경우_available_false() throws Exception {
         mockMvc.perform(get("/api/v1/auth/check-username")
                         .param("username", "user"))
@@ -144,6 +154,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 회원가입_성공시_회원저장과_BCrypt인코딩_검증() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
@@ -174,6 +185,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 회원가입시_username_중복이면_실패() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
@@ -194,6 +206,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 회원가입시_CSRF_없으면_403() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
                         .contentType("application/json")
@@ -210,6 +223,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 로그인_API_성공시_HTTP세션_생성확인() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .param("username", "user")

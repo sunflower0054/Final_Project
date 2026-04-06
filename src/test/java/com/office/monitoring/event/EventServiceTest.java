@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 
 
 @ExtendWith(MockitoExtension.class)
+/** 애플리케이션 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class EventServiceTest {
 
     @Mock
@@ -45,6 +46,7 @@ class EventServiceTest {
     Path tempDir;
 
     @BeforeEach
+    /** 요청된 애플리케이션 작업의 입력 조건을 반영해 결과를 만든다. */
     void setUp() {
         ReflectionTestUtils.setField(eventService, "uploadDir", tempDir.toString());
         ReflectionTestUtils.setField(eventService, "sep", "/");
@@ -58,6 +60,7 @@ class EventServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 정상요청과_이미지첨부시_이벤트와_이미지가_저장되고_파일이_생성된다() throws IOException {
         EventReceiveRequest request = 요청("1", "VIOLENT_MOTION_DETECTED", "2026-04-06T10:11:12", "0.85",
                 "{'person_count': 2, 'max_velocity': 0.05, 'last_motion_timestamp': '2026-04-06T10:00:00'}");
@@ -91,6 +94,7 @@ class EventServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 이미지가_null이면_이벤트만_저장되고_이미지는_저장되지_않는다() throws IOException {
         EventReceiveRequest request = 요청("2", "FALL_DETECTED", "2026-04-06T12:00:00", "0.9", null);
 
@@ -101,6 +105,7 @@ class EventServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 이미지가_empty면_이벤트만_저장되고_이미지는_저장되지_않는다() throws IOException {
         EventReceiveRequest request = 요청("3", "FALL_DETECTED", "2026-04-06T12:00:00", "0.9", null);
         MultipartFile emptyImage = new MockMultipartFile("frameImage", "", "image/jpeg", new byte[0]);
@@ -112,6 +117,7 @@ class EventServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void metadata가_없거나_키가_누락되어도_이벤트는_저장되고_파생필드는_null이다() throws IOException {
         EventReceiveRequest request = 요청("4", "NO_MOTION_DETECTED", "2026-04-06T13:00:00", "0.7", null);
 
@@ -127,6 +133,7 @@ class EventServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void metadata형식이_이상하면_파싱실패필드는_null로_처리되고_이벤트저장은_계속된다() throws IOException {
         EventReceiveRequest request = 요청("5", "VIOLENT_MOTION_DETECTED", "2026-04-06T14:00:00", "0.6",
                 "{'person_count': two, 'max_velocity': fast, 'last_motion_timestamp': 'broken'}");
@@ -143,6 +150,7 @@ class EventServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void residentId_confidence_timestamp가_잘못된_문자열이면_예외가_발생하고_저장하지_않는다() {
         EventReceiveRequest badResidentId = 요청("not-number", "FALL_DETECTED", "2026-04-06T15:00:00", "0.5", null);
         EventReceiveRequest badConfidence = 요청("1", "FALL_DETECTED", "2026-04-06T15:00:00", "not-double", null);
@@ -156,6 +164,7 @@ class EventServiceTest {
         verify(eventImageRepository, never()).save(any(EventImage.class));
     }
 
+    /** 요청된 애플리케이션 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     private EventReceiveRequest 요청(String residentId, String eventType, String timestamp, String confidence, String metadata) {
         EventReceiveRequest request = new EventReceiveRequest();
         request.setResidentId(residentId);

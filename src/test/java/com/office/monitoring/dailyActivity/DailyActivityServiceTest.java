@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+/** 애플리케이션 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class DailyActivityServiceTest {
 
     @Mock
@@ -25,6 +26,7 @@ class DailyActivityServiceTest {
     private DailyActivityService dailyActivityService;
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 기존_일일활동이_있으면_motion_score만_업데이트한다() {
         LocalDate date = LocalDate.of(2026, 4, 6);
         DailyActivity existing = DailyActivity.builder()
@@ -43,6 +45,7 @@ class DailyActivityServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 기존_일일활동이_없으면_새_레코드를_저장한다() {
         LocalDate date = LocalDate.of(2026, 4, 6);
         when(dailyActivityRepository.findByResidentIdAndDate(20L, date)).thenReturn(Optional.empty());
