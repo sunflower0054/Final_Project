@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-/** Resident의 역할을 담당한다. */
 public class Resident {
 
     @Id
@@ -47,7 +46,6 @@ public class Resident {
     private LocalDateTime createdAt;
 
     @PrePersist
-    /** onCreate 동작을 수행한다. */
     protected void onCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
@@ -70,7 +68,6 @@ public class Resident {
         this.longitude = longitude;
     }
 
-    /** trimToNull 동작을 수행한다. */
     private String trimToNull(String value) {
         if (value == null) {
             return null;

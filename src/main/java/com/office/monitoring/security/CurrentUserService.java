@@ -10,12 +10,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-/** CurrentUserService의 역할을 담당한다. */
 public class CurrentUserService {
 
     private final MemberRepository memberRepository;
 
-    /** getUsername 동작을 수행한다. */
     public String getUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -36,14 +34,12 @@ public class CurrentUserService {
         return username;
     }
 
-    /** getCurrentMember 동작을 수행한다. */
     public Member getCurrentMember() {
         String username = getUsername();
         return memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalStateException("현재 로그인한 사용자를 찾을 수 없습니다."));
     }
 
-    /** getResidentId 동작을 수행한다. */
     public Long getResidentId() {
         Member member = getCurrentMember();
 

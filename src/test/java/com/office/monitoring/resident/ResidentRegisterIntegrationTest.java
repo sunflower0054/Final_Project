@@ -13,10 +13,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** ResidentRegisterIntegrationTest 테스트를 정의한다. */
 class ResidentRegisterIntegrationTest extends ResidentIntegrationTestSupport {
 
-/** 거주자등록_성공시_거주자저장_회원연결_AI기본설정생성 시나리오를 검증한다. */
     @Test
     void 거주자등록_성공시_거주자저장_회원연결_AI기본설정생성() throws Exception {
         mockMvc.perform(post("/api/v1/residents")
@@ -51,7 +49,6 @@ class ResidentRegisterIntegrationTest extends ResidentIntegrationTestSupport {
         assertThat(aiSettingsRepository.findByResidentId(resident.getId())).isPresent();
     }
 
-/** 이미_연결된_거주자가_있으면_거주자등록_실패 시나리오를 검증한다. */
     @Test
     void 이미_연결된_거주자가_있으면_거주자등록_실패() throws Exception {
         mockMvc.perform(post("/api/v1/residents")
@@ -74,7 +71,6 @@ class ResidentRegisterIntegrationTest extends ResidentIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("이미 연결된 거주자 정보가 있습니다."));
     }
 
-/** 거주자등록_validation_실패시_400 시나리오를 검증한다. */
     @Test
     void 거주자등록_validation_실패시_400() throws Exception {
         mockMvc.perform(post("/api/v1/residents")

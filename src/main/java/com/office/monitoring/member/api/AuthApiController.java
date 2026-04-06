@@ -18,13 +18,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
-/** AuthApiController의 역할을 담당한다. */
 public class AuthApiController {
 
     private final MemberService memberService;
 
     @GetMapping("/check-username")
-    /** checkUsername 동작을 수행한다. */
     public CheckUsernameResponse checkUsername(@RequestParam String username) {
         boolean available = memberService.checkUsernameAvailable(username);
 
@@ -36,7 +34,6 @@ public class AuthApiController {
     }
 
     @PostMapping("/register")
-    /** register 동작을 수행한다. */
     public RegisterResponse register(@Valid @RequestBody RegisterRequest request) {
         return memberService.register(request);
     }

@@ -16,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-/** DailyActivityServiceTest 테스트를 정의한다. */
 class DailyActivityServiceTest {
 
     @Mock
@@ -25,7 +24,6 @@ class DailyActivityServiceTest {
     @InjectMocks
     private DailyActivityService dailyActivityService;
 
-/** 기존_일일활동이_있으면_motion_score만_업데이트한다 시나리오를 검증한다. */
     @Test
     void 기존_일일활동이_있으면_motion_score만_업데이트한다() {
         LocalDate date = LocalDate.of(2026, 4, 6);
@@ -44,7 +42,6 @@ class DailyActivityServiceTest {
         verify(dailyActivityRepository, never()).save(org.mockito.ArgumentMatchers.any(DailyActivity.class));
     }
 
-/** 기존_일일활동이_없으면_새_레코드를_저장한다 시나리오를 검증한다. */
     @Test
     void 기존_일일활동이_없으면_새_레코드를_저장한다() {
         LocalDate date = LocalDate.of(2026, 4, 6);

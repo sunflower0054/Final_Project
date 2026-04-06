@@ -10,11 +10,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Map;
 
 @RestControllerAdvice
-/** GlobalExceptionHandler의 역할을 담당한다. */
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    /** handleValidationException 동작을 수행한다. */
     public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException e) {
         String message = e.getBindingResult()
                 .getFieldErrors()
@@ -30,7 +28,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    /** handleIllegalArgumentException 동작을 수행한다. */
     public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
@@ -39,7 +36,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    /** handleIllegalStateException 동작을 수행한다. */
     public ResponseEntity<?> handleIllegalStateException(IllegalStateException e) {
         return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
@@ -48,7 +44,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    /** handleAccessDeniedException 동작을 수행한다. */
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
                 "success", false,

@@ -12,10 +12,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** ResidentUpdateIntegrationTest 테스트를 정의한다. */
 class ResidentUpdateIntegrationTest extends ResidentIntegrationTestSupport {
 
-/** 연결된_거주자수정_성공시_DB반영 시나리오를 검증한다. */
     @Test
     void 연결된_거주자수정_성공시_DB반영() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
@@ -57,7 +55,6 @@ class ResidentUpdateIntegrationTest extends ResidentIntegrationTestSupport {
         assertThat(updated.getDisease()).isEqualTo("치매 초기");
     }
 
-/** 연결되지않은_거주자수정시_403 시나리오를 검증한다. */
     @Test
     void 연결되지않은_거주자수정시_403() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
@@ -90,7 +87,6 @@ class ResidentUpdateIntegrationTest extends ResidentIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("해당 거주자 정보에 접근할 수 없습니다."));
     }
 
-/** 거주자수정_validation_실패시_400 시나리오를 검증한다. */
     @Test
     void 거주자수정_validation_실패시_400() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
