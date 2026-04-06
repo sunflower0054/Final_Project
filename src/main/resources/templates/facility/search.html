@@ -1,309 +1,3 @@
-<!--
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>늘 봄 - 주변 시설 찾기</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=05dea7c839bf99daaa3a652b70da85fe&libraries=services"></script>
-
-    <style>
-        /* 페이지 전체 레이아웃 */
-        .page-container {
-            display: grid;
-            grid-template-areas:
-                "categories"
-                "content";
-            grid-template-rows: auto 1fr;
-            gap: 20px;
-            height: calc(100vh - 120px); /* 헤더 높이를 고려한 전체 높이 */
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        /* 1. 상단 카테고리 영역 */
-        .category-section {
-            grid-area: categories;
-            background: #fff;
-            border-radius: 12px;
-            border: 1px solid var(&#45;&#45;gray-200);
-            padding: 20px;
-        }
-        .category-section h3 {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 15px;
-            color: var(&#45;&#45;navy);
-        }
-        .category-container {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .cat-chip {
-            padding: 12px 20px;
-            border-radius: 10px;
-            border: 2px solid var(&#45;&#45;gray-200);
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            background: #fff;
-            color: var(&#45;&#45;gray-600);
-            transition: all 0.2s ease;
-        }
-        /* 카테고리 활성화 스타일 - 서비스 남색 적용 */
-        .cat-chip.active {
-            background: var(&#45;&#45;navy);
-            color: #fff;
-            border-color: var(&#45;&#45;navy);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .category-hint {
-            font-size: 14px;
-            color: var(&#45;&#45;gray-500);
-            margin-top: 10px;
-        }
-
-        /* 2. 메인 콘텐츠 영역 (지도 + 리스트) */
-        .content-section {
-            grid-area: content;
-            display: grid;
-            grid-template-columns: 1fr 420px; /* 지도 1 : 리스트 고정 너비 */
-            gap: 20px;
-            overflow: hidden; /* 자식 요소의 스크롤을 위해 필수 */
-        }
-
-        /* 지도 영역 */
-        .map-section {
-            background: #fff;
-            border-radius: 12px;
-            border: 1px solid var(&#45;&#45;gray-200);
-            overflow: hidden;
-        }
-        #map { width: 100%; height: 100%; }
-
-        /* 리스트 영역 */
-        .list-section {
-            background: #fff;
-            border-radius: 12px;
-            border: 1px solid var(&#45;&#45;gray-200);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .list-section h4 {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(&#45;&#45;gray-800);
-            padding: 20px;
-            border-bottom: 1px solid var(&#45;&#45;gray-100);
-            background: #fcfcfc;
-        }
-        .facility-scroll {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            background: #f8f9fa;
-        }
-
-        /* 시설 리스트 아이템 스타일 */
-        .facility-item {
-            padding: 18px;
-            border: 1px solid var(&#45;&#45;gray-200);
-            border-radius: 12px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            background: #fff;
-            transition: 0.2s;
-        }
-        .facility-item:hover {
-            border-color: var(&#45;&#45;navy);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        .f-name { font-weight: 800; color: #1a202c; font-size: 17px; margin-bottom: 6px; }
-        .f-dist { font-size: 14px; color: var(&#45;&#45;navy-light); font-weight: 700; margin-bottom: 4px; }
-        .f-info { font-size: 14px; color: var(&#45;&#45;gray-600); margin-top: 2px; }
-
-        /* 개선된 거주자 위치 마커 (커스텀 오버레이) - 빨간색에서 남색으로 변경 */
-        .resident-label {
-            padding: 8px 16px;
-            background: var(&#45;&#45;navy); /* 서비스 남색 적용 */
-            color: white;
-            border-radius: 20px;
-            font-weight: 800;
-            font-size: 14px;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            white-space: nowrap;
-        }
-
-        /* 개선된 지도 인포윈도우 디자인 (말풍선) */
-        .custom-infowindow {
-            padding: 15px;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid var(&#45;&#45;gray-200);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative;
-            margin-bottom: 15px;
-        }
-        .custom-infowindow::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 10px 10px 0;
-            border-style: solid;
-            border-color: white transparent transparent;
-        }
-        .custom-infowindow-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(&#45;&#45;navy);
-            margin-bottom: 5px;
-        }
-        .custom-infowindow-desc {
-            font-size: 13px;
-            color: var(&#45;&#45;gray-600);
-        }
-    </style>
-</head>
-<body>
-<div th:replace="~{fragments/header :: header}"></div>
-
-<div class="page-container">
-    <div class="category-section">
-        <h3>어떤 시설을 찾으세요?</h3>
-        <div class="category-container" id="categoryGroup">
-            <button class="cat-chip" data-keyword="병원">병원 찾기</button>
-            <button class="cat-chip" data-keyword="요양원">요양원 찾기</button>
-            <button class="cat-chip" data-keyword="복지관">복지관 찾기</button>
-            <button class="cat-chip" data-keyword="치매지원센터">치매지원센터 찾기</button>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <div class="map-section">
-            <div id="map"></div>
-            <button class="home-btn" onclick="panToResident()">🏠 우리 집 위치로</button>
-        </div>
-
-        <div class="list-section">
-            <h4>주변 시설 리스트</h4>
-            <div class="facility-scroll" id="facilityList">
-                <div id="noSelectionMessage" style="text-align: center; padding: 40px; color: var(&#45;&#45;gray-500);">
-                    카테고리를 선택해 주세요.
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script th:inline="javascript">
-    // 서버 데이터 수신
-    const resident = [[${resident}]];
-    const residentAddr = resident ? resident.address : "서울 강남구 테헤란로 152";
-    const residentName = resident ? resident.name : "거주자";
-
-    let map, ps;
-    let markers = []; // 시설 마커들
-    let residentMarker, residentOverlay; // 거주자 전용 (삭제되지 않음)
-    let residentCoords; // 거주자 좌표 저장
-    let selectedKeywords = [];
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const mapContainer = document.getElementById('map');
-        map = new kakao.maps.Map(mapContainer, { center: new kakao.maps.LatLng(37.5668, 126.9786), level: 4 });
-        ps = new kakao.maps.services.Places();
-
-        const geocoder = new kakao.maps.services.Geocoder();
-        geocoder.addressSearch(residentAddr, function(result, status) {
-            if (status === kakao.maps.services.Status.OK) {
-                residentCoords = new kakao.maps.LatLng(result[0].y, result[0].x);
-
-                // 거주자 마커 생성
-                const imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png';
-                residentMarker = new kakao.maps.Marker({
-                    map: map,
-                    position: residentCoords,
-                    image: new kakao.maps.MarkerImage(imageSrc, new kakao.maps.Size(24, 35))
-                });
-
-                // 거주자 오버레이 생성
-                residentOverlay = new kakao.maps.CustomOverlay({
-                    position: residentCoords,
-                    content: `<div class="resident-label">🏠 ${residentName}님의 집</div>`,
-                    yAnchor: 2.3
-                });
-                residentOverlay.setMap(map);
-
-                map.setCenter(residentCoords);
-                console.log("거주자 위치 설정 완료:", residentAddr);
-            } else {
-                console.error("주소 변환 실패. DB의 주소를 확인하세요:", residentAddr);
-            }
-        });
-
-        // 카테고리 로직은 동일...
-        document.querySelectorAll('.cat-chip').forEach(chip => {
-            chip.addEventListener('click', function() {
-                this.classList.toggle('active');
-                const keyword = this.dataset.keyword;
-                if (this.classList.contains('active')) selectedKeywords.push(keyword);
-                else selectedKeywords = selectedKeywords.filter(k => k !== keyword);
-                updateSearch();
-            });
-        });
-    });
-
-    function panToResident() {
-        if (residentCoords) map.panTo(residentCoords);
-    }
-
-    function updateSearch() {
-        removeMarkers();
-        const listEl = document.getElementById('facilityList');
-        if (selectedKeywords.length === 0) {
-            listEl.innerHTML = '<div style="text-align: center; padding: 40px; color: var(&#45;&#45;gray-500);">카테고리를 선택해 주세요.</div>';
-            return;
-        }
-        listEl.innerHTML = '<div style="text-align: center; padding: 40px; color: var(&#45;&#45;gray-500);">검색 중...</div>';
-        selectedKeywords.forEach(keyword => {
-            ps.keywordSearch(keyword, (data, status) => {
-                if (status === kakao.maps.services.Status.OK) displayPlaces(data);
-            }, { location: residentCoords || map.getCenter(), radius: 2000 });
-        });
-    }
-
-    // displayPlaces 및 removeMarkers 로직 (기존 markers 배열만 삭제하도록 유지)
-    function displayPlaces(places) {
-        const listEl = document.getElementById('facilityList');
-        if (listEl.querySelector('div[style*="text-align: center"]')) listEl.innerHTML = '';
-
-        places.forEach(place => {
-            const pos = new kakao.maps.LatLng(place.y, place.x);
-            const marker = new kakao.maps.Marker({ position: pos, map: map });
-            markers.push(marker);
-
-            const item = document.createElement('div');
-            item.className = 'facility-item';
-            item.innerHTML = `<div class="f-name">${place.place_name}</div><div class="f-dist">집에서 ${place.distance}m</div>`;
-            item.onclick = () => { map.panTo(pos); };
-            listEl.appendChild(item);
-        });
-    }
-
-    function removeMarkers() {
-        markers.forEach(m => m.setMap(null));
-        markers = [];
-    }
-</script>
-</body>
-</html>-->
-
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
@@ -506,6 +200,8 @@
     </div>
 </div>
 
+
+<script th:src="@{/js/dropdown.js}"></script>
 <script th:inline="javascript">
     const residentAddr = [[${resident?.address}]] || "서울 강남구 테헤란로 152";
     const residentName = [[${resident?.name}]] || "거주자";
@@ -525,14 +221,12 @@
             if (status === kakao.maps.services.Status.OK) {
                 const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
 
-                // 1. 거주자 마커 이미지 변경 (제공된 style.css와 조화되는 이미지 사용)
                 const imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png';
                 const imageSize = new kakao.maps.Size(24, 35);
                 const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
 
                 new kakao.maps.Marker({ map: map, position: coords, image: markerImage });
 
-                // 거주자 라벨 - 빨간색에서 남색으로 변경된 스타일 적용
                 new kakao.maps.CustomOverlay({
                     position: coords,
                     content: `<div class="resident-label">🏠 ${residentName}님의 집</div>`,
@@ -540,7 +234,10 @@
                 }).setMap(map);
 
                 map.setCenter(coords);
-                // 초기 검색은 수행하지 않습니다.
+            } else {
+                // 이 부분을 추가해 주세요!
+                console.error("카카오맵 API 주소 검색 실패. 전달된 주소:", residentAddr);
+                alert("거주자의 주소(" + residentAddr + ")를 찾을 수 없습니다. 상세 주소(동/호수)가 있다면 제거해 주세요.");
             }
         });
 
@@ -573,16 +270,14 @@
         const listEl = document.getElementById('facilityList');
         const messageEl = document.getElementById('noSelectionMessage');
 
-        listEl.innerHTML = ''; // 리스트 초기화
+        // 변경된 부분: innerHTML을 비우는 대신, 실제 추가된 검색 결과 카드들만 삭제
+        document.querySelectorAll('.facility-item').forEach(item => item.remove());
 
         if (selectedKeywords.length === 0) {
-            // 선택된 카테고리가 없는 경우
             messageEl.style.display = 'block';
-            listEl.appendChild(messageEl);
             return;
         }
 
-        // 선택된 카테고리가 있는 경우 초기 메시지 숨김
         messageEl.style.display = 'none';
 
         currentSearchCount = 0;
