@@ -100,6 +100,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                       "password": "new-pass-1234!",
                       "name": "신규 사용자",
                       "phone": "010-9999-9999",
+                      "birthYear": 1972,
                       "purpose": "테스트 목적"
                     }
                     """))
@@ -112,6 +113,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
         assertThat(saved.getRole()).isEqualTo(Role.FAMILY);
         assertThat(saved.getName()).isEqualTo("신규 사용자");
         assertThat(saved.getPhone()).isEqualTo("010-9999-9999");
+        assertThat(saved.getBirthYear()).isEqualTo(1972);
         assertThat(saved.getPurpose()).isEqualTo("테스트 목적");
         assertThat(passwordEncoder.matches("new-pass-1234!", saved.getPassword())).isTrue();
         assertThat(saved.getPassword()).isNotEqualTo("new-pass-1234!");
@@ -128,6 +130,7 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                       "password": "another-pass-1234!",
                       "name": "중복 사용자",
                       "phone": "010-1111-1111",
+                      "birthYear": 1972,
                       "purpose": "중복 테스트"
                     }
                     """))
