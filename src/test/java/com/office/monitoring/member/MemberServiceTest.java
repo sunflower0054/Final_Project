@@ -19,7 +19,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-/** MemberServiceTest 테스트를 정의한다. */
 class MemberServiceTest {
 
     @Mock
@@ -38,7 +37,6 @@ class MemberServiceTest {
     private MemberService memberService;
 
     @Test
-/** checkUsernameAvailable_앞뒤공백을_trim한_뒤_중복검사한다 시나리오를 검증한다. */
     void checkUsernameAvailable_앞뒤공백을_trim한_뒤_중복검사한다() {
         when(memberRepository.findByUsername("user")).thenReturn(Optional.of(Member.builder()
                 .username("user")
@@ -51,7 +49,6 @@ class MemberServiceTest {
     }
 
     @Test
-/** updateMyInfo_성공시_trim된_정보로_응답한다 시나리오를 검증한다. */
     void updateMyInfo_성공시_trim된_정보로_응답한다() {
         Member member = Member.builder()
                 .username("user")
@@ -82,7 +79,6 @@ class MemberServiceTest {
     }
 
     @Test
-/** withdraw_탈퇴회원백업후_원본회원은_삭제한다 시나리오를 검증한다. */
     void withdraw_탈퇴회원백업후_원본회원은_삭제한다() {
         Member member = Member.builder()
                 .id(1L)

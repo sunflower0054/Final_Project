@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-/** RegisterRequest 타입을 정의한다. */
 public record RegisterRequest(
         @NotBlank(message = "아이디는 필수입니다.")
         String username,

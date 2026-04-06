@@ -13,10 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** AuthIntegrationTest 테스트를 정의한다. */
 class AuthIntegrationTest extends MemberIntegrationTestSupport {
 
-/** 로그인_API_성공시_세션생성_및_JSON응답 시나리오를 검증한다. */
     @Test
     void 로그인_API_성공시_세션생성_및_JSON응답() throws Exception {
         mockMvc.perform(post("/api/v1/auth/login")
@@ -32,7 +30,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("로그인 성공"));
     }
 
-/** 로그인_API_실패시_401_JSON응답 시나리오를 검증한다. */
     @Test
     void 로그인_API_실패시_401_JSON응답() throws Exception {
         mockMvc.perform(post("/api/v1/auth/login")
@@ -43,7 +40,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("아이디 또는 비밀번호가 올바르지 않습니다."));
     }
 
-/** 로그아웃_API_호출시_성공_JSON응답 시나리오를 검증한다. */
     @Test
     void 로그아웃_API_호출시_성공_JSON응답() throws Exception {
         MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
@@ -65,7 +61,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
         assertThat(session.isInvalid()).isTrue();
     }
 
-/** 인증없어도_auth_endpoint_접근가능 시나리오를 검증한다. */
     @Test
     void 인증없어도_auth_endpoint_접근가능() throws Exception {
         mockMvc.perform(post("/api/v1/auth/login")
@@ -74,7 +69,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(status().isUnauthorized());
     }
 
-/** checkUsername_중복아닌경우_available_true 시나리오를 검증한다. */
     @Test
     void checkUsername_중복아닌경우_available_true() throws Exception {
         mockMvc.perform(get("/api/v1/auth/check-username")
@@ -85,7 +79,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("사용 가능한 아이디입니다."));
     }
 
-/** checkUsername_공백만_보내면_400 시나리오를 검증한다. */
     @Test
     void checkUsername_공백만_보내면_400() throws Exception {
         mockMvc.perform(get("/api/v1/auth/check-username")
@@ -95,7 +88,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("아이디는 필수입니다."));
     }
 
-/** 회원가입시_username_앞뒤공백을_제거한_후_중복검사한다 시나리오를 검증한다. */
     @Test
     void 회원가입시_username_앞뒤공백을_제거한_후_중복검사한다() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
@@ -116,7 +108,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("이미 사용 중인 아이디입니다."));
     }
 
-/** 회원가입_성공시_username_name_phone_purpose는_trim되어_저장된다 시나리오를 검증한다. */
     @Test
     void 회원가입_성공시_username_name_phone_purpose는_trim되어_저장된다() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
@@ -142,7 +133,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
         assertThat(saved.getPurpose()).isEqualTo("테스트 목적");
     }
 
-/** checkUsername_중복인경우_available_false 시나리오를 검증한다. */
     @Test
     void checkUsername_중복인경우_available_false() throws Exception {
         mockMvc.perform(get("/api/v1/auth/check-username")
@@ -153,7 +143,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("이미 사용 중인 아이디입니다."));
     }
 
-/** 회원가입_성공시_회원저장과_BCrypt인코딩_검증 시나리오를 검증한다. */
     @Test
     void 회원가입_성공시_회원저장과_BCrypt인코딩_검증() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
@@ -184,7 +173,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
         assertThat(saved.getPassword()).isNotEqualTo("new-pass-1234!");
     }
 
-/** 회원가입시_username_중복이면_실패 시나리오를 검증한다. */
     @Test
     void 회원가입시_username_중복이면_실패() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
@@ -205,7 +193,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("이미 사용 중인 아이디입니다."));
     }
 
-/** 회원가입시_CSRF_없으면_403 시나리오를 검증한다. */
     @Test
     void 회원가입시_CSRF_없으면_403() throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
@@ -222,7 +209,6 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(status().isForbidden());
     }
 
-/** 로그인_API_성공시_HTTP세션_생성확인 시나리오를 검증한다. */
     @Test
     void 로그인_API_성공시_HTTP세션_생성확인() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")

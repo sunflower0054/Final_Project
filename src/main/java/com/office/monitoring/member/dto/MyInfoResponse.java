@@ -2,7 +2,6 @@ package com.office.monitoring.member.dto;
 
 import com.office.monitoring.member.Member;
 
-/** MyInfoResponse 타입을 정의한다. */
 public record MyInfoResponse(
         boolean success,
         String username,
@@ -12,7 +11,6 @@ public record MyInfoResponse(
         String role
 ) {
 
-    /** from 동작을 수행한다. */
     public static MyInfoResponse from(Member member) {
         return new MyInfoResponse(
                 true,

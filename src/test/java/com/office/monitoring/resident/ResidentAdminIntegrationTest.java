@@ -12,10 +12,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** ResidentAdminIntegrationTest 테스트를 정의한다. */
 class ResidentAdminIntegrationTest extends ResidentIntegrationTestSupport {
 
-/** ADMIN은_임의의_거주자정보를_수정할_수_있다 시나리오를 검증한다. */
     @Test
     void ADMIN은_임의의_거주자정보를_수정할_수_있다() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
@@ -57,7 +55,6 @@ class ResidentAdminIntegrationTest extends ResidentIntegrationTestSupport {
         assertThat(updated.getLongitude()).isEqualTo(128.5678);
     }
 
-/** ADMIN은_연결관계와_무관하게_이력없는_거주자를_삭제할_수_있다 시나리오를 검증한다. */
     @Test
     void ADMIN은_연결관계와_무관하게_이력없는_거주자를_삭제할_수_있다() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()

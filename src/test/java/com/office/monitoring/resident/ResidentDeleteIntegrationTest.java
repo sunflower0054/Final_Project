@@ -15,10 +15,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** ResidentDeleteIntegrationTest 테스트를 정의한다. */
 class ResidentDeleteIntegrationTest extends ResidentIntegrationTestSupport {
 
-/** 이력이_없는_거주자는_삭제되고_회원연결과_ai설정이_정리된다 시나리오를 검증한다. */
     @Test
     void 이력이_없는_거주자는_삭제되고_회원연결과_ai설정이_정리된다() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
@@ -59,7 +57,6 @@ class ResidentDeleteIntegrationTest extends ResidentIntegrationTestSupport {
         assertThat(memberRepository.findByUsername("new-user").orElseThrow().getResidentId()).isNull();
     }
 
-/** 이벤트_이력이_있으면_409로_삭제가_차단된다 시나리오를 검증한다. */
     @Test
     void 이벤트_이력이_있으면_409로_삭제가_차단된다() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
@@ -95,7 +92,6 @@ class ResidentDeleteIntegrationTest extends ResidentIntegrationTestSupport {
         assertThat(memberRepository.findByUsername("user").orElseThrow().getResidentId()).isEqualTo(resident.getId());
     }
 
-/** daily_activity_이력이_있으면_409로_삭제가_차단된다 시나리오를 검증한다. */
     @Test
     void daily_activity_이력이_있으면_409로_삭제가_차단된다() throws Exception {
         createDailyActivityTableIfNeeded();

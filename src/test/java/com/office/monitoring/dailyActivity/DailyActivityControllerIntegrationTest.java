@@ -20,7 +20,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-/** DailyActivityControllerIntegrationTest 테스트를 정의한다. */
 class DailyActivityControllerIntegrationTest {
 
     @Autowired
@@ -30,7 +29,6 @@ class DailyActivityControllerIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-/** setUp 시나리오를 검증한다. */
     void setUp() {
         jdbcTemplate.execute("""
                 create table if not exists daily_activity (
@@ -44,7 +42,6 @@ class DailyActivityControllerIntegrationTest {
         jdbcTemplate.execute("delete from daily_activity");
     }
 
-/** 정상요청이면_success를_반환하고_DB에_저장된다 시나리오를 검증한다. */
     @Test
     void 정상요청이면_success를_반환하고_DB에_저장된다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
@@ -65,7 +62,6 @@ class DailyActivityControllerIntegrationTest {
         assertThat(motionScore).isEqualTo(1234);
     }
 
-/** 같은_거주자와_날짜로_두번호출하면_한건만_유지되고_motionScore가_업데이트된다 시나리오를 검증한다. */
     @Test
     void 같은_거주자와_날짜로_두번호출하면_한건만_유지되고_motionScore가_업데이트된다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
@@ -94,7 +90,6 @@ class DailyActivityControllerIntegrationTest {
         assertThat(motionScore).isEqualTo(999);
     }
 
-/** residentId가_숫자가_아니면_500과_저장실패를_반환하고_DB저장이_없다 시나리오를 검증한다. */
     @Test
     void residentId가_숫자가_아니면_500과_저장실패를_반환하고_DB저장이_없다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
@@ -108,7 +103,6 @@ class DailyActivityControllerIntegrationTest {
         assertThat(count).isEqualTo(0);
     }
 
-/** date형식이_잘못되면_500을_반환하고_DB저장이_없다 시나리오를 검증한다. */
     @Test
     void date형식이_잘못되면_500을_반환하고_DB저장이_없다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
@@ -122,7 +116,6 @@ class DailyActivityControllerIntegrationTest {
         assertThat(count).isEqualTo(0);
     }
 
-/** motionScore가_숫자가_아니면_500을_반환하고_DB저장이_없다 시나리오를 검증한다. */
     @Test
     void motionScore가_숫자가_아니면_500을_반환하고_DB저장이_없다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
@@ -136,7 +129,6 @@ class DailyActivityControllerIntegrationTest {
         assertThat(count).isEqualTo(0);
     }
 
-/** 인증없이도_호출할수있다 시나리오를 검증한다. */
     @Test
     void 인증없이도_호출할수있다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
@@ -147,7 +139,6 @@ class DailyActivityControllerIntegrationTest {
                 .andExpect(content().string("success"));
     }
 
-/** csrf없이도_호출할수있다 시나리오를 검증한다. */
     @Test
     void csrf없이도_호출할수있다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")

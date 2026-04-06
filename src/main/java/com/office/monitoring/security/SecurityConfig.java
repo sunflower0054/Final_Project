@@ -26,13 +26,11 @@ import java.nio.charset.StandardCharsets;
 
 @Configuration
 @RequiredArgsConstructor
-/** SecurityConfig의 역할을 담당한다. */
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final MemberRepository memberRepository;
 
-    /** securityFilterChain 동작을 수행한다. */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -168,7 +166,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /** escapeJson 동작을 수행한다. */
     private String escapeJson(String value) {
         if (value == null) {
             return "";
@@ -177,7 +174,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    /** passwordEncoder 동작을 수행한다. */
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }

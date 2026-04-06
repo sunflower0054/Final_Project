@@ -11,7 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-/** MemberIntegrationTestSupport 테스트를 정의한다. */
 abstract class MemberIntegrationTestSupport {
 
     @Autowired
@@ -27,7 +26,6 @@ abstract class MemberIntegrationTestSupport {
     protected PasswordEncoder passwordEncoder;
 
     @BeforeEach
-/** setUp 시나리오를 검증한다. */
     void setUp() {
         memberRepository.deleteAll();
         withdrawnUserRepository.deleteAll();

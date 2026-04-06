@@ -12,13 +12,11 @@ import java.sql.SQLException;
 
 @Repository
 @RequiredArgsConstructor
-/** ResidentHistoryRepository의 역할을 담당한다. */
 public class ResidentHistoryRepository { //거주자 삭제 전에 관련 이력 데이터가 있는지 검사
 
     private final JdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
 
-    /** existsDailyActivityByResidentId 동작을 수행한다. */
     public boolean existsDailyActivityByResidentId(Long residentId) {
         if (!tableExists("daily_activity")) {
             return false;
@@ -33,7 +31,6 @@ public class ResidentHistoryRepository { //거주자 삭제 전에 관련 이력
         return count != null && count > 0;
     }
 
-    /** tableExists 동작을 수행한다. */
     private boolean tableExists(String tableName) {
         try (Connection connection = dataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
