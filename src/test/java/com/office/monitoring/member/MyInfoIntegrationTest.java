@@ -12,9 +12,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** 회원 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class MyInfoIntegrationTest extends MemberIntegrationTestSupport {
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 비로그인_상태_GET_myinfo_API_접근시_인증진입점_리다이렉트() throws Exception {
         mockMvc.perform(get("/api/v1/my-info"))
                 .andExpect(status().is3xxRedirection())
@@ -22,6 +24,7 @@ class MyInfoIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 로그인_상태_GET_myinfo_API_성공_응답필드_검증() throws Exception {
         mockMvc.perform(get("/api/v1/my-info").with(user("user").roles("FAMILY")))
                 .andExpect(status().isOk())
@@ -34,6 +37,7 @@ class MyInfoIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 로그인_상태_PUT_myinfo_API_성공시_DB반영과_응답필드_검증() throws Exception {
         mockMvc.perform(put("/api/v1/my-info")
                         .with(user("user").roles("FAMILY"))
@@ -61,6 +65,7 @@ class MyInfoIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 로그인_상태_PUT_myinfo_API_validation_실패시_400과_기존예외응답형식_검증() throws Exception {
         mockMvc.perform(put("/api/v1/my-info")
                         .with(user("user").roles("FAMILY"))

@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/** 거주자 데이터 조회·등록·수정·삭제 흐름을 담당하는 구성 요소. */
 public class Resident {
 
     @Id
@@ -46,6 +47,7 @@ public class Resident {
     private LocalDateTime createdAt;
 
     @PrePersist
+    /** 요청된 거주자 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     protected void onCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
@@ -68,6 +70,7 @@ public class Resident {
         this.longitude = longitude;
     }
 
+    /** 요청된 거주자 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     private String trimToNull(String value) {
         if (value == null) {
             return null;

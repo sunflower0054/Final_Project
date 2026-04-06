@@ -26,6 +26,7 @@ abstract class MemberIntegrationTestSupport {
     protected PasswordEncoder passwordEncoder;
 
     @BeforeEach
+    /** 요청된 회원 작업의 입력 조건을 반영해 결과를 만든다. */
     void setUp() {
         memberRepository.deleteAll();
         withdrawnUserRepository.deleteAll();

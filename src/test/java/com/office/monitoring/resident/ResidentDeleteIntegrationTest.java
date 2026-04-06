@@ -15,9 +15,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** 거주자 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class ResidentDeleteIntegrationTest extends ResidentIntegrationTestSupport {
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 이력이_없는_거주자는_삭제되고_회원연결과_ai설정이_정리된다() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("삭제 대상")
@@ -58,6 +60,7 @@ class ResidentDeleteIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 이벤트_이력이_있으면_409로_삭제가_차단된다() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("이력 보존 대상")
@@ -93,6 +96,7 @@ class ResidentDeleteIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void daily_activity_이력이_있으면_409로_삭제가_차단된다() throws Exception {
         createDailyActivityTableIfNeeded();
 
