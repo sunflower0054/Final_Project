@@ -39,7 +39,6 @@ class ResidentRegisterIntegrationTest extends ResidentIntegrationTestSupport {
 
         Member member = memberRepository.findByUsername("new-user").orElseThrow();
         Resident resident = residentRepository.findById(member.getResidentId()).orElseThrow();
-        AiSettings aiSettings = aiSettingsRepository.findByResidentId(resident.getId());
 
         assertThat(member.getResidentId()).isNotNull();
         assertThat(resident.getName()).isEqualTo("김영희");
@@ -47,7 +46,7 @@ class ResidentRegisterIntegrationTest extends ResidentIntegrationTestSupport {
         assertThat(resident.getAddress()).isEqualTo("서울시 강남구 테스트로 101");
         assertThat(resident.getPhone()).isNull();
         assertThat(resident.getDisease()).isEqualTo("고혈압");
-        assertThat(aiSettings).isNotNull();
+        assertThat(aiSettingsRepository.findByResidentId(resident.getId())).isPresent();
     }
 
     @Test
