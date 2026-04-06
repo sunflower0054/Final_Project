@@ -16,9 +16,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** 회원 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class WithdrawIntegrationTest extends MemberIntegrationTestSupport {
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 비로그인_상태_회원탈퇴_API_접근시_차단() throws Exception {
         mockMvc.perform(delete("/api/v1/auth/withdraw")
                         .with(csrf()))
@@ -27,6 +29,7 @@ class WithdrawIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 로그인_상태_회원탈퇴_성공() throws Exception {
         mockMvc.perform(delete("/api/v1/auth/withdraw")
                         .with(user("user").roles("FAMILY"))
@@ -37,6 +40,7 @@ class WithdrawIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 회원탈퇴_성공시_users_테이블에서_삭제됨() throws Exception {
         mockMvc.perform(delete("/api/v1/auth/withdraw")
                         .with(user("user").roles("FAMILY"))
@@ -47,6 +51,7 @@ class WithdrawIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 회원탈퇴_성공시_withdrawn_users_테이블에_복사됨() throws Exception {
         Member beforeWithdraw = memberRepository.findByUsername("user").orElseThrow();
 
@@ -73,6 +78,7 @@ class WithdrawIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 회원탈퇴_성공시_세션_무효화() throws Exception {
         MvcResult loginResult = mockMvc.perform(post("/api/v1/auth/login")
                         .param("username", "user")

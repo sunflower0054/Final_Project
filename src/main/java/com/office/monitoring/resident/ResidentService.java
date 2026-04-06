@@ -21,6 +21,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+/** 거주자 데이터 조회·등록·수정·삭제 흐름을 담당하는 구성 요소. */
 public class ResidentService {
 
     private final ResidentRepository residentRepository;
@@ -31,6 +32,7 @@ public class ResidentService {
     private final CurrentUserService currentUserService;
 
     @Transactional
+    /** 요청 데이터를 거주자 기준으로 저장하고 저장 결과를 반환한다. */
     public Long createResident(ResidentCreateRequest request) {
         Member currentMember = currentUserService.getCurrentMember();
 
@@ -59,6 +61,7 @@ public class ResidentService {
     }
 
     @Transactional
+    /** 수정 요청값을 기존 거주자 정보에 반영하고 최신 결과를 반환한다. */
     public void updateResident(Long residentId, ResidentUpdateRequest request) {
         Resident resident = getAuthorizedResident(residentId);
         resident.update(
@@ -73,6 +76,7 @@ public class ResidentService {
     }
 
     @Transactional
+    /** 대상 거주자 정보를 삭제 또는 탈퇴 처리하고 완료 결과를 반환한다. */
     public void deleteResident(Long residentId) {
         Resident resident = getAuthorizedResident(residentId);
 
@@ -85,11 +89,13 @@ public class ResidentService {
         residentRepository.delete(resident);
     }
 
+    /** 거주자 관련 데이터를 조회해 호출자에게 필요한 형태로 반환한다. */
     public ResidentResponse getResident(Long residentId) {
         Resident resident = getAuthorizedResident(residentId);
         return ResidentResponse.from(resident);
     }
 
+    /** 거주자 관련 데이터를 조회해 호출자에게 필요한 형태로 반환한다. */
     public List<ResidentResponse> getResidents() {
         Member currentMember = currentUserService.getCurrentMember();
 
@@ -109,6 +115,7 @@ public class ResidentService {
                 .orElseGet(List::of);
     }
 
+    /** 거주자 관련 데이터를 조회해 호출자에게 필요한 형태로 반환한다. */
     private Resident getAuthorizedResident(Long residentId) {
         Member currentMember = currentUserService.getCurrentMember();
 
@@ -126,6 +133,7 @@ public class ResidentService {
         return resident;
     }
 
+    /** 요청된 거주자 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     private String trimToNull(String value) {
         if (value == null) {
             return null;
@@ -135,6 +143,7 @@ public class ResidentService {
         return trimmed.isEmpty() ? null : trimmed;
     }
 
+    /** 요청 데이터를 거주자 기준으로 저장하고 저장 결과를 반환한다. */
     private void createDefaultAiSettingsIfAbsent(Long residentId) {
         // orphan 데이터 등으로 resident_id 기준 설정이 이미 있으면 중복 INSERT를 방지한다.
         if (aiSettingsRepository.existsByResidentId(residentId)) {
@@ -149,6 +158,7 @@ public class ResidentService {
                 .build());
     }
 
+    /** 요청된 거주자 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     private boolean hasHistoryData(Long residentId) {
         return eventRepository.existsByResidentId(residentId)
                 || residentHistoryRepository.existsDailyActivityByResidentId(residentId);

@@ -15,6 +15,7 @@ import java.util.Map;
 
 @ControllerAdvice
 @RequiredArgsConstructor
+/** 여러 기능에서 공통으로 사용하는 모델 구성과 예외 응답을 제공하는 구성 요소. */
 public class CurrentUserModelAdvice {
 
     private static final String NOT_REGISTERED = "미등록";
@@ -22,6 +23,7 @@ public class CurrentUserModelAdvice {
     private final CurrentUserService currentUserService;
 
     @ModelAttribute("currentUser")
+    /** 요청된 공통 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     public Map<String, Object> currentUser() {
         System.out.println("=== currentUser() 실행됨 ===");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -60,6 +62,7 @@ public class CurrentUserModelAdvice {
         }
     }
 
+    /** 요청 데이터를 공통 기준으로 저장하고 저장 결과를 반환한다. */
     private Map<String, Object> createDefaultModel(boolean authenticated) {
         Map<String, Object> model = new LinkedHashMap<>();
         model.put("authenticated", authenticated);
@@ -81,6 +84,7 @@ public class CurrentUserModelAdvice {
         return model;
     }
 
+    /** 요청된 공통 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     private String display(String value) {
         if (value == null || value.isBlank()) {
             return NOT_REGISTERED;
@@ -88,6 +92,7 @@ public class CurrentUserModelAdvice {
         return value.trim();
     }
 
+    /** 요청/엔티티 데이터를 다른 표현 객체로 변환해 반환한다. */
     private String toRoleLabel(Role role) {
         if (role == null) {
             return NOT_REGISTERED;

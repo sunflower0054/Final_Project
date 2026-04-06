@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+/** 애플리케이션 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class DailyActivityControllerIntegrationTest {
 
     @Autowired
@@ -29,6 +30,7 @@ class DailyActivityControllerIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
+    /** 요청된 애플리케이션 작업의 입력 조건을 반영해 결과를 만든다. */
     void setUp() {
         jdbcTemplate.execute("""
                 create table if not exists daily_activity (
@@ -43,6 +45,7 @@ class DailyActivityControllerIntegrationTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 정상요청이면_success를_반환하고_DB에_저장된다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
                         .param("resident_id", "11")
@@ -63,6 +66,7 @@ class DailyActivityControllerIntegrationTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 같은_거주자와_날짜로_두번호출하면_한건만_유지되고_motionScore가_업데이트된다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
                         .param("resident_id", "22")
@@ -91,6 +95,7 @@ class DailyActivityControllerIntegrationTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void residentId가_숫자가_아니면_500과_저장실패를_반환하고_DB저장이_없다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
                         .param("resident_id", "abc")
@@ -104,6 +109,7 @@ class DailyActivityControllerIntegrationTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void date형식이_잘못되면_500을_반환하고_DB저장이_없다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
                         .param("resident_id", "33")
@@ -117,6 +123,7 @@ class DailyActivityControllerIntegrationTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void motionScore가_숫자가_아니면_500을_반환하고_DB저장이_없다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
                         .param("resident_id", "44")
@@ -130,6 +137,7 @@ class DailyActivityControllerIntegrationTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 인증없이도_호출할수있다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
                         .param("resident_id", "55")
@@ -140,6 +148,7 @@ class DailyActivityControllerIntegrationTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void csrf없이도_호출할수있다() throws Exception {
         mockMvc.perform(post("/api/v1/daily-activity")
                         .param("resident_id", "66")

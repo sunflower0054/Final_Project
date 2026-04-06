@@ -10,14 +10,17 @@ public class TimeUtility {
     private static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private static final ZoneId DEFAULT_ZONE = ZoneId.of("Asia/Seoul");
 
+    /** 요청된 공통 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     public static String formatTimestamp(Timestamp ts) {
         return formatTimestamp(ts, DEFAULT_PATTERN, DEFAULT_ZONE);
     }
 
+    /** 요청된 공통 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     public static String formatTimestamp(Timestamp ts, String pattern) {
         return formatTimestamp(ts, pattern, DEFAULT_ZONE);
     }
 
+    /** 요청된 공통 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     public static String formatTimestamp(Timestamp ts, String pattern, ZoneId zoneId) {
         // null 보정
         if (ts == null) return "null";
