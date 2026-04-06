@@ -80,6 +80,60 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
     }
 
     @Test
+    void checkUsername_공백만_보내면_400() throws Exception {
+        mockMvc.perform(get("/api/v1/auth/check-username")
+                        .param("username", "   "))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("아이디는 필수입니다."));
+    }
+
+    @Test
+    void 회원가입시_username_앞뒤공백을_제거한_후_중복검사한다() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("""
+                    {
+                      "username": "  user  ",
+                      "password": "another-pass-1234!",
+                      "name": "중복 사용자",
+                      "phone": "010-1111-1111",
+                      "birthYear": 1972,
+                      "purpose": "중복 테스트"
+                    }
+                    """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("이미 사용 중인 아이디입니다."));
+    }
+
+    @Test
+    void 회원가입_성공시_username_name_phone_purpose는_trim되어_저장된다() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("""
+                    {
+                      "username": "  spaced-user  ",
+                      "password": "new-pass-1234!",
+                      "name": "  공백 사용자  ",
+                      "phone": "  010-9999-9999  ",
+                      "birthYear": 1972,
+                      "purpose": "  테스트 목적  "
+                    }
+                    """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+
+        Member saved = memberRepository.findByUsername("spaced-user").orElse(null);
+        assertThat(saved).isNotNull();
+        assertThat(saved.getName()).isEqualTo("공백 사용자");
+        assertThat(saved.getPhone()).isEqualTo("010-9999-9999");
+        assertThat(saved.getPurpose()).isEqualTo("테스트 목적");
+    }
+
+    @Test
     void checkUsername_중복인경우_available_false() throws Exception {
         mockMvc.perform(get("/api/v1/auth/check-username")
                         .param("username", "user"))
