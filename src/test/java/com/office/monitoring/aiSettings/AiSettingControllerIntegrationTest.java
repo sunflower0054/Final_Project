@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+/** AiSettingControllerIntegrationTest 테스트를 정의한다. */
 class AiSettingControllerIntegrationTest {
 
     @Autowired
@@ -34,10 +35,12 @@ class AiSettingControllerIntegrationTest {
 
 
     @BeforeEach
+/** setUp 시나리오를 검증한다. */
     void setUp() {
         aiSettingsRepository.deleteAll();
     }
 
+/** 인증된_FAMILY사용자가_GET호출하면_설정값을_정상반환한다 시나리오를 검증한다. */
     @Test
     void 인증된_FAMILY사용자가_GET호출하면_설정값을_정상반환한다() throws Exception {
         aiSettingsRepository.save(AiSettings.builder()
@@ -58,6 +61,7 @@ class AiSettingControllerIntegrationTest {
     }
 
     @Test
+/** residentId1설정이_없을때_GET호출하면_현재구현대로_예외가_전파된다 시나리오를 검증한다. */
     void residentId1설정이_없을때_GET호출하면_현재구현대로_예외가_전파된다() {
         assertThatThrownBy(() -> mockMvc.perform(get("/api/v1/settings")
                         .with(user("user").roles("FAMILY"))))
@@ -65,6 +69,7 @@ class AiSettingControllerIntegrationTest {
                 .hasRootCauseMessage("AI 설정이 존재하지 않습니다.");
     }
 
+/** 인증된_사용자가_PUT호출하면_설정값이_저장되고_updatedAt이_채워진다 시나리오를 검증한다. */
     @Test
     void 인증된_사용자가_PUT호출하면_설정값이_저장되고_updatedAt이_채워진다() throws Exception {
         mockMvc.perform(put("/api/v1/settings")
@@ -91,6 +96,7 @@ class AiSettingControllerIntegrationTest {
         assertThat(saved.getUpdatedAt()).isNotNull();
     }
 
+/** 기존설정이_있을때_PUT호출하면_새행추가가아닌_업데이트로_동작한다 시나리오를 검증한다. */
     @Test
     void 기존설정이_있을때_PUT호출하면_새행추가가아닌_업데이트로_동작한다() throws Exception {
         AiSettings existing = aiSettingsRepository.save(AiSettings.builder()
@@ -129,6 +135,7 @@ class AiSettingControllerIntegrationTest {
         assertThat(updated.getVelocityThreshold()).isEqualTo(0.35);
     }
 
+/** 인증된_사용자가_apply호출하면_FastAPI없어도_200을_반환한다 시나리오를 검증한다. */
     @Test
     void 인증된_사용자가_apply호출하면_FastAPI없어도_200을_반환한다() throws Exception {
         mockMvc.perform(post("/api/v1/settings/apply")
@@ -145,6 +152,7 @@ class AiSettingControllerIntegrationTest {
                 .andExpect(status().isOk());
     }
 
+/** 인증없이_GET요청하면_로그인페이지로_리다이렉트된다 시나리오를 검증한다. */
     @Test
     void 인증없이_GET요청하면_로그인페이지로_리다이렉트된다() throws Exception {
         mockMvc.perform(get("/api/v1/settings"))
@@ -152,6 +160,7 @@ class AiSettingControllerIntegrationTest {
                 .andExpect(redirectedUrl("/member/login"));
     }
 
+/** 인증없이_PUT요청하면_로그인페이지로_리다이렉트된다 시나리오를 검증한다. */
     @Test
     void 인증없이_PUT요청하면_로그인페이지로_리다이렉트된다() throws Exception {
         mockMvc.perform(put("/api/v1/settings")
@@ -168,6 +177,7 @@ class AiSettingControllerIntegrationTest {
                 .andExpect(redirectedUrl("/member/login"));
     }
 
+/** PUT요청에서_csrf없이_요청하면_403이다 시나리오를 검증한다. */
     @Test
     void PUT요청에서_csrf없이_요청하면_403이다() throws Exception {
         mockMvc.perform(put("/api/v1/settings")
@@ -183,6 +193,7 @@ class AiSettingControllerIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 
+/** apply_POST요청에서_csrf없이_요청하면_403이다 시나리오를 검증한다. */
     @Test
     void apply_POST요청에서_csrf없이_요청하면_403이다() throws Exception {
         mockMvc.perform(post("/api/v1/settings/apply")

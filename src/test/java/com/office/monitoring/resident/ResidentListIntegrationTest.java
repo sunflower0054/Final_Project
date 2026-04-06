@@ -10,8 +10,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** ResidentListIntegrationTest 테스트를 정의한다. */
 class ResidentListIntegrationTest extends ResidentIntegrationTestSupport {
 
+/** FAMILY_연결된_거주자가_있으면_본인_거주자만_목록으로_조회한다 시나리오를 검증한다. */
     @Test
     void FAMILY_연결된_거주자가_있으면_본인_거주자만_목록으로_조회한다() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
@@ -37,6 +39,7 @@ class ResidentListIntegrationTest extends ResidentIntegrationTestSupport {
                 .andExpect(jsonPath("$.residents[0].name").value("박순자"));
     }
 
+/** FAMILY_연결된_거주자가_없으면_빈_목록을_반환한다 시나리오를 검증한다. */
     @Test
     void FAMILY_연결된_거주자가_없으면_빈_목록을_반환한다() throws Exception {
         mockMvc.perform(get("/api/v1/residents")
@@ -46,6 +49,7 @@ class ResidentListIntegrationTest extends ResidentIntegrationTestSupport {
                 .andExpect(jsonPath("$.residents.length()").value(0));
     }
 
+/** FAMILY_회원에_연결ID만_남고_실제_거주자가_없어도_빈_목록을_반환한다 시나리오를 검증한다. */
     @Test
     void FAMILY_회원에_연결ID만_남고_실제_거주자가_없어도_빈_목록을_반환한다() throws Exception {
         mockMvc.perform(get("/api/v1/residents")
@@ -55,6 +59,7 @@ class ResidentListIntegrationTest extends ResidentIntegrationTestSupport {
                 .andExpect(jsonPath("$.residents.length()").value(0));
     }
 
+/** ADMIN은_전체_거주자_목록을_ID오름차순으로_조회한다 시나리오를 검증한다. */
     @Test
     void ADMIN은_전체_거주자_목록을_ID오름차순으로_조회한다() throws Exception {
         Resident first = residentRepository.save(Resident.builder()

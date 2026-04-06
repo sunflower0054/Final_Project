@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/** WithdrawnUser의 역할을 담당한다. */
 public class WithdrawnUser {
 
     @Id
@@ -52,12 +53,14 @@ public class WithdrawnUser {
     private LocalDateTime withdrawnAt;
 
     @PrePersist
+    /** onCreate 동작을 수행한다. */
     protected void onCreate() {
         if (withdrawnAt == null) {
             withdrawnAt = LocalDateTime.now();
         }
     }
 
+    /** from 동작을 수행한다. */
     public static WithdrawnUser from(Member member) {
         return WithdrawnUser.builder()
                 .originalUserId(member.getId())

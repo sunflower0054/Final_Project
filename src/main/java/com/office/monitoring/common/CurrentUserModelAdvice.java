@@ -15,6 +15,7 @@ import java.util.Map;
 
 @ControllerAdvice
 @RequiredArgsConstructor
+/** CurrentUserModelAdvice의 역할을 담당한다. */
 public class CurrentUserModelAdvice {
 
     private static final String NOT_REGISTERED = "미등록";
@@ -22,6 +23,7 @@ public class CurrentUserModelAdvice {
     private final CurrentUserService currentUserService;
 
     @ModelAttribute("currentUser")
+    /** currentUser 동작을 수행한다. */
     public Map<String, Object> currentUser() {
         System.out.println("=== currentUser() 실행됨 ===");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -60,6 +62,7 @@ public class CurrentUserModelAdvice {
         }
     }
 
+    /** createDefaultModel 동작을 수행한다. */
     private Map<String, Object> createDefaultModel(boolean authenticated) {
         Map<String, Object> model = new LinkedHashMap<>();
         model.put("authenticated", authenticated);
@@ -81,6 +84,7 @@ public class CurrentUserModelAdvice {
         return model;
     }
 
+    /** display 동작을 수행한다. */
     private String display(String value) {
         if (value == null || value.isBlank()) {
             return NOT_REGISTERED;
@@ -88,6 +92,7 @@ public class CurrentUserModelAdvice {
         return value.trim();
     }
 
+    /** toRoleLabel 동작을 수행한다. */
     private String toRoleLabel(Role role) {
         if (role == null) {
             return NOT_REGISTERED;

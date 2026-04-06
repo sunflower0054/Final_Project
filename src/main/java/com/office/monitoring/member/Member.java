@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/** Member의 역할을 담당한다. */
 public class Member {
 
     @Id
@@ -48,6 +49,7 @@ public class Member {
     private LocalDateTime createdAt;
 
     @PrePersist
+    /** onCreate 동작을 수행한다. */
     protected void onCreate() {
         if (role == null) {
             role = Role.FAMILY;
@@ -57,12 +59,14 @@ public class Member {
         }
     }
 
+    /** updateMyInfo 동작을 수행한다. */
     public void updateMyInfo(String name, String phone, String purpose) {
         this.name = name.trim();
         this.phone = phone.trim();
         this.purpose = purpose.trim();
     }
 
+    /** assignResident 동작을 수행한다. */
     public void assignResident(Long residentId) {
         this.residentId = residentId;
     }

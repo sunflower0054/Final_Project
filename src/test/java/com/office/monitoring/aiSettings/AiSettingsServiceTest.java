@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+/** AiSettingsServiceTest 테스트를 정의한다. */
 class AiSettingsServiceTest {
 
     @Mock
@@ -25,6 +26,7 @@ class AiSettingsServiceTest {
     private AiSettingsService aiSettingsService;
 
     @Test
+/** save_기존_설정이_있으면_값을_갱신하고_updatedAt을_응답에_반영한다 시나리오를 검증한다. */
     void save_기존_설정이_있으면_값을_갱신하고_updatedAt을_응답에_반영한다() {
         AiSettings existing = AiSettings.builder()
                 .id(1L)
@@ -52,6 +54,7 @@ class AiSettingsServiceTest {
     }
 
     @Test
+/** save_기존_설정이_없으면_새_설정을_생성한다 시나리오를 검증한다. */
     void save_기존_설정이_없으면_새_설정을_생성한다() {
         AiSettingsDto dto = new AiSettingsDto();
         dto.setFallSensitivity(0.4D);
@@ -74,6 +77,7 @@ class AiSettingsServiceTest {
     }
 
     @Test
+/** get_저장된_설정을_조회하면_DTO로_매핑한다 시나리오를 검증한다. */
     void get_저장된_설정을_조회하면_DTO로_매핑한다() {
         AiSettings settings = AiSettings.builder()
                 .residentId(3L)
@@ -94,6 +98,7 @@ class AiSettingsServiceTest {
     }
 
     @Test
+/** get_updatedAt이_null이면_대시를_반환한다 시나리오를 검증한다. */
     void get_updatedAt이_null이면_대시를_반환한다() {
         AiSettings settings = AiSettings.builder()
                 .residentId(4L)
@@ -111,6 +116,7 @@ class AiSettingsServiceTest {
     }
 
     @Test
+/** get_설정이_없으면_예외를_던진다 시나리오를 검증한다. */
     void get_설정이_없으면_예외를_던진다() {
         when(aiSettingsRepository.findByResidentId(99L)).thenReturn(Optional.empty());
 

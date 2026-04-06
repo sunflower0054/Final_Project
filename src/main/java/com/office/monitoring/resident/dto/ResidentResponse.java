@@ -5,6 +5,7 @@ import com.office.monitoring.resident.Resident;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/** ResidentResponse 타입을 정의한다. */
 public record ResidentResponse(
         Long id,
         String name,
@@ -16,6 +17,7 @@ public record ResidentResponse(
         Double longitude,
         LocalDateTime createdAt
 ) {
+    /** from 동작을 수행한다. */
     public static ResidentResponse from(Resident resident) {
         return new ResidentResponse(
                 resident.getId(),

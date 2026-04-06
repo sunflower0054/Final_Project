@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Profile({"local", "dev"})
 @RequiredArgsConstructor
+/** DefaultMemberInitializer의 역할을 담당한다. */
 public class DefaultMemberInitializer implements CommandLineRunner {
 
     private final MemberRepository memberRepository;
@@ -19,6 +20,7 @@ public class DefaultMemberInitializer implements CommandLineRunner {
 
     @Override
     @Transactional
+    /** run 동작을 수행한다. */
     public void run(String... args) {
         if (memberRepository.count() > 0) {
             return;

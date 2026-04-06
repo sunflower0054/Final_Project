@@ -10,8 +10,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** ResidentQueryIntegrationTest 테스트를 정의한다. */
 class ResidentQueryIntegrationTest extends ResidentIntegrationTestSupport {
 
+/** 본인에게_연결된_거주자조회_성공 시나리오를 검증한다. */
     @Test
     void 본인에게_연결된_거주자조회_성공() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
@@ -35,6 +37,7 @@ class ResidentQueryIntegrationTest extends ResidentIntegrationTestSupport {
                 .andExpect(jsonPath("$.resident.name").value("박순자"));
     }
 
+/** ADMIN은_임의의_거주자조회_성공 시나리오를 검증한다. */
     @Test
     void ADMIN은_임의의_거주자조회_성공() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
@@ -54,6 +57,7 @@ class ResidentQueryIntegrationTest extends ResidentIntegrationTestSupport {
                 .andExpect(jsonPath("$.resident.name").value("관리대상자"));
     }
 
+/** 연결되지않은_거주자조회시_403 시나리오를 검증한다. */
     @Test
     void 연결되지않은_거주자조회시_403() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
@@ -73,6 +77,7 @@ class ResidentQueryIntegrationTest extends ResidentIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("해당 거주자 정보에 접근할 수 없습니다."));
     }
 
+/** 존재하지않는_거주자조회시_400 시나리오를 검증한다. */
     @Test
     void 존재하지않는_거주자조회시_400() throws Exception {
         mockMvc.perform(get("/api/v1/residents/999999")
