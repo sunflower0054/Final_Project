@@ -12,8 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** MyInfoIntegrationTest 테스트를 정의한다. */
 class MyInfoIntegrationTest extends MemberIntegrationTestSupport {
 
+/** 비로그인_상태_GET_myinfo_API_접근시_인증진입점_리다이렉트 시나리오를 검증한다. */
     @Test
     void 비로그인_상태_GET_myinfo_API_접근시_인증진입점_리다이렉트() throws Exception {
         mockMvc.perform(get("/api/v1/my-info"))
@@ -21,6 +23,7 @@ class MyInfoIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(redirectedUrl("/member/login"));
     }
 
+/** 로그인_상태_GET_myinfo_API_성공_응답필드_검증 시나리오를 검증한다. */
     @Test
     void 로그인_상태_GET_myinfo_API_성공_응답필드_검증() throws Exception {
         mockMvc.perform(get("/api/v1/my-info").with(user("user").roles("FAMILY")))
@@ -33,6 +36,7 @@ class MyInfoIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(jsonPath("$.role").value("FAMILY"));
     }
 
+/** 로그인_상태_PUT_myinfo_API_성공시_DB반영과_응답필드_검증 시나리오를 검증한다. */
     @Test
     void 로그인_상태_PUT_myinfo_API_성공시_DB반영과_응답필드_검증() throws Exception {
         mockMvc.perform(put("/api/v1/my-info")
@@ -60,6 +64,7 @@ class MyInfoIntegrationTest extends MemberIntegrationTestSupport {
         assertThat(updated.getPurpose()).isEqualTo("가족 모니터링");
     }
 
+/** 로그인_상태_PUT_myinfo_API_validation_실패시_400과_기존예외응답형식_검증 시나리오를 검증한다. */
     @Test
     void 로그인_상태_PUT_myinfo_API_validation_실패시_400과_기존예외응답형식_검증() throws Exception {
         mockMvc.perform(put("/api/v1/my-info")

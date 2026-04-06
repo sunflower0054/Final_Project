@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 
 
 @ExtendWith(MockitoExtension.class)
+/** EventServiceTest 테스트를 정의한다. */
 class EventServiceTest {
 
     @Mock
@@ -45,6 +46,7 @@ class EventServiceTest {
     Path tempDir;
 
     @BeforeEach
+/** setUp 시나리오를 검증한다. */
     void setUp() {
         ReflectionTestUtils.setField(eventService, "uploadDir", tempDir.toString());
         ReflectionTestUtils.setField(eventService, "sep", "/");
@@ -57,6 +59,7 @@ class EventServiceTest {
         });
     }
 
+/** 정상요청과_이미지첨부시_이벤트와_이미지가_저장되고_파일이_생성된다 시나리오를 검증한다. */
     @Test
     void 정상요청과_이미지첨부시_이벤트와_이미지가_저장되고_파일이_생성된다() throws IOException {
         EventReceiveRequest request = 요청("1", "VIOLENT_MOTION_DETECTED", "2026-04-06T10:11:12", "0.85",
@@ -90,6 +93,7 @@ class EventServiceTest {
         assertThat(Files.exists(Path.of(savedImage.getImagePath()))).isTrue();
     }
 
+/** 이미지가_null이면_이벤트만_저장되고_이미지는_저장되지_않는다 시나리오를 검증한다. */
     @Test
     void 이미지가_null이면_이벤트만_저장되고_이미지는_저장되지_않는다() throws IOException {
         EventReceiveRequest request = 요청("2", "FALL_DETECTED", "2026-04-06T12:00:00", "0.9", null);
@@ -100,6 +104,7 @@ class EventServiceTest {
         verify(eventImageRepository, never()).save(any(EventImage.class));
     }
 
+/** 이미지가_empty면_이벤트만_저장되고_이미지는_저장되지_않는다 시나리오를 검증한다. */
     @Test
     void 이미지가_empty면_이벤트만_저장되고_이미지는_저장되지_않는다() throws IOException {
         EventReceiveRequest request = 요청("3", "FALL_DETECTED", "2026-04-06T12:00:00", "0.9", null);
@@ -111,6 +116,7 @@ class EventServiceTest {
         verify(eventImageRepository, never()).save(any(EventImage.class));
     }
 
+/** metadata가_없거나_키가_누락되어도_이벤트는_저장되고_파생필드는_null이다 시나리오를 검증한다. */
     @Test
     void metadata가_없거나_키가_누락되어도_이벤트는_저장되고_파생필드는_null이다() throws IOException {
         EventReceiveRequest request = 요청("4", "NO_MOTION_DETECTED", "2026-04-06T13:00:00", "0.7", null);
@@ -126,6 +132,7 @@ class EventServiceTest {
         assertThat(savedEvent.getLastMotionTimestamp()).isNull();
     }
 
+/** metadata형식이_이상하면_파싱실패필드는_null로_처리되고_이벤트저장은_계속된다 시나리오를 검증한다. */
     @Test
     void metadata형식이_이상하면_파싱실패필드는_null로_처리되고_이벤트저장은_계속된다() throws IOException {
         EventReceiveRequest request = 요청("5", "VIOLENT_MOTION_DETECTED", "2026-04-06T14:00:00", "0.6",
@@ -143,6 +150,7 @@ class EventServiceTest {
     }
 
     @Test
+/** residentId_confidence_timestamp가_잘못된_문자열이면_예외가_발생하고_저장하지_않는다 시나리오를 검증한다. */
     void residentId_confidence_timestamp가_잘못된_문자열이면_예외가_발생하고_저장하지_않는다() {
         EventReceiveRequest badResidentId = 요청("not-number", "FALL_DETECTED", "2026-04-06T15:00:00", "0.5", null);
         EventReceiveRequest badConfidence = 요청("1", "FALL_DETECTED", "2026-04-06T15:00:00", "not-double", null);

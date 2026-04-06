@@ -21,6 +21,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+/** ResidentService의 역할을 담당한다. */
 public class ResidentService {
 
     private final ResidentRepository residentRepository;
@@ -31,6 +32,7 @@ public class ResidentService {
     private final CurrentUserService currentUserService;
 
     @Transactional
+    /** createResident 동작을 수행한다. */
     public Long createResident(ResidentCreateRequest request) {
         Member currentMember = currentUserService.getCurrentMember();
 
@@ -59,6 +61,7 @@ public class ResidentService {
     }
 
     @Transactional
+    /** updateResident 동작을 수행한다. */
     public void updateResident(Long residentId, ResidentUpdateRequest request) {
         Resident resident = getAuthorizedResident(residentId);
         resident.update(
@@ -73,6 +76,7 @@ public class ResidentService {
     }
 
     @Transactional
+    /** deleteResident 동작을 수행한다. */
     public void deleteResident(Long residentId) {
         Resident resident = getAuthorizedResident(residentId);
 
@@ -85,11 +89,13 @@ public class ResidentService {
         residentRepository.delete(resident);
     }
 
+    /** getResident 동작을 수행한다. */
     public ResidentResponse getResident(Long residentId) {
         Resident resident = getAuthorizedResident(residentId);
         return ResidentResponse.from(resident);
     }
 
+    /** getResidents 동작을 수행한다. */
     public List<ResidentResponse> getResidents() {
         Member currentMember = currentUserService.getCurrentMember();
 
@@ -109,6 +115,7 @@ public class ResidentService {
                 .orElseGet(List::of);
     }
 
+    /** getAuthorizedResident 동작을 수행한다. */
     private Resident getAuthorizedResident(Long residentId) {
         Member currentMember = currentUserService.getCurrentMember();
 
@@ -126,6 +133,7 @@ public class ResidentService {
         return resident;
     }
 
+    /** trimToNull 동작을 수행한다. */
     private String trimToNull(String value) {
         if (value == null) {
             return null;
@@ -135,6 +143,7 @@ public class ResidentService {
         return trimmed.isEmpty() ? null : trimmed;
     }
 
+    /** createDefaultAiSettingsIfAbsent 동작을 수행한다. */
     private void createDefaultAiSettingsIfAbsent(Long residentId) {
         // orphan 데이터 등으로 resident_id 기준 설정이 이미 있으면 중복 INSERT를 방지한다.
         if (aiSettingsRepository.existsByResidentId(residentId)) {
@@ -149,6 +158,7 @@ public class ResidentService {
                 .build());
     }
 
+    /** hasHistoryData 동작을 수행한다. */
     private boolean hasHistoryData(Long residentId) {
         return eventRepository.existsByResidentId(residentId)
                 || residentHistoryRepository.existsDailyActivityByResidentId(residentId);

@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+/** ResidentServiceTest 테스트를 정의한다. */
 class ResidentServiceTest {
 
     @Mock
@@ -46,6 +47,7 @@ class ResidentServiceTest {
     @InjectMocks
     private ResidentService residentService;
 
+/** 신규등록시_기존_ai설정이_있으면_기본_ai설정_insert를_생략한다 시나리오를 검증한다. */
     @Test
     void 신규등록시_기존_ai설정이_있으면_기본_ai설정_insert를_생략한다() {
         Member currentMember = Member.builder()
@@ -87,6 +89,7 @@ class ResidentServiceTest {
         verify(aiSettingsRepository, never()).save(any());
     }
 
+/** 신규등록시_ai설정이_없으면_기존_기본값으로_생성한다 시나리오를 검증한다. */
     @Test
     void 신규등록시_ai설정이_없으면_기존_기본값으로_생성한다() {
         Member currentMember = Member.builder()

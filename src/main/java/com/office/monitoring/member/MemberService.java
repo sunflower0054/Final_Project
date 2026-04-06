@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+/** MemberService의 역할을 담당한다. */
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -21,6 +22,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final CurrentUserService currentUserService;
 
+    /** checkUsernameAvailable 동작을 수행한다. */
     public boolean checkUsernameAvailable(String username) {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("아이디는 필수입니다.");
@@ -31,6 +33,7 @@ public class MemberService {
     }
 
     @Transactional
+    /** register 동작을 수행한다. */
     public RegisterResponse register(RegisterRequest request) {
         String username = request.username().trim();
 
@@ -53,11 +56,13 @@ public class MemberService {
         return new RegisterResponse(true, "회원가입이 완료되었습니다.");
     }
 
+    /** getMyInfo 동작을 수행한다. */
     public MyInfoResponse getMyInfo() {
         return MyInfoResponse.from(currentUserService.getCurrentMember());
     }
 
     @Transactional
+    /** updateMyInfo 동작을 수행한다. */
     public MyInfoResponse updateMyInfo(UpdateMyInfoRequest request) {
         Member member = currentUserService.getCurrentMember();
         member.updateMyInfo(
@@ -69,6 +74,7 @@ public class MemberService {
     }
 
     @Transactional
+    /** withdraw 동작을 수행한다. */
     public WithdrawResponse withdraw() {
         Member member = currentUserService.getCurrentMember();
 

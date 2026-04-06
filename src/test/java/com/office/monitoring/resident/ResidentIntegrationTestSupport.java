@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+/** ResidentIntegrationTestSupport 테스트를 정의한다. */
 abstract class ResidentIntegrationTestSupport {
 
     @Autowired
@@ -45,6 +46,7 @@ abstract class ResidentIntegrationTestSupport {
     protected PasswordEncoder passwordEncoder;
 
     @BeforeEach
+/** setUp 시나리오를 검증한다. */
     void setUp() {
         eventRepository.deleteAll();
         aiSettingsRepository.deleteAll();
@@ -83,6 +85,7 @@ abstract class ResidentIntegrationTestSupport {
                 .build());
     }
 
+/** createDailyActivityTableIfNeeded 시나리오를 검증한다. */
     protected void createDailyActivityTableIfNeeded() {
         jdbcTemplate.execute("""
                 create table if not exists daily_activity (
@@ -94,6 +97,7 @@ abstract class ResidentIntegrationTestSupport {
                 """);
     }
 
+/** clearDailyActivityTableIfExists 시나리오를 검증한다. */
     private void clearDailyActivityTableIfExists() {
         Integer tableCount = jdbcTemplate.queryForObject(
                 "select count(*) from information_schema.tables where table_name = 'DAILY_ACTIVITY'",

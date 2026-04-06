@@ -14,10 +14,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+/** CustomUserDetailsService의 역할을 담당한다. */
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
+    /** loadUserByUsername 동작을 수행한다. */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findByUsername(username)
@@ -30,6 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             .build();
     }
 
+    /** toAuthorities 동작을 수행한다. */
     private Collection<? extends GrantedAuthority> toAuthorities(Role role) {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
