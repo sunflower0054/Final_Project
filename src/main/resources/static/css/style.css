@@ -727,3 +727,57 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 }
 
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.wrap { background: #f5f2e8; padding: 20px; border-radius: 12px; }
+.resident-name { font-size: 13px; color: #5a6e3a; font-weight: 500; margin-bottom: 2px; }
+.section-title { font-size: 20px; font-weight: 500; color: #2d3a1e; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.date-input { border: 1px solid #b8c9a0; border-radius: 8px; padding: 5px 10px; font-size: 15px; background: #fff; color: #2d3a1e; }
+.risk-card { background: #fff; border-radius: 12px; border: 1px solid #d4e0bc; padding: 16px; margin-bottom: 14px; }
+.risk-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.risk-label { font-size: 15px; color: #5a6e3a; font-weight: 500; }
+.risk-date-range { font-size: 13px; color: #8a9a70; }
+.risk-score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.risk-badge { font-size: 14px; font-weight: 500; padding: 4px 12px; border-radius: 20px; background: #fde8e8; color: #a32d2d; }
+.risk-score-num { font-size: 26px; font-weight: 500; color: #a32d2d; }
+.gauge-bg { height: 14px; border-radius: 7px; background: #e8e4d8; overflow: hidden; }
+.gauge-fill { height: 100%; border-radius: 7px; background: #a32d2d; width: 55%; transition: width 0.5s ease-in-out; }
+.gauge-ends { display: flex; justify-content: space-between; font-size: 13px; color: #8a9a70; margin-top: 4px; }
+.summary-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.chip { padding: 8px 18px; border-radius: 20px; font-size: 15px; font-weight: 500; border: none; }
+.chip-all { background: #3b6d11; color: #eaf3de; }
+.chip-fall { background: #fde8e8; color: #791f1f; }
+.chip-nomotion { background: #faeeda; color: #633806; }
+.chip-fight { background: #EEEDFE; color: #3C3489; }
+.sort-row { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.sort-select { padding: 7px 12px; border-radius: 8px; border: 1px solid #b8c9a0; font-size: 14px; background: #fff; color: #2d3a1e; }
+
+.all-btn-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.all-btn { border-radius: 10px; border: none; padding: 13px 0; font-size: 16px; font-weight: 500; cursor: pointer; text-align: center; }
+.all-btn-fall { background: #fde8e8; color: #791f1f; }
+.all-btn-nomotion { background: #faeeda; color: #633806; }
+.all-btn-fight { background: #EEEDFE; color: #3C3489; }
+
+.timeline { position: relative; padding-left: 28px; }
+.timeline-line { position: absolute; left: 9px; top: 0; bottom: 0; width: 2px; background: #d4e0bc; }
+.event-item { position: relative; margin-bottom: 14px; }
+.event-dot { position: absolute; left: -23px; top: 20px; width: 13px; height: 13px; border-radius: 50%; border: 2px solid #fff; }
+.dot-red { background: #a32d2d; }
+.dot-amber { background: #854F0B; }
+.dot-purple { background: #534AB7; }
+.event-card { background: #fff; border-radius: 12px; border: 1px solid #d4e0bc; padding: 14px; width: 100%; }
+.event-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+.tag { font-size: 13px; font-weight: 500; padding: 4px 12px; border-radius: 20px; }
+.tag-fall { background: #fde8e8; color: #791f1f; }
+.tag-nomotion { background: #faeeda; color: #633806; }
+.tag-fight { background: #EEEDFE; color: #3C3489; }
+.event-time { font-size: 14px; color: #8a9a70; }
+.event-body { display: flex; gap: 14px; align-items: flex-start; }
+.event-img { width: 76px; height: 76px; border-radius: 8px; background: #e8e4d8; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 1px solid #d4e0bc; overflow: hidden; }
+.img-label { font-size: 11px; color: #8a9a70; }
+.event-info { flex: 1; }
+.event-date-txt { font-size: 14px; color: #8a9a70; margin-bottom: 4px; }
+.event-title { font-size: 17px; font-weight: 500; color: #2d3a1e; }
+.event-status { font-size: 17px; font-weight: 500; margin-top: 6px; color: #2d3a1e; }
+
+.pill.active { border: 2px solid #3b6d11; font-weight: 700; opacity: 1; }
+.pill:not(.active) { opacity: 0.6; }
