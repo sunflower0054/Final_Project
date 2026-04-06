@@ -46,23 +46,20 @@
             </div>
 
             <div class="btn-group">
-                <!-- 119 수동 신고 버튼 -->
                 <button class="btn btn-red" th:if="${resident != null}" th:onclick="|goToManualReport(${resident.id})|">
                     🚨 119 수동 신고
                 </button>
 
-                <!-- 시설 찾기 버튼 -->
                 <button class="btn btn-info"
                         th:if="${currentUser != null and currentUser.residentId != null}"
-                        th:onclick="|location.href='/facility/search?residentId=' + ${currentUser.residentId}|"
-                        style="background-color: #3182ce; color: white;">
+                        th:onclick="|location.href='/facility/search?residentId=' + ${currentUser.residentId}|">
                     📍 주변 안심 시설 찾기
                 </button>
 
                 <button class="btn btn-info"
                         th:unless="${currentUser != null and currentUser.residentId != null}"
                         onclick="alert('등록된 거주자 정보가 없어 해당 기능을 사용할 수 없습니다. 먼저 어르신을 등록해 주세요.')"
-                        style="background-color: var(--gray-400); color: white; cursor: not-allowed;">
+                        style="background-color: var(--gray-400) !important; cursor: not-allowed;">
                     📍 주변 안심 시설 찾기
                 </button>
 
@@ -311,14 +308,14 @@
         const percent = Math.min(((risk.totalScore || 0) / 200) * 100, 100);
         document.getElementById('riskGaugeFill').style.width = percent + '%';
 
-        // 뱃지 색상 동적 변경
+        // [수정됨] 뱃지 색상 동적 변경 (테마 변수 var 사용)
         const badge = document.getElementById('riskLevelBadge');
         if (risk.riskLevel === '안전') {
-            badge.style.background = '#eaf3de'; badge.style.color = '#3b6d11';
+            badge.style.background = 'var(--success-bg)'; badge.style.color = 'var(--success)';
         } else if (risk.riskLevel === '주의') {
-            badge.style.background = '#faeeda'; badge.style.color = '#854F0B';
+            badge.style.background = 'var(--warning-bg)'; badge.style.color = 'var(--warning)';
         } else {
-            badge.style.background = '#fde8e8'; badge.style.color = '#a32d2d';
+            badge.style.background = 'var(--error-bg)'; badge.style.color = 'var(--error)';
         }
     }
 
