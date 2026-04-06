@@ -18,19 +18,19 @@ class PageAccessIntegrationTest extends MemberIntegrationTestSupport {
 
     @Test
     void FAMILY_로그인_setting_접근시_200() throws Exception {
-        mockMvc.perform(get("/setting/setting").with(user("user").roles("FAMILY")))
+        mockMvc.perform(get("/setting").with(user("user").roles("FAMILY")))
                 .andExpect(status().isOk());
     }
 
     @Test
     void ADMIN_권한_setting_접근시_200() throws Exception {
-        mockMvc.perform(get("/setting/setting").with(user("admin").roles("ADMIN")))
+        mockMvc.perform(get("/setting").with(user("admin").roles("ADMIN")))
                 .andExpect(status().isOk());
     }
 
     @Test
     void 비로그인_사용자_setting_접근시_로그인페이지로_리다이렉트() throws Exception {
-        mockMvc.perform(get("/setting/setting"))
+        mockMvc.perform(get("/setting"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/member/login"));
     }

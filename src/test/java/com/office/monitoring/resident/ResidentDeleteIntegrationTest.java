@@ -52,7 +52,7 @@ class ResidentDeleteIntegrationTest extends ResidentIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("거주자 정보가 삭제되었습니다."));
 
         assertThat(residentRepository.findById(resident.getId())).isEmpty();
-        assertThat(aiSettingsRepository.findByResidentId(resident.getId())).isEmpty();
+        assertThat(aiSettingsRepository.findByResidentId(resident.getId())).isNull();
         assertThat(memberRepository.findByUsername("user").orElseThrow().getResidentId()).isNull();
         assertThat(memberRepository.findByUsername("new-user").orElseThrow().getResidentId()).isNull();
     }
