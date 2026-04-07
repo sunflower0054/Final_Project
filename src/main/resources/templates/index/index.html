@@ -22,7 +22,7 @@
                     <p>실시간 화면을 불러오는 중입니다...</p>
                 </div>
 
-                <img id="videoFeed" src="http://localhost:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">
+<!--                <img id="videoFeed" src="http://192.168.0.23:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">-->
 
                 <div class="live-indicator"><div class="live-dot"></div> LIVE MONITORING</div>
             </div>
@@ -133,6 +133,20 @@
 <script th:inline="javascript">
     // 1. 초기화 및 이벤트 리스너 설정
     window.addEventListener('load', initialize);
+
+    function showVideo() {
+        // 1. 로딩 UI 숨기기
+        const loader = document.getElementById('videoLoader');
+        if (loader) {
+            loader.style.display = 'none';
+        }
+
+        // 2. 영상 피드 보여주기
+        const videoFeed = document.getElementById('videoFeed');
+        if (videoFeed) {
+            videoFeed.style.display = 'block'; // 숨겨진 영상을 나타나게 함
+        }
+    }
 
     function initialize() {
         updateClock();
