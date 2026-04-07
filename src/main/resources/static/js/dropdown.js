@@ -37,8 +37,6 @@ function closeDropdownsOnOutside(e) {
 function initialize() {
     updateClock();
     setInterval(updateClock, 1000);
-
-    setupDropdown('notiBtn', 'notiDropdown');
     setupDropdown('profileBtn', 'profileDropdown');
 
     document.addEventListener('click', closeDropdownsOnOutside);

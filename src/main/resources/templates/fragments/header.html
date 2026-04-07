@@ -116,7 +116,7 @@
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
             // 드롭다운 설정
-            setupDropdown('notiBtn', 'notiDropdown');
+
             setupDropdown('profileBtn', 'profileDropdown');
 
             // 알림 데이터 불러오기
@@ -155,7 +155,7 @@
             // fetchNotificationStatus 함수는 그대로 유지
             async function fetchNotificationStatus(residentId) {
                 try {
-                    const response = await fetch(`/api/v1/recovery-status?residentId=${residentId}`);
+                    const response = await fetch(`/api/v1/notifications/fall-activity-alert?residentId=22`);
                     if (!response.ok) throw new Error('불러오기 실패');
                     const data = await response.json();
 
