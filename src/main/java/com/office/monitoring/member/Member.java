@@ -66,6 +66,11 @@ public class Member {
         this.purpose = purpose.trim();
     }
 
+    /** 탈퇴 직전 사유 정보를 최신값으로 갱신한다. */
+    public void updatePurpose(String purpose) {
+        this.purpose = purpose == null ? null : purpose.trim();
+    }
+
     /** 요청된 회원 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     public void assignResident(Long residentId) {
         this.residentId = residentId;

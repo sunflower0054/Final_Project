@@ -4,6 +4,7 @@ import com.office.monitoring.member.dto.MyInfoResponse;
 import com.office.monitoring.member.dto.RegisterRequest;
 import com.office.monitoring.member.dto.RegisterResponse;
 import com.office.monitoring.member.dto.UpdateMyInfoRequest;
+import com.office.monitoring.member.dto.WithdrawRequest;
 import com.office.monitoring.member.dto.WithdrawResponse;
 import com.office.monitoring.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
@@ -75,8 +76,17 @@ public class MemberService {
 
     @Transactional
     /** 대상 회원 정보를 삭제 또는 탈퇴 처리하고 완료 결과를 반환한다. */
-    public WithdrawResponse withdraw() {
+    public WithdrawResponse withdraw(WithdrawRequest request) {
         Member member = currentUserService.getCurrentMember();
+
+        if (!passwordEncoder.matches(request.password(), member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        String requestedPurpose = request.purpose();
+        if (requestedPurpose != null && !requestedPurpose.isBlank()) {
+            member.updatePurpose(requestedPurpose);
+        }
 
         WithdrawnUser withdrawnUser = WithdrawnUser.from(member);
         withdrawnUserRepository.save(withdrawnUser);

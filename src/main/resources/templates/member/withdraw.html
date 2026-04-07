@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원 탈퇴</title>
+
+    <!-- 보안을 위한 CSRF 토큰 (Spring Security 연동용) -->
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
+
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- 기존 CSS 경로 그대로 유지 -->
     <link rel="stylesheet" th:href="@{/css/member_style.css}">
     <style>
-        /* 기존 CSS를 건드리지 않고, 탈퇴 페이지 전용으로 폼 라디오 버튼 정렬을 위한 최소한의 인라인 스타일 추가 */
         .radio-group { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
         .radio-label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--gray-700); }
         .radio-label input[type="radio"] { width: 16px; height: 16px; accent-color: var(--navy); cursor: pointer; }
@@ -21,22 +24,13 @@
     <span class="global-logo-text">늘 봄</span>
 </div>
 
-<!-- STEP 1: 탈퇴 사유 입력 (purpose 매핑) -->
+<!-- STEP 1: 탈퇴 사유 입력 -->
 <div id="step1" class="step-container" style="display: flex;">
     <div class="card">
         <div class="step-bar-card">
-            <div class="step-item active" id="sb1i1">
-                <div class="step-num">1</div>
-                <div class="step-label">사유 선택</div>
-            </div>
-            <div class="step-item" id="sb1i2">
-                <div class="step-num">2</div>
-                <div class="step-label">본인 확인</div>
-            </div>
-            <div class="step-item" id="sb1i3">
-                <div class="step-num">3</div>
-                <div class="step-label">탈퇴 완료</div>
-            </div>
+            <div class="step-item active" id="sb1i1"><div class="step-num">1</div><div class="step-label">사유 선택</div></div>
+            <div class="step-item" id="sb1i2"><div class="step-num">2</div><div class="step-label">본인 확인</div></div>
+            <div class="step-item" id="sb1i3"><div class="step-num">3</div><div class="step-label">탈퇴 완료</div></div>
         </div>
 
         <div class="section-title">탈퇴 사유를 알려주세요</div>
@@ -45,18 +39,10 @@
         <div class="form-group" style="margin-top: 24px;">
             <label class="form-label">이용 목적 및 탈퇴 사유 <span class="req">*</span></label>
             <div class="radio-group">
-                <label class="radio-label">
-                    <input type="radio" name="purpose" value="사용 빈도 낮음"> 시스템 사용 빈도가 낮음
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="purpose" value="기능 부족"> 원하는 기능(AI 분석 등)이 부족함
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="purpose" value="개인정보 우려"> 개인정보 및 영상 데이터 보안 우려
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="purpose" value="기타" id="reasonOther" onchange="toggleOtherInput()"> 기타 사유
-                </label>
+                <label class="radio-label"><input type="radio" name="purpose" value="사용 빈도 낮음"> 시스템 사용 빈도가 낮음</label>
+                <label class="radio-label"><input type="radio" name="purpose" value="기능 부족"> 원하는 기능(AI 분석 등)이 부족함</label>
+                <label class="radio-label"><input type="radio" name="purpose" value="개인정보 우려"> 개인정보 및 영상 데이터 보안 우려</label>
+                <label class="radio-label"><input type="radio" name="purpose" value="기타" id="reasonOther" onchange="toggleOtherInput()"> 기타 사유</label>
             </div>
             <input class="form-input" id="purposeEtc" type="text" placeholder="상세 사유를 입력해주세요 (선택)" style="margin-top: 12px; display: none;">
         </div>
@@ -66,22 +52,13 @@
     </div>
 </div>
 
-<!-- STEP 2: 본인 확인 (username, password 매핑) -->
+<!-- STEP 2: 본인 확인 -->
 <div id="step2" class="step-container" style="display: none;">
     <div class="card">
         <div class="step-bar-card">
-            <div class="step-item done" id="sb2i1">
-                <div class="step-num"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                <div class="step-label">사유 선택</div>
-            </div>
-            <div class="step-item active" id="sb2i2">
-                <div class="step-num">2</div>
-                <div class="step-label">본인 확인</div>
-            </div>
-            <div class="step-item" id="sb2i3">
-                <div class="step-num">3</div>
-                <div class="step-label">탈퇴 완료</div>
-            </div>
+            <div class="step-item done" id="sb2i1"><div class="step-num"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="step-label">사유 선택</div></div>
+            <div class="step-item active" id="sb2i2"><div class="step-num">2</div><div class="step-label">본인 확인</div></div>
+            <div class="step-item" id="sb2i3"><div class="step-num">3</div><div class="step-label">탈퇴 완료</div></div>
         </div>
 
         <div class="section-title">본인 확인</div>
@@ -97,7 +74,8 @@
 
         <div class="form-group">
             <label class="form-label">아이디</label>
-            <input class="form-input" id="withdrawId" type="text" value="gildong hong" readonly style="background-color: var(--gray-50); color: var(--gray-500);">
+            <!-- 자바스크립트로 내 정보를 불러와서 채워넣을 빈 input 입니다 -->
+            <input class="form-input" id="withdrawId" type="text" placeholder="아이디 불러오는 중..." readonly style="background-color: var(--gray-50); color: var(--gray-500);">
         </div>
 
         <div class="form-group">
@@ -117,18 +95,9 @@
 <div id="step3" class="step-container" style="display: none;">
     <div class="card">
         <div class="step-bar-card">
-            <div class="step-item done">
-                <div class="step-num"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                <div class="step-label">사유 선택</div>
-            </div>
-            <div class="step-item done">
-                <div class="step-num"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-                <div class="step-label">본인 확인</div>
-            </div>
-            <div class="step-item active">
-                <div class="step-num">3</div>
-                <div class="step-label">탈퇴 완료</div>
-            </div>
+            <div class="step-item done"><div class="step-num"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="step-label">사유 선택</div></div>
+            <div class="step-item done"><div class="step-num"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="step-label">본인 확인</div></div>
+            <div class="step-item active"><div class="step-num">3</div><div class="step-label">탈퇴 완료</div></div>
         </div>
 
         <div class="done-wrap">
@@ -138,19 +107,29 @@
                 </svg>
             </div>
             <div class="done-title" style="color: var(--gray-700);">탈퇴가 완료되었습니다.</div>
-            <div class="done-sub">
-                그동안 늘 봄 서비스를 이용해 주셔서 감사합니다.<br>
-                더 나은 서비스로 다시 뵙기를 바라겠습니다.
-            </div>
-            <button class="btn-primary" onclick="location.href='/';">
-                메인 화면으로 가기
-            </button>
+            <div class="done-sub">그동안 늘 봄 서비스를 이용해 주셔서 감사합니다.<br>더 나은 서비스로 다시 뵙기를 바라겠습니다.</div>
+            <button class="btn-primary" onclick="location.href='/';">메인 화면으로 가기</button>
         </div>
     </div>
 </div>
 
 <script>
-    // 기타 사유 선택 시 텍스트 인풋 토글
+    // 페이지 로드 시 백엔드에서 '내 정보'를 가져와 아이디 칸에 채웁니다.
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            // 백엔드의 내 정보 조회 API 주소 (백엔드 개발자와 조율된 주소로 변경 가능)
+            const data = await AppApi.get('/api/v1/my-info');
+            if (data?.success) {
+                document.getElementById('withdrawId').value = data.username;
+            } else {
+                document.getElementById('withdrawId').value = "아이디를 불러올 수 없습니다.";
+            }
+        } catch (error) {
+            console.error('사용자 정보 로딩 실패:', error);
+        }
+    });
+
+    // 기타 사유 텍스트 입력창 토글
     function toggleOtherInput() {
         const isOther = document.getElementById('reasonOther').checked;
         const etcInput = document.getElementById('purposeEtc');
@@ -160,7 +139,7 @@
         }
     }
 
-    // 라디오 버튼 변경 시 이벤트 바인딩
+    // 다른 사유 선택 시 기타 입력창 초기화
     document.querySelectorAll('input[name="purpose"]').forEach(radio => {
         radio.addEventListener('change', function() {
             if(this.id !== 'reasonOther') {
@@ -170,14 +149,12 @@
         });
     });
 
-    // 단계 이동 함수들
+    // 단계 이동
     function goStep2() {
-        const selectedReason = document.querySelector('input[name="purpose"]:checked');
-        if (!selectedReason) {
+        if (!document.querySelector('input[name="purpose"]:checked')) {
             alert('탈퇴 사유를 선택해 주세요.');
             return;
         }
-
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'flex';
         window.scrollTo({top: 0, behavior: 'smooth'});
@@ -189,28 +166,41 @@
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
+    // 비밀번호 보이기/숨기기 토글
+    function togglePw(id) {
+        const el = document.getElementById(id);
+        el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    // 탈퇴 API 요청
     async function submitWithdraw() {
         const pw = document.getElementById('withdrawPw').value;
-        const selectedRadio = document.querySelector('input[name="purpose"]:checked'); // 체크된 요소 찾기
+        const selectedRadio = document.querySelector('input[name="purpose"]:checked');
         const purposeEtc = document.getElementById('purposeEtc').value;
 
-        if (!selectedRadio) {
-            alert('탈퇴 사유를 선택해 주세요.');
-            return;
-        }
+        if (!selectedRadio) { alert('탈퇴 사유를 선택해 주세요.'); return; }
+        if (!pw) { alert('비밀번호를 입력해 주세요.'); return; }
 
         const finalPurpose = selectedRadio.value === '기타' ? purposeEtc : selectedRadio.value;
 
-        if (!pw) {
-            alert('비밀번호를 입력해 주세요.');
-            return;
+        // CSRF 토큰 가져오기 (Spring Security 사용 시 필수)
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+        const headers = { 'Content-Type': 'application/json' };
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
         }
 
         try {
-            // 백엔드 API 호출 시 Query String으로 전달 (자바 코드 미수정 시 가장 유력한 방식)
-            const response = await fetch(`/api/v1/auth/withdraw?purpose=${encodeURIComponent(finalPurpose)}&password=${encodeURIComponent(pw)}`, {
+            // URL 파라미터 대신 Body에 JSON 형태로 담아서 전송 (보안 강화)
+            const response = await fetch('/api/v1/auth/withdraw', {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' }
+                headers: headers,
+                body: JSON.stringify({
+                    purpose: finalPurpose,
+                    password: pw
+                })
             });
 
             const data = await response.json();
@@ -224,9 +214,10 @@
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('탈퇴 처리 중 오류가 발생했습니다.');
+            alert('탈퇴 처리 중 오류가 발생했습니다. 네트워크 상태를 확인해주세요.');
         }
     }
 </script>
+<script th:src="@{/js/app-api.js}"></script>
 </body>
 </html>
