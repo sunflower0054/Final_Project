@@ -82,7 +82,9 @@
                     </div>
 
                     <div class="dropdown-footer">
-                        <button type="button" class="btn-profile-logout" style="width:100%;" onclick="execLogout()">로그아웃</button>
+                        <button type="button" class="btn-profile-logout" style="width:100%;" onclick="handleLogout()">
+                            로그아웃
+                        </button>
                     </div>
                 </div>
 
@@ -173,6 +175,36 @@
                 }
             }
         });
+    </script>
+
+    <script th:inline="javascript">
+        // 2. 로그아웃 함수를 스크립트 안에 직접 선언
+        async function handleLogout() {
+            console.log("로그아웃 버튼 클릭됨!"); // 작동 확인용
+
+            // CSRF 토큰 가져오기 (Security 설정 때문)
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+                const response = await fetch('/api/v1/auth/logout', {
+                    method: 'POST',
+                    headers: headers
+                });
+
+                if (response.ok) {
+                    // 로그아웃 성공 시 로그인 페이지로 이동
+                    window.location.href = '/member/login?logout';
+                } else {
+                    alert("로그아웃 실패 (서버 에러)");
+                }
+            } catch (error) {
+                console.error("통신 에러:", error);
+            }
+        }
     </script>
 </header>
 

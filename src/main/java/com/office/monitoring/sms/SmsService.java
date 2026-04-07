@@ -189,7 +189,7 @@ public class SmsService {
 
         for (int attempt = 1; attempt <= maxRetry; attempt++) {
             try {
-                sendMessage("01083763942", message); // 119 번호로 교체
+                sendMessage("01034200339", message); // 119 번호로 교체
                 log.info("[SMS] 119 재시도 성공 ({}회차)", attempt);
                 return true;
             } catch (Exception e) {

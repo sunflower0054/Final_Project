@@ -33,10 +33,11 @@ public class IndexController {
                 // 2. 로그인한 사용자의 residentId를 가져옵니다.
                 Long loggedInResidentId = currentUserService.getResidentId();
                 resident = residentRepository.findById(loggedInResidentId).orElse(null);
-            } catch (Exception e) {
-                // 로그인 정보가 없거나 거주자 등록이 안 된 경우
-                // 로그인을 유도하거나 등록 페이지로 보낼 수 있습니다.
-                return "redirect:/member/login";
+            }  catch (Exception e) {
+            // 수정 전: return "redirect:/member/login";
+            // 수정 후: 거주자 없어도 홈 화면 보여줌
+            model.addAttribute("resident", null);
+            return "index/index";
             }
         }
 

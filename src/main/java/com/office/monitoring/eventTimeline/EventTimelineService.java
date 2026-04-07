@@ -17,7 +17,7 @@ public class EventTimelineService {
 
     private final EventRepository eventRepository;
 
-    private static final Long TEMP_RESIDENT_ID = 1L;
+    private static final Long TEMP_RESIDENT_ID = 22L;
 
     // 하루치 타임라인 조회
     public EventTimelineDto getTimeline(LocalDate date) {
