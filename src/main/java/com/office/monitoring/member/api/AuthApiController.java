@@ -4,6 +4,7 @@ import com.office.monitoring.member.MemberService;
 import com.office.monitoring.member.dto.CheckUsernameResponse;
 import com.office.monitoring.member.dto.RegisterRequest;
 import com.office.monitoring.member.dto.RegisterResponse;
+import com.office.monitoring.member.dto.WithdrawRequest;
 import com.office.monitoring.member.dto.WithdrawResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,8 +44,9 @@ public class AuthApiController {
 
     @DeleteMapping("/withdraw")
     public WithdrawResponse withdraw(HttpServletRequest request,
-                                     HttpServletResponse response) {
-        WithdrawResponse result = memberService.withdraw();
+                                     HttpServletResponse response,
+                                     @Valid @RequestBody WithdrawRequest withdrawRequest) {
+        WithdrawResponse result = memberService.withdraw(withdrawRequest);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         new SecurityContextLogoutHandler().logout(request, response, authentication);
