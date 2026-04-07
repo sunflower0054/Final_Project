@@ -12,17 +12,18 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class DailyActivityService {
 
-    private final DailyActivityRepository dailyActivityRepository;
+    private final DailyActivityMapper dailyActivityMapper;
 
     @Transactional
     public void save(Long residentId, LocalDate date, Integer motionScore) {
 
-        // DB UNIQUE KEY + 코드 레벨 이중 중복 방지
-        dailyActivityRepository.findByResidentIdAndDate(residentId, date)
+        dailyActivityMapper.findByResidentIdAndDate(residentId, date)
                 .ifPresentOrElse(
                         existing -> {
+                            //같은 날짜 데이터가 이미 있으면 중복 저장 대신 최신값으로 업데이트
                             log.warn("[DAILY 중복] residentId={} date={} → 업데이트", residentId, date);
                             existing.setMotionScore(motionScore);
+                            dailyActivityMapper.update(existing);
                         },
                         () -> {
                             DailyActivity activity = DailyActivity.builder()
@@ -30,7 +31,7 @@ public class DailyActivityService {
                                     .date(date)
                                     .motionScore(motionScore)
                                     .build();
-                            dailyActivityRepository.save(activity);
+                            dailyActivityMapper.insert(activity);
                             log.info("[DAILY 저장] residentId={} date={} score={}", residentId, date, motionScore);
                         }
                 );

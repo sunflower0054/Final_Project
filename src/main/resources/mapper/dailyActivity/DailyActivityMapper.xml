@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.office.monitoring.dailyActivity.DailyActivityMapper">
+
+    <!-- 결과 매핑 -->
+    <resultMap id="dailyActivityResultMap" type="com.office.monitoring.dailyActivity.DailyActivity">
+        <id     property="id"          column="id"/>
+        <result property="residentId"  column="resident_id"/>
+        <result property="date"        column="date"/>
+        <result property="motionScore" column="motion_score"/>
+    </resultMap>
+
+    <!-- 저장 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO daily_activity (resident_id, date, motion_score)
+        VALUES (#{residentId}, #{date}, #{motionScore})
+    </insert>
+
+    <!-- 업데이트 -->
+    <update id="update">
+        UPDATE daily_activity
+        SET motion_score = #{motionScore}
+        WHERE resident_id = #{residentId}
+        AND date = #{date}
+    </update>
+
+    <!-- 날짜 중복 체크 -->
+    <select id="findByResidentIdAndDate" resultMap="dailyActivityResultMap">
+        SELECT id, resident_id, date, motion_score
+        FROM daily_activity
+        WHERE resident_id = #{residentId}
+        AND date = #{date}
+    </select>
+
+    <!-- 날짜 범위 조회 (알림용) -->
+    <select id="findByResidentIdAndDateBetween" resultMap="dailyActivityResultMap">
+        SELECT id, resident_id, date, motion_score
+        FROM daily_activity
+        WHERE resident_id = #{residentId}
+        AND date BETWEEN #{start} AND #{end}
+        ORDER BY date ASC
+    </select>
+
+</mapper>
