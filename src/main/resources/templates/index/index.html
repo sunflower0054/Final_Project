@@ -134,6 +134,22 @@
     // 1. 초기화 및 이벤트 리스너 설정
     window.addEventListener('load', initialize);
 
+    function showVideo() {
+        // 1. 로딩 UI 숨기기
+        const loader = document.getElementById('videoLoader');
+        if (loader) {
+            loader.style.display = 'none';
+        }
+
+        // 2. 영상 피드 보여주기
+        const videoFeed = document.getElementById('videoFeed');
+        if (videoFeed) {
+            videoFeed.style.display = 'block'; // 숨겨진 영상을 나타나게 함
+        }
+    }
+
+
+
     function initialize() {
         updateClock();
         setInterval(updateClock, 1000);
