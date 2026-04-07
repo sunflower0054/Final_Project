@@ -16,37 +16,66 @@
 <div class="main-container">
     <div class="top-row">
         <section class="content-card">
-            <div class="monitoring-box green-border" id="monitoringContainer">
+            <!--
+              수정 완료:
+              eventId가 없으면(상황 발생 X) -> 'green-border'
+              eventId가 있으면(상황 발생 O) -> 'red-border'
+            -->
+            <div class="monitoring-box" id="monitoringContainer"
+                 th:classappend="${eventId == null} ? 'green-border' : 'red-border'">
+
                 <div id="videoLoader" class="video-loader">
                     <div class="spinner"></div>
                     <p>실시간 화면을 불러오는 중입니다...</p>
                 </div>
 
-<!--                <img id="videoFeed" src="http://192.168.0.23:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">-->
+                <img id="videoFeed" src="http://192.168.0.30:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">
 
-                <div class="live-indicator"><div class="live-dot"></div> LIVE MONITORING</div>
+                <!-- 라이브 인디케이터 점 색상도 eventId 기준으로 변경 -->
+                <div class="live-indicator">
+                    <div class="live-dot" th:style="${eventId == null} ? 'background: #2ecc71;' : 'background: #e74c3c;'"></div>
+                    LIVE MONITORING
+                </div>
             </div>
         </section>
 
         <aside class="content-card control-panel">
             <h2 style="font-size: 14px; color: var(--gray-500); margin-bottom: 15px;">실시간 감지 정보</h2>
 
-            <!-- 에러 메시지가 있을 때 보여줄 안내창 -->
-            <div th:if="${errorMessage != null}" class="urgent-alert" style="background: var(--gray-100); border: 2px solid var(--gray-300);">
-                <p style="color: var(--gray-600); font-weight: 700; text-align: center;" th:text="${errorMessage}">
-                    회원정보를 불러올 수 없습니다.
+            <!--
+              수정 완료:
+              event 객체의 데이터를 활용하여 상황에 맞는 동적 알림창을 띄웁니다.
+            -->
+            <div th:if="${event != null}" class="urgent-alert">
+
+                <!-- 1. 이벤트 타입에 따른 제목 표시 -->
+                <th:block th:switch="${event.eventType}">
+                    <h3 th:case="'FALL_DETECTED'">🚨 낙상 발생</h3>
+                    <h3 th:case="'NO_MOTION_DETECTED'">🚨 움직임 없음 감지</h3>
+                    <h3 th:case="'VIOLENT_MOTION_DETECTED'">🚨 격한 움직임 감지</h3>
+                    <h3 th:case="*">🚨 이상 상황 발생</h3>
+                </th:block>
+
+                <!-- 2. 거주자 이름 표시 -->
+                <p><b th:text="${resident.name} + ' 어르신'">김영희 어르신</b></p>
+
+                <!-- 3. 실제 신뢰도와 감지 시간 표시 -->
+                <p style="font-size:13px; margin-top:5px;">
+                    <span th:if="${event.confidence != null}" th:text="'신뢰도 ' + ${#numbers.formatDecimal(event.confidence * 100, 1, 0)} + '% | '"></span>
+                    <span th:text="${#temporals.format(event.timestamp, 'HH:mm:ss')}"></span>
+                </p>
+
+                <!-- 4. 격한 움직임(폭행 등)일 경우 최대 속도 및 인원수 표시 -->
+                <p style="font-size:12px; margin-top:5px; color: var(--gray-600);"
+                   th:if="${event.eventType == 'VIOLENT_MOTION_DETECTED' and event.maxVelocity != null}">
+                    <span th:text="'최대 속도: ' + ${event.maxVelocity} + 'm/s'"></span>
+                    <span th:if="${event.personCount != null}" th:text="' | 인원: ' + ${event.personCount} + '명'"></span>
                 </p>
             </div>
 
-            <!-- 기존 알림창 -->
-            <div th:if="${resident != null}" class="urgent-alert">
-                <h3>🚨 낙상 발생</h3>
-                <p><b th:text="${resident.name} + ' (거실)'">김영희 (거실)</b></p>
-                <p style="font-size:13px; margin-top:5px;">신뢰도 98% | 15:28:05</p>
-            </div>
-
+            <!-- 버튼 그룹은 기존과 동일하게 유지 -->
             <div class="btn-group">
-                <button class="btn btn-red" th:if="${resident != null}" th:onclick="|goToManualReport(${resident.id})|">
+                <button class="btn btn-red" th:if="${eventId != null}" th:onclick="|goToManualReport(${eventId})|">
                     🚨 119 수동 신고
                 </button>
 
@@ -63,8 +92,11 @@
                     📍 주변 안심 시설 찾기
                 </button>
 
-                <button class="btn btn-outline">보호자 비상 연락</button>
-                <button class="btn btn-success">상황 종료 및 복구</button>
+                <button class="btn btn-success"
+                        th:if="${eventId != null}"
+                        th:onclick="|closeSituation(${eventId})|">
+                    상황 종료
+                </button>
             </div>
         </aside>
     </div>
@@ -338,6 +370,72 @@
         });
         if (response.ok) window.location.href = '/member/login?logout';
     });
+
+    // 119 수동 신고 페이지 이동 및 문자 전송 함수
+    function goToManualReport(eventId) {
+        if (!eventId) {
+            alert("이벤트 정보가 없어 신고를 진행할 수 없습니다.");
+            return;
+        }
+
+        // 사용자의 실수를 방지하기 위해 한 번 더 확인창을 띄워주는 것이 좋습니다.
+        if (confirm("119 수동 신고를 진행하시겠습니까? 관련 정보가 문자로 전송됩니다.")) {
+            // SmsController의 @GetMapping("/confirm") 경로로 이동하며 eventId 전달
+            location.href = `/report/confirm?eventId=${eventId}`;
+        }
+    }
+
+
+    // 상황 종료 처리 함수 (비동기 통신)
+    async function closeSituation(eventId) {
+        if (!eventId) {
+            alert("이벤트 정보가 없어 상황을 종료할 수 없습니다.");
+            return;
+        }
+
+        // 오작동 방지를 위한 확인창
+        if (confirm("오탐지이거나 상황이 해제되었습니까? 상황을 종료 처리합니다.")) {
+            try {
+                // SmsController의 @GetMapping("/close") 경로로 비동기 요청
+                const response = await fetch(`/report/close?eventId=${eventId}`);
+
+                if (response.ok) {
+                    // 컨트롤러에서 반환한 문자열("상황이 종료되었습니다.")을 받아옴
+                    const message = await response.text();
+                    alert(message);
+
+                    // 긴급 알림창 숨기기
+                    const alertBox = document.querySelector('.urgent-alert');
+                    if (alertBox) {
+                        alertBox.style.display = 'none';
+                    }
+
+                    // --- 추가된 부분: 모니터링 테두리를 녹색으로 원상복구 ---
+                    const monitoringContainer = document.getElementById('monitoringContainer');
+                    if (monitoringContainer) {
+                        monitoringContainer.classList.remove('red-border');
+                        monitoringContainer.classList.add('green-border');
+
+                        // 라이브 인디케이터 색상도 녹색으로 변경
+                        const liveDot = monitoringContainer.querySelector('.live-dot');
+                        if(liveDot) {
+                            liveDot.style.background = '#2ecc71';
+                        }
+                    }
+
+                    // (선택) 처리 완료 후 우측의 수동신고 / 상황종료 버튼들도 숨기거나 비활성화 처리할 수 있습니다.
+                    // const actionBtns = document.querySelectorAll('.btn-red, .btn-success');
+                    // actionBtns.forEach(btn => btn.style.display = 'none');
+
+                } else {
+                    alert("상황 종료 처리에 실패했습니다. 서버 상태를 확인해 주세요.");
+                }
+            } catch (error) {
+                console.error('Close Situation Error:', error);
+                alert("서버와 통신 중 오류가 발생했습니다.");
+            }
+        }
+    }
 </script>
 </body>
 </html>
