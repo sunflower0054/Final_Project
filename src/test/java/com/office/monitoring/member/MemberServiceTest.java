@@ -1,6 +1,7 @@
 package com.office.monitoring.member;
 
 import com.office.monitoring.member.dto.MyInfoResponse;
+import com.office.monitoring.member.dto.WithdrawRequest;
 import com.office.monitoring.member.dto.WithdrawResponse;
 import com.office.monitoring.security.CurrentUserService;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -98,8 +100,9 @@ class MemberServiceTest {
                 .build();
 
         when(currentUserService.getCurrentMember()).thenReturn(member);
+        when(passwordEncoder.matches("user1234!", "encoded-password")).thenReturn(true);
 
-        WithdrawResponse response = memberService.withdraw();
+        WithdrawResponse response = memberService.withdraw(new WithdrawRequest("user1234!", "  기능 부족  "));
 
         ArgumentCaptor<WithdrawnUser> captor = ArgumentCaptor.forClass(WithdrawnUser.class);
         verify(withdrawnUserRepository).save(captor.capture());
@@ -112,11 +115,26 @@ class MemberServiceTest {
         assertThat(saved.getName()).isEqualTo("테스트 사용자");
         assertThat(saved.getPhone()).isEqualTo("010-2222-2222");
         assertThat(saved.getBirthYear()).isEqualTo(1990);
-        assertThat(saved.getPurpose()).isEqualTo("초기 목적");
+        assertThat(saved.getPurpose()).isEqualTo("기능 부족");
         assertThat(saved.getResidentId()).isEqualTo(101L);
         assertThat(saved.getRole()).isEqualTo(Role.FAMILY);
         assertThat(saved.getCreatedAt()).isEqualTo(LocalDateTime.of(2026, 4, 1, 9, 30));
         assertThat(response.success()).isTrue();
         assertThat(response.message()).isEqualTo("회원탈퇴가 완료되었습니다.");
+    }
+
+    @Test
+    void withdraw_비밀번호가_다르면_예외가_발생한다() {
+        Member member = Member.builder()
+                .username("user")
+                .password("encoded-password")
+                .build();
+
+        when(currentUserService.getCurrentMember()).thenReturn(member);
+        when(passwordEncoder.matches("wrong", "encoded-password")).thenReturn(false);
+
+        assertThatThrownBy(() -> memberService.withdraw(new WithdrawRequest("wrong", "사유")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("비밀번호가 일치하지 않습니다.");
     }
 }
