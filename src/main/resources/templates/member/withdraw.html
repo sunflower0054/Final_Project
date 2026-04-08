@@ -74,8 +74,7 @@
 
         <div class="form-group">
             <label class="form-label">아이디</label>
-            <!-- 자바스크립트로 내 정보를 불러와서 채워넣을 빈 input 입니다 -->
-            <input class="form-input" id="withdrawId" type="text" placeholder="아이디 불러오는 중..." readonly style="background-color: var(--gray-50); color: var(--gray-500);">
+            <input class="form-input" id="withdrawId" type="text" th:value="${currentUser.username}" placeholder="아이디" readonly style="background-color: var(--gray-50); color: var(--gray-500);">
         </div>
 
         <div class="form-group">
@@ -114,21 +113,6 @@
 </div>
 
 <script>
-    // 페이지 로드 시 백엔드에서 '내 정보'를 가져와 아이디 칸에 채웁니다.
-    document.addEventListener('DOMContentLoaded', async () => {
-        try {
-            // 백엔드의 내 정보 조회 API 주소 (백엔드 개발자와 조율된 주소로 변경 가능)
-            const data = await AppApi.get('/api/v1/my-info');
-            if (data?.success) {
-                document.getElementById('withdrawId').value = data.username;
-            } else {
-                document.getElementById('withdrawId').value = "아이디를 불러올 수 없습니다.";
-            }
-        } catch (error) {
-            console.error('사용자 정보 로딩 실패:', error);
-        }
-    });
-
     // 기타 사유 텍스트 입력창 토글
     function toggleOtherInput() {
         const isOther = document.getElementById('reasonOther').checked;
