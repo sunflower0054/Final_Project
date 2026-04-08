@@ -56,22 +56,83 @@
         /* 지도 및 병원 리스트 */
         .map-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 24px; }
         .map-wrap { width: 100%; height: 350px; background: #E2E8F0; border-radius: 12px; margin-bottom: 16px; }
-        .hospital-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
-        .hospital-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid var(--gray-200); border-radius: 12px; }
-        .h-info { display: flex; flex-direction: column; gap: 4px; }
-        .h-name { font-weight: 700; color: var(--gray-900); font-size: 16px; display: flex; align-items: center; gap: 8px; }
-        .h-dist { font-size: 13px; color: var(--success); font-weight: 600; background: var(--success-bg); padding: 2px 8px; border-radius: 4px; }
-        .h-tel { font-size: 14px; color: var(--gray-500); }
-        .h-call-btn {
-            display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px;
-            background: var(--gray-100); color: var(--gray-700); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--gray-200);
-        }
+
 
         .bottom-actions { text-align: center; padding-top: 16px; }
         .btn-home {
             display: inline-flex; align-items: center; gap: 8px; background: var(--navy); color: white;
             padding: 14px 32px; border-radius: 12px; font-weight: 600; text-decoration: none;
         }
+
+        /* 🏠 거주자 위치 마커 (남색 둥근 라벨) */
+        .resident-label {
+            padding: 8px 16px;
+            background: var(--navy);
+            color: white;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 14px;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+
+        /* 💬 병원 지도 말풍선 (CustomOverlay) */
+        .custom-infowindow {
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .custom-infowindow::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+        .custom-infowindow-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 5px;
+        }
+        .custom-infowindow-desc {
+            font-size: 13px;
+            color: var(--gray-600);
+        }
+
+        /* 🏥 병원 리스트 카드 (search.html 스타일 + 통화버튼 유지) */
+        .facility-item {
+            padding: 18px;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            cursor: pointer;
+            background: #fff;
+            transition: 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .facility-item:hover {
+            border-color: var(--navy);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .f-info-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .f-name { font-weight: 800; color: #1a202c; font-size: 17px; }
+        .f-dist { font-size: 14px; color: var(--navy-mid); font-weight: 700; }
+        .f-info { font-size: 14px; color: var(--gray-600); }
     </style>
 </head>
 <body>
@@ -91,7 +152,7 @@
             <!-- SMS, 지도, 하단 버튼은 그대로 -->
             <div class="sms-preview-card">
                 <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">발송된 문자 내용</h3>
-                <div class="sms-bubble" id="sms-content">데이터를 불러오는 중입니다...</div>
+                <div class="sms-bubble" id="sms-content" th:text="${messageContent}"></div>
             </div>
 
             <div id="emergency-call-card" class="emergency-call-card">
