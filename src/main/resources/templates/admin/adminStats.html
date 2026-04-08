@@ -9,10 +9,6 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
     <style>
-
-        /* =========================================
-           2. 인라인 스타일을 CSS 클래스로 분리
-           ========================================= */
         .header-area {
             padding: 20px;
             background: #fff;
@@ -31,13 +27,30 @@
             padding: 24px;
         }
 
+        .chart-card-wide {
+            grid-column: 1 / -1;
+        }
+
         .chart-container {
             width: 100%;
             height: 300px;
             margin-top: 10px;
         }
 
-        /* 특정 차트용 개별 스타일 */
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            border-radius: 12px;
+            background: var(--gray-50);
+            color: var(--gray-500);
+            font-size: 14px;
+            text-align: center;
+        }
+
         #userAgeChart {
             background: var(--navy-light);
         }
@@ -48,7 +61,6 @@
 </head>
 <body>
 
-<!-- 인라인 style 속성 제거 -->
 <header class="header-area">
     <div class="brand-logo">
         <div class="logo-box">A</div>
@@ -74,7 +86,7 @@
             <div class="stat-value" id="totalEvents">로딩중...</div>
         </div>
         <div class="stat-card">
-            <div class="stat-title">AI 오탐지율 (CLOSED 비율)</div>
+            <div class="stat-title">AI 오탐지율</div>
             <div class="stat-value red" id="falseAlarmRate">로딩중...</div>
         </div>
     </div>
@@ -84,7 +96,6 @@
             <div class="section-title">
                 [ 회원 연령대 분포 ]
             </div>
-            <!-- 인라인 style 속성 제거 -->
             <div id="userAgeChart" class="chart-container"></div>
         </div>
 
@@ -109,8 +120,7 @@
             <div id="eventStatusChart" class="chart-container"></div>
         </div>
 
-        <!-- 인라인 style 속성 제거 (grid-column 등) -->
-        <div class="content-card chart-card" style="grid-column: 1 / -1;">
+        <div class="content-card chart-card chart-card-wide">
             <div class="section-title">
                 [ 월별 이벤트 발생 추이 ]
             </div>
@@ -121,16 +131,27 @@
 
 <script>
     google.charts.load('current', {'packages':['corechart', 'bar']});
-    google.charts.setOnLoadCallback(fetchDataAndDrawCharts);
+    google.charts.setOnLoadCallback(initAdminStatsPage);
 
-    // 전역 변수
     let colors = {};
-    let charts = {}; // 차트 인스턴스 저장 (resize 시 재사용)
+    const dashboardState = {
+        userData: null,
+        residentData: null,
+        eventData: null,
+        userError: null,
+        residentError: null,
+        eventError: null
+    };
 
-    function fetchDataAndDrawCharts() {
-        // CSS 변수 동적으로 읽어오기 (가장 먼저 실행)
+    function initAdminStatsPage() {
+        colors = readChartColors();
+        setLoadingState();
+        loadDashboardData();
+    }
+
+    function readChartColors() {
         const rootStyle = getComputedStyle(document.documentElement);
-        colors = {
+        return {
             primary: rootStyle.getPropertyValue('--navy').trim() || '#94D05C',
             primaryMid: rootStyle.getPropertyValue('--navy-mid').trim() || '#A7D673',
             primaryLight: rootStyle.getPropertyValue('--navy-light').trim() || '#f6f7ea',
@@ -145,67 +166,279 @@
             pieYellow1: rootStyle.getPropertyValue('--chart-pie-yellow-1').trim() || '#FBBF24',
             pieYellow2: rootStyle.getPropertyValue('--chart-pie-yellow-2').trim() || '#FDE68A'
         };
-
-        // ==================== 데이터 ====================
-        const userData = {
-            totalUsers: 1245,
-            ageGroups: [
-                ['연령대', '인원 수'],
-                ['20대', 350], ['30대', 420], ['40대', 280], ['50대', 145], ['60대 이상', 50]
-            ],
-            purposes: [
-                ['목적', '비율'],
-                ['부모님 안전 확인', 65], ['방범 및 모니터링', 20], ['연구/공공기관', 10], ['기타', 5]
-            ]
-        };
-
-        const residentData = {
-            totalResidents: 412,
-            averageAge: 76.4,
-            ageGroups: [
-                ['연령대', '인원 수'],
-                ['60대', 120], ['70대', 190], ['80대 이상', 102]
-            ]
-        };
-
-        const eventData = {
-            totalEvents: 3890,
-            byStatus: [
-                ['상태', '건수'],
-                ['수동신고', 1500],
-                ['자동신고', 1650],
-                ['오탐지', 640]
-            ],
-            monthlyTrend: [
-                ['월', '낙상', '움직임 없음', '폭행'],
-                ['10월', 45, 12, 5],
-                ['11월', 52, 18, 8],
-                ['12월', 61, 25, 4],
-                ['1월', 85, 40, 10],
-                ['2월', 70, 32, 6],
-                ['3월', 40, 15, 3]
-            ]
-        };
-
-        // ==================== 숫자 업데이트 ====================
-        document.getElementById('totalUsers').innerText = userData.totalUsers.toLocaleString() + '명';
-        document.getElementById('totalResidents').innerText = residentData.totalResidents.toLocaleString() + '명';
-        document.getElementById('avgAge').innerText = residentData.averageAge;
-        document.getElementById('totalEvents').innerText = eventData.totalEvents.toLocaleString() + '건';
-
-        const closedEvents = eventData.byStatus[3][1];
-        const falseAlarmRate = ((closedEvents / eventData.totalEvents) * 100).toFixed(1);
-        document.getElementById('falseAlarmRate').innerText = falseAlarmRate + '%';
-
-        // ==================== 차트 그리기 ====================
-        drawUserAgeChart(userData.ageGroups);
-        drawUserPurposeChart(userData.purposes);
-        drawResidentAgeChart(residentData.ageGroups);
-        drawEventStatusChart(eventData.byStatus);
-        drawMonthlyTrendChart(eventData.monthlyTrend);
     }
 
-    // ==================== 차트 함수들 ====================
+    async function loadDashboardData() {
+        const [userResult, residentResult, eventResult] = await Promise.allSettled([
+            fetchStats('/api/v1/admin/stats/users'),
+            fetchStats('/api/v1/admin/stats/residents'),
+            fetchStats('/api/v1/admin/stats/events')
+        ]);
+
+        applySectionResult('userData', 'userError', userResult);
+        applySectionResult('residentData', 'residentError', residentResult);
+        applySectionResult('eventData', 'eventError', eventResult);
+
+        renderDashboard();
+    }
+
+    function applySectionResult(dataKey, errorKey, result) {
+        if (result.status === 'fulfilled') {
+            dashboardState[dataKey] = result.value;
+            dashboardState[errorKey] = null;
+            return;
+        }
+
+        dashboardState[dataKey] = null;
+        dashboardState[errorKey] = result.reason instanceof Error
+            ? result.reason.message
+            : '데이터를 불러오지 못했습니다.';
+    }
+
+    async function fetchStats(url) {
+        const response = await fetch(url, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.redirected && response.url.includes('/member/login')) {
+            window.location.href = '/member/login';
+            throw new Error('로그인이 필요합니다.');
+        }
+
+        const contentType = (response.headers.get('content-type') || '').toLowerCase();
+        const payload = contentType.includes('application/json')
+            ? await response.json().catch(() => null)
+            : null;
+
+        if (!response.ok) {
+            if (response.status === 403) {
+                throw new Error('관리자 권한이 필요합니다.');
+            }
+            throw new Error(payload?.message || `통계 데이터를 불러오지 못했습니다. (${response.status})`);
+        }
+
+        if (!payload || payload.success !== true) {
+            throw new Error('통계 응답 형식이 올바르지 않습니다.');
+        }
+
+        return payload;
+    }
+
+    function setLoadingState() {
+        setCardText('totalUsers', '로딩중...');
+        setCardText('totalResidents', '로딩중...');
+        setCardText('totalEvents', '로딩중...');
+        setCardText('falseAlarmRate', '로딩중...');
+        document.getElementById('avgAge').innerText = '0';
+
+        showChartMessage('userAgeChart', '회원 연령대 데이터를 불러오는 중입니다.');
+        showChartMessage('userPurposeChart', '회원 가입 목적 데이터를 불러오는 중입니다.');
+        showChartMessage('residentAgeChart', '거주자 데이터를 불러오는 중입니다.');
+        showChartMessage('eventStatusChart', '이벤트 상태 데이터를 불러오는 중입니다.');
+        showChartMessage('monthlyTrendChart', '월별 이벤트 추이를 불러오는 중입니다.');
+    }
+
+    function renderDashboard() {
+        renderUserSection();
+        renderResidentSection();
+        renderEventSection();
+    }
+
+    function renderUserSection() {
+        if (dashboardState.userError) {
+            setCardText('totalUsers', '오류');
+            showChartMessage('userAgeChart', dashboardState.userError);
+            showChartMessage('userPurposeChart', dashboardState.userError);
+            return;
+        }
+
+        const userData = normalizeUserStats(dashboardState.userData);
+        setCardText('totalUsers', `${formatNumber(userData.totalUsers)}명`);
+        renderSingleSeriesChart('userAgeChart', userData.ageGroups, drawUserAgeChart, '회원 연령대 데이터가 없습니다.');
+        renderSingleSeriesChart('userPurposeChart', userData.purposes, drawUserPurposeChart, '회원 가입 목적 데이터가 없습니다.');
+    }
+
+    function renderResidentSection() {
+        if (dashboardState.residentError) {
+            setCardText('totalResidents', '오류');
+            document.getElementById('avgAge').innerText = '오류';
+            showChartMessage('residentAgeChart', dashboardState.residentError);
+            return;
+        }
+
+        const residentData = normalizeResidentStats(dashboardState.residentData);
+        setCardText('totalResidents', `${formatNumber(residentData.totalResidents)}명`);
+        document.getElementById('avgAge').innerText = formatAverageAge(residentData.averageAge);
+        renderSingleSeriesChart('residentAgeChart', residentData.ageGroups, drawResidentAgeChart, '거주자 연령대 데이터가 없습니다.');
+    }
+
+    function renderEventSection() {
+        if (dashboardState.eventError) {
+            setCardText('totalEvents', '오류');
+            setCardText('falseAlarmRate', '오류');
+            showChartMessage('eventStatusChart', dashboardState.eventError);
+            showChartMessage('monthlyTrendChart', dashboardState.eventError);
+            return;
+        }
+
+        const eventData = normalizeEventStats(dashboardState.eventData);
+        setCardText('totalEvents', `${formatNumber(eventData.totalEvents)}건`);
+        setCardText('falseAlarmRate', `${calculateFalseAlarmRate(eventData.totalEvents, eventData.byStatus)}%`);
+        renderSingleSeriesChart('eventStatusChart', eventData.byStatus, drawEventStatusChart, '이벤트 상태 데이터가 없습니다.');
+        renderMultiSeriesChart('monthlyTrendChart', eventData.monthlyTrend, drawMonthlyTrendChart, '월별 이벤트 데이터가 없습니다.');
+    }
+
+    function normalizeUserStats(data) {
+        return {
+            totalUsers: asNumber(data?.totalUsers),
+            ageGroups: normalizeChartData(data?.ageGroups, [
+                ['연령대', '인원 수']
+            ]),
+            purposes: normalizeChartData(data?.purposes, [
+                ['이용 목적', '회원 수']
+            ])
+        };
+    }
+
+    function normalizeResidentStats(data) {
+        return {
+            totalResidents: asNumber(data?.totalResidents),
+            averageAge: asNumber(data?.averageAge),
+            ageGroups: normalizeChartData(data?.ageGroups, [
+                ['연령대', '인원 수']
+            ])
+        };
+    }
+
+    function normalizeEventStats(data) {
+        return {
+            totalEvents: asNumber(data?.totalEvents),
+            byStatus: normalizeChartData(data?.byStatus, [
+                ['상태', '건수']
+            ]),
+            monthlyTrend: normalizeChartData(data?.monthlyTrend, [
+                ['월', '낙상', '움직임 없음', '폭행']
+            ])
+        };
+    }
+
+    function normalizeChartData(dataArray, fallback) {
+        return Array.isArray(dataArray) && dataArray.every(row => Array.isArray(row))
+            ? dataArray
+            : fallback;
+    }
+
+    function renderSingleSeriesChart(containerId, dataArray, drawFn, emptyMessage) {
+        if (!hasChartRows(dataArray) || getNumericTotal(dataArray) === 0) {
+            showChartMessage(containerId, emptyMessage);
+            return;
+        }
+
+        drawChart(containerId, dataArray, drawFn);
+    }
+
+    function renderMultiSeriesChart(containerId, dataArray, drawFn, emptyMessage) {
+        if (!hasChartRows(dataArray) || getNumericTotal(dataArray) === 0) {
+            showChartMessage(containerId, emptyMessage);
+            return;
+        }
+
+        drawChart(containerId, dataArray, drawFn);
+    }
+
+    function drawChart(containerId, dataArray, drawFn) {
+        try {
+            clearChartMessage(containerId);
+            drawFn(dataArray);
+        } catch (error) {
+            console.error(`차트 렌더링 실패 (${containerId})`, error);
+            showChartMessage(containerId, '차트를 그리지 못했습니다.');
+        }
+    }
+
+    function hasChartRows(dataArray) {
+        return Array.isArray(dataArray) && dataArray.length > 1;
+    }
+
+    function getNumericTotal(dataArray) {
+        if (!Array.isArray(dataArray)) {
+            return 0;
+        }
+
+        return dataArray.slice(1).reduce((total, row) => {
+            if (!Array.isArray(row)) {
+                return total;
+            }
+
+            const rowSum = row.slice(1).reduce((sum, value) => sum + (Number(value) || 0), 0);
+            return total + rowSum;
+        }, 0);
+    }
+
+    function calculateFalseAlarmRate(totalEvents, byStatus) {
+        if (totalEvents === 0) {
+            return '0.0';
+        }
+
+        const falseAlarmCount = findRowValue(byStatus, '오탐지');
+        return ((falseAlarmCount / totalEvents) * 100).toFixed(1);
+    }
+
+    function findRowValue(dataArray, label) {
+        const targetRow = Array.isArray(dataArray)
+            ? dataArray.find((row, index) => index > 0 && Array.isArray(row) && row[0] === label)
+            : null;
+        return targetRow ? asNumber(targetRow[1]) : 0;
+    }
+
+    function showChartMessage(containerId, message) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            return;
+        }
+        container.innerHTML = `<div class="chart-placeholder">${escapeHtml(message)}</div>`;
+    }
+
+    function clearChartMessage(containerId) {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = '';
+        }
+    }
+
+    function setCardText(elementId, text) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.innerText = text;
+        }
+    }
+
+    function formatNumber(value) {
+        return asNumber(value).toLocaleString();
+    }
+
+    function formatAverageAge(value) {
+        return asNumber(value).toFixed(1);
+    }
+
+    function asNumber(value) {
+        return Number.isFinite(Number(value)) ? Number(value) : 0;
+    }
+
+    function escapeHtml(value) {
+        return String(value)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+    }
+
     function drawUserAgeChart(dataArray) {
         var data = google.visualization.arrayToDataTable(dataArray);
         var options = {
@@ -274,12 +507,11 @@
         chart.draw(data, options);
     }
 
-    // ==================== Resize 최적화 ====================
     let resizeTimer;
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            fetchDataAndDrawCharts();
+            renderDashboard();
         }, 250);   // 250ms 디바운스
     });
 </script>

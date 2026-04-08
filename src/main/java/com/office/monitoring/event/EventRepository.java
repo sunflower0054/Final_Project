@@ -10,6 +10,12 @@ import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
+    interface AdminStatsView {
+        String getEventType();
+        String getStatus();
+        LocalDateTime getTimestamp();
+    }
+
     // 스케줄러용: PENDING 상태이면서 timeout 지난 이벤트 전체 조회
     List<Event> findAllByStatusAndCreatedAtBefore(String status, LocalDateTime threshold);
 
@@ -59,5 +65,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "ORDER BY e.createdAt ASC")
     List<Event> findAllByTypeAsc(@Param("residentId") Long residentId,
                                  @Param("eventType") String eventType);
+
+    @Query("select e.eventType as eventType, e.status as status, e.timestamp as timestamp from Event e")
+    List<AdminStatsView> findAllForAdminStats();
+
+    @Query("select e.eventType as eventType, e.status as status, e.timestamp as timestamp " +
+            "from Event e " +
+            "where e.timestamp >= :start and e.timestamp < :end")
+    List<AdminStatsView> findAllForAdminStatsBetween(@Param("start") LocalDateTime start,
+                                                     @Param("end") LocalDateTime end);
 
 }

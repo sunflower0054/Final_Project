@@ -73,7 +73,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/daily-activity").permitAll()
 
                         // 관리자 전용
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**", "/admin/**").hasRole("ADMIN")
 
                         // 로그인 필수 회원 API
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/auth/withdraw").authenticated()
