@@ -29,7 +29,7 @@
                     <p>실시간 화면을 불러오는 중입니다...</p>
                 </div>
 
-<!--                <img id="videoFeed" src="http://192.168.0.23:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">-->
+                <img id="videoFeed" src="http://192.168.0.23:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">
 
                 <!-- 라이브 인디케이터 점 색상도 eventId 기준으로 변경 -->
                 <div class="live-indicator">
@@ -51,8 +51,8 @@
                 <!-- 1. 이벤트 타입에 따른 제목 표시 -->
                 <th:block th:switch="${event.eventType}">
                     <h3 th:case="'FALL_DETECTED'">🚨 낙상 발생</h3>
-                    <h3 th:case="'NO_MOTION_DETECTED'">🚨 움직임 없음 감지</h3>
-                    <h3 th:case="'VIOLENT_MOTION_DETECTED'">🚨 격한 움직임 감지</h3>
+                    <h3 th:case="'NO_MOTION_DETECTED'">🚨 무응답 감지</h3>
+                    <h3 th:case="'VIOLENT_MOTION_DETECTED'">🚨 폭행 의심 감지</h3>
                     <h3 th:case="*">🚨 이상 상황 발생</h3>
                 </th:block>
 
@@ -65,7 +65,7 @@
                     <span th:text="${#temporals.format(event.timestamp, 'HH:mm:ss')}"></span>
                 </p>
 
-                <!-- 4. 격한 움직임(폭행 등)일 경우 최대 속도 및 인원수 표시 -->
+                <!-- 4. 폭행(폭행 등)일 경우 최대 속도 및 인원수 표시 -->
                 <p style="font-size:12px; margin-top:5px; color: var(--gray-600);"
                    th:if="${event.eventType == 'VIOLENT_MOTION_DETECTED' and event.maxVelocity != null}">
                     <span th:text="'최대 속도: ' + ${event.maxVelocity} + 'm/s'"></span>
@@ -332,7 +332,7 @@
 
     // 기타 유틸리티 (기존 로직 유지)
     function getEventTitle(type) {
-        const titles = { 'FALL_DETECTED': '낙상 감지', 'NO_MOTION_DETECTED': '움직임 없음', 'VIOLENT_MOTION_DETECTED': '격한 움직임' };
+        const titles = { 'FALL_DETECTED': '낙상 감지', 'NO_MOTION_DETECTED': '무응답', 'VIOLENT_MOTION_DETECTED': '폭행' };
         return titles[type] || type;
     }
 

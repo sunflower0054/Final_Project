@@ -31,17 +31,6 @@
                     <span class="badge badge-navy" id="profileRole" style="margin-top: 10px;">가족 회원</span>
                 </div>
 
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">24</div>
-                        <div class="stat-label">관리 기기</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">12</div>
-                        <div class="stat-label">이번달 알림</div>
-                    </div>
-                </div>
-
                 <!--                <div class="profile-actions" style="padding: 20px;">
                                     <button class="btn-profile-detail">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -66,66 +55,26 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label class="form-label">아이디</label>
-                            <input type="text" class="form-control" id="infoUsername" value="gildong" readonly>
+                            <input type="text" class="form-control" id="infoUsername" readonly>
                         </div>
                         <div class="form-group">
                             <label class="form-label">이름</label>
-                            <input type="text" class="form-control" id="infoName" value="홍길동" readonly>
+                            <input type="text" class="form-control" id="infoName" readonly>
                         </div>
                         <div class="form-group">
                             <label class="form-label">휴대폰 번호</label>
-                            <input type="tel" class="form-control userInfoInput" id="infoPhone" value="010-1234-5678" readonly>
+                            <input type="tel" class="form-control userInfoInput" id="infoPhone" readonly>
                         </div>
                         <div class="form-group">
                             <label class="form-label">출생연도</label>
-                            <input type="text" class="form-control" id="infoBirthYear" value="1976년" readonly>
+                            <input type="text" class="form-control" id="infoBirthYear" readonly>
                         </div>
 
                         <!-- 역할 (권한) 표시 -->
                         <div class="form-group">
                             <label class="form-label">계정 유형</label>
-                            <input type="text" class="form-control" id="infoRole" value="가족 회원" readonly>
+                            <input type="text" class="form-control" id="infoRole" readonly>
                         </div>
-                    </div>
-                </div>
-
-                <!-- 알림 서비스 설정 카드 -->
-                <div class="content-card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 class="card-title">알림 서비스 설정</h3>
-                    </div>
-                    <div class="card-body" style="padding: 0;">
-                        <div class="setting-row">
-                            <div class="setting-info">
-                                <div class="setting-title">이메일 알림</div>
-                                <div class="setting-desc">중요 이벤트 발생 시 메일 발송</div>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox" checked>
-                                <div class="toggle-track"><div class="toggle-thumb"></div></div>
-                            </label>
-                        </div>
-                        <div class="setting-row">
-                            <div class="setting-info">
-                                <div class="setting-title">SMS 긴급 알림</div>
-                                <div class="setting-desc">낙상 등 긴급 상황 시 즉시 문자</div>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox"> <div class="toggle-track"><div class="toggle-thumb"></div></div>
-                            </label>
-                        </div>
-                        <div class="setting-row">
-                            <div class="setting-info">
-                                <div class="setting-title">시간 방해 금지</div>
-                                <div class="setting-desc">22:00 ~ 07:00 사이 일반 알림 제한</div>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox"> <div class="toggle-track"><div class="toggle-thumb"></div></div>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn btn-navy" style="padding: 8px 16px; font-size: 13px;">설정 저장하기</button>
                     </div>
                 </div>
 
@@ -184,15 +133,49 @@
         });
     }
 
-    // 정보 수정 버튼 로직 업데이트 예시
+    // 🌟 1. 내 정보 불러오기 (GET API 호출)
+    async function loadMyInfo() {
+        try {
+            const response = await fetch('/api/v1/my-info');
+            if (response.ok) {
+                const data = await response.json();
+
+                // 🌟 역할명 변환 로직
+                let displayRole = data.role;
+                if (data.role === 'FAMILY') {
+                    displayRole = '가족';
+                } else if (data.role === 'ADMIN') {
+                    displayRole = '운영자';
+                }
+
+                // 좌측 프로필 카드 업데이트
+                document.querySelector('.profile-name-lg').innerText = data.name;
+                document.getElementById('profileRole').innerText = displayRole;
+
+                // 우측 기본 정보 카드 업데이트
+                document.getElementById('infoUsername').value = data.username;
+                document.getElementById('infoName').value = data.name;
+                document.getElementById('infoPhone').value = data.phone;
+                document.getElementById('infoBirthYear').value = data.birthYear + '년';
+                document.getElementById('infoRole').value = displayRole;
+            } else {
+                console.error('내 정보를 불러오는데 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('API 호출 중 오류 발생:', error);
+        }
+    }
+
+    // 🌟 2. 정보 수정 버튼 로직 업데이트 (PUT API 호출)
     function setupInfoEdit() {
         const editBtn = document.getElementById('editInfoBtn');
-        const editableInputs = document.querySelectorAll('.userInfoInput'); // 휴대폰 번호만 editable로
+        const editableInputs = document.querySelectorAll('.userInfoInput'); // 현재 휴대폰 번호만
 
         if(!editBtn) return;
 
-        editBtn.addEventListener('click', () => {
+        editBtn.addEventListener('click', async () => {
             if(editBtn.innerText === '정보 수정') {
+                // 수정 모드 활성화
                 editableInputs.forEach(input => {
                     input.readOnly = false;
                     input.style.backgroundColor = '#fff';
@@ -203,22 +186,43 @@
                 editBtn.style.color = 'var(--navy)';
                 editableInputs[0].focus();
             } else {
-                // 여기서 실제 저장 AJAX 호출 예정
-                alert('정보가 저장되었습니다.');
-                editableInputs.forEach(input => {
-                    input.readOnly = true;
-                    input.style.backgroundColor = '';
-                });
-                editBtn.innerText = '정보 수정';
-                editBtn.style.borderStyle = 'dashed';
-                editBtn.style.borderColor = 'var(--gray-400)';
-                editBtn.style.color = 'var(--gray-600)';
+                // 저장 모드: 실제 수정 AJAX(fetch) 호출
+                const newPhone = document.getElementById('infoPhone').value;
+
+                try {
+                    const response = await fetch('/api/v1/my-info', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        // UpdateMyInfoRequest DTO 구조에 맞게 필드명을 매핑해주세요.
+                        body: JSON.stringify({ phone: newPhone })
+                    });
+
+                    if (response.ok) {
+                        alert('정보가 성공적으로 저장되었습니다.');
+
+                        // 읽기 전용 모드로 복구
+                        editableInputs.forEach(input => {
+                            input.readOnly = true;
+                            input.style.backgroundColor = '';
+                        });
+                        editBtn.innerText = '정보 수정';
+                        editBtn.style.borderStyle = 'dashed';
+                        editBtn.style.borderColor = 'var(--gray-400)';
+                        editBtn.style.color = 'var(--gray-600)';
+                    } else {
+                        alert('정보 수정에 실패했습니다. 다시 시도해주세요.');
+                    }
+                } catch (error) {
+                    console.error('저장 중 오류 발생:', error);
+                    alert('서버와 통신 중 오류가 발생했습니다.');
+                }
             }
         });
     }
 
     window.addEventListener('load', () => {
-        // 헤더 프래그먼트 내 요소 ID 확인 필요
         setupDropdown('notiBtn', 'notiDropdown');
         setupDropdown('profileBtn', 'profileDropdown');
 
@@ -232,8 +236,9 @@
             menu.addEventListener('click', e => e.stopImmediatePropagation());
         });
 
-        // 정보 수정 기능 초기화
+        // 기능 초기화 및 데이터 로드
         setupInfoEdit();
+        loadMyInfo(); // 페이지 로드 시 정보 불러오기 실행
     });
 </script>
 
