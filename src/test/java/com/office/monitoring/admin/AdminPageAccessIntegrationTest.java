@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** 관리자 통계 화면 접근 제어와 템플릿 연결을 검증하는 테스트. */
+/** 관리자 통계 화면의 접근 권한과 페이지 응답을 검증한다. */
 class AdminPageAccessIntegrationTest extends AdminIntegrationTestSupport {
 
     @Test

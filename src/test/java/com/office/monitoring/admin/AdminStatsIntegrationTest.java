@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** 관리자 통계 API의 접근 제어와 기본 응답 구조를 검증하는 테스트. */
+/** 관리자 통계 API의 접근 제어와 응답 구조를 검증한다. */
 class AdminStatsIntegrationTest extends AdminIntegrationTestSupport {
 
     @Test

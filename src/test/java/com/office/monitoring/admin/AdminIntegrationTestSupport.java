@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+/** 관리자 통계 통합 테스트에서 공통 기준 데이터를 제공한다. */
 abstract class AdminIntegrationTestSupport {
 
     protected Long defaultResidentId;
