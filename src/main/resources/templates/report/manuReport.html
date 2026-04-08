@@ -53,9 +53,9 @@
             color: var(--gray-900); line-height: 1.6; border-left: 4px solid var(--navy); white-space: pre-wrap;
         }
 
-        /* 지도 및 병원 리스트 */
+        /* 지도 영역 스타일 (위) */
         .map-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 24px; }
-        .map-wrap { width: 100%; height: 350px; background: #E2E8F0; border-radius: 12px; margin-bottom: 16px; }
+        .map-wrap { width: 100%; height: 350px; background: #E2E8F0; border-radius: 12px; margin-bottom: 20px; }
 
         /* 🏠 거주자 위치 마커 (남색 둥근 라벨) */
         .resident-label {
@@ -101,7 +101,7 @@
             color: var(--gray-600);
         }
 
-        /* 🏥 병원 리스트 아이템 (search.html 스타일) */
+        /* 🏥 병원 리스트 카드 (아래 - search.html 스타일) */
         .hospital-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
         .facility-item {
             padding: 18px;
@@ -110,15 +110,30 @@
             cursor: pointer;
             background: #fff;
             transition: 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .facility-item:hover {
             border-color: var(--navy);
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-        .f-name { font-weight: 800; color: #1a202c; font-size: 17px; margin-bottom: 6px; }
-        .f-dist { font-size: 14px; color: var(--navy-mid); font-weight: 700; margin-bottom: 4px; }
-        .f-info { font-size: 14px; color: var(--gray-600); margin-top: 2px; }
+        .f-info-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .f-name { font-weight: 800; color: #1a202c; font-size: 17px; }
+        .f-dist { font-size: 14px; color: var(--navy-mid); font-weight: 700; }
+        .f-info { font-size: 14px; color: var(--gray-600); }
+
+        /* 전화 걸기 버튼 스타일 */
+        .h-call-btn {
+            display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px;
+            background: var(--gray-100); color: var(--gray-700); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--gray-200);
+        }
+        .h-call-btn:hover { background: #e2e8f0; }
 
         .bottom-actions { text-align: center; padding-top: 16px; }
         .btn-home {
@@ -138,16 +153,27 @@
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </div>
                 <h2 class="success-text" style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">119 신고 완료</h2>
-                <p style="color: var(--gray-600); font-size: 16px;">관제 센터에서 119 상황실로 문자를 성공적으로 발송했습니다.</p>
+                <!-- ✅ 관제 센터 -> 가족(보호자)로 내용 수정 -->
+                <p style="color: var(--gray-600); font-size: 16px;">보호자(가족)님께서 119 상황실로 문자를 성공적으로 발송했습니다.</p>
             </div>
 
-            <!-- SMS, 지도, 하단 버튼은 그대로 -->
+            <!-- SMS 미리보기 -->
             <div class="sms-preview-card">
-                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--error);">발송 실패 안내</h3>
-                <div class="sms-bubble" id="sms-content" th:text="${messageContent}"></div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">발송된 문자 내용</h3>
+                <div class="sms-bubble" id="sms-content">
+                    <strong style="color: var(--navy);">[수동 신고] 응급 환자 발생</strong>
+                    보호자가 응급 상황으로 판단하여 직접 119에 신고를 접수하였습니다.
+                    이름: <span th:text="${resident?.name}">이름</span> / <span th:text="${resident?.age}">00</span>세
+                    기저질환: <span th:text="${resident?.disease}">없음</span>
+                    주소: <span th:text="${resident?.address}">주소 정보 없음</span>
+                    거주자 연락처: <span th:text="${resident?.phone}">010-0000-0000</span>
+                    보호자 연락처: <span th:text="${resident?.guardianPhone}">010-0000-0000</span>
+                </div>
             </div>
 
-            <div id="emergency-call-card" class="emergency-call-card">
+            <!-- 119 전화하기 경고 박스 -->
+            <!-- ✅ display: block; 을 추가하여 화면에 항상 보이도록 수정 -->
+            <div id="emergency-call-card" class="emergency-call-card" style="display: block;">
                 <p style="color: #991B1B; font-weight: 600; font-size: 15px; margin-bottom: 16px;">
                     ⚠️ 문자 접수가 지연되거나 통신사 문제로 누락되었을 수 있습니다.<br>안전을 위해 아래 버튼을 눌러 직접 119 상황실에 전화로 확인해 주세요.
                 </p>

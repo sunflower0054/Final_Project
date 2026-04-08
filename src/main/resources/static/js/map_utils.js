@@ -101,19 +101,30 @@ function searchHospitals(center, map) {
                     };
                 })(customOverlay, hospitalPos));
 
-                // 병원 리스트 생성 (search.html 완벽 동일 스타일)
+                // 병원 리스트 생성 (CSS 구조에 맞게 수정 + 전화버튼 부활)
+                var phoneText = place.phone || '전화번호 없음';
+                var phoneLink = place.phone ? 'tel:' + place.phone.replace(/-/g, '') : '#';
+
                 var li = document.createElement('li');
                 li.className = 'facility-item';
                 li.innerHTML = `
-                    <div class="f-name">${place.place_name}</div>
-                    <div class="f-dist">집에서 ${place.distance}m 떨어짐</div>
-                    <div class="f-info">전화: ${place.phone || '정보 없음'}</div>
-                    <div class="f-info">주소: ${place.address_name}</div>
+                    <div class="f-info-wrap">
+                        <div class="f-name">${place.place_name}</div>
+                        <div class="f-dist">집에서 ${place.distance}m 떨어짐</div>
+                        <div class="f-info">${place.road_address_name || place.address_name}</div>
+                    </div>
+                    <a href="${phoneLink}" class="h-call-btn" style="flex-shrink: 0; z-index: 10;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        ${phoneText}
+                    </a>
                 `;
 
                 // 리스트 아이템 클릭 시 지도 이동 & 말풍선 표시
                 li.onclick = (function(overlay, pos) {
-                    return function() {
+                    return function(e) {
+                        // 전화 버튼(a 태그) 클릭 시에는 지도 이동 무시하고 전화만 걸리게 예외 처리
+                        if(e.target.closest('.h-call-btn')) return;
+
                         map.panTo(pos);
                         if (currentCustomOverlay) currentCustomOverlay.setMap(null);
                         overlay.setMap(map);

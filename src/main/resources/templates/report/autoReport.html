@@ -53,9 +53,9 @@
             color: var(--gray-900); line-height: 1.6; border-left: 4px solid var(--navy); white-space: pre-wrap;
         }
 
-        /* 지도 및 병원 리스트 */
+        /* 지도 영역 스타일 (위) */
         .map-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 24px; }
-        .map-wrap { width: 100%; height: 350px; background: #E2E8F0; border-radius: 12px; margin-bottom: 16px; }
+        .map-wrap { width: 100%; height: 350px; background: #E2E8F0; border-radius: 12px; margin-bottom: 20px; }
 
 
         .bottom-actions { text-align: center; padding-top: 16px; }
@@ -108,7 +108,8 @@
             color: var(--gray-600);
         }
 
-        /* 🏥 병원 리스트 카드 (search.html 스타일 + 통화버튼 유지) */
+        /* 🏥 병원 리스트 카드 (아래 - search.html 스타일) */
+        .hospital-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
         .facility-item {
             padding: 18px;
             border: 1px solid var(--gray-200);
@@ -133,6 +134,13 @@
         .f-name { font-weight: 800; color: #1a202c; font-size: 17px; }
         .f-dist { font-size: 14px; color: var(--navy-mid); font-weight: 700; }
         .f-info { font-size: 14px; color: var(--gray-600); }
+
+        /* 전화 걸기 버튼 스타일 */
+        .h-call-btn {
+            display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px;
+            background: var(--gray-100); color: var(--gray-700); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--gray-200);
+        }
+        .h-call-btn:hover { background: #e2e8f0; }
     </style>
 </head>
 <body>
@@ -149,13 +157,21 @@
                 <p style="color: var(--gray-600); font-size: 16px;">관제 센터에서 10분간 응답이 없어, 시스템이 <strong>자동으로 119에 문자를 접수</strong>했습니다.</p>
             </div>
 
-            <!-- SMS, 지도, 하단 버튼은 그대로 -->
+            <!-- 문자 내용 미리보기 -->
             <div class="sms-preview-card">
                 <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">발송된 문자 내용</h3>
-                <div class="sms-bubble" id="sms-content" th:text="${messageContent}"></div>
+                <div class="sms-bubble" id="sms-content">
+                    <strong style="color: var(--error);">[자동 신고] 응급 상황 발생</strong>
+                    늘 봄입니다. 대상자가 10분간 응답이 없어 시스템이 자동으로 119에 신고합니다.
+                    이름: <span th:text="${resident?.name}">이름</span> / <span th:text="${resident?.age}">00</span>세
+                    기저질환: <span th:text="${resident?.disease}">없음</span>
+                    주소: <span th:text="${resident?.address}">주소</span>
+                    거주자 연락처: <span th:text="${resident?.phone}">010-0000-0000</span>
+                    보호자 연락처: <span th:text="${resident?.guardianPhone}">010-0000-0000</span>
+                </div>
             </div>
 
-            <div id="emergency-call-card" class="emergency-call-card">
+            <div id="emergency-call-card" class="emergency-call-card" style="display: block;">
                 <p style="color: #991B1B; font-weight: 600; font-size: 15px; margin-bottom: 16px;">
                     ⚠️ 문자 접수가 지연되거나 통신사 문제로 누락되었을 수 있습니다.<br>안전을 위해 아래 버튼을 눌러 직접 119 상황실에 전화로 확인해 주세요.
                 </p>

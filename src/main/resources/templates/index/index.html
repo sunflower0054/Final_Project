@@ -75,7 +75,7 @@
 
             <!-- 버튼 그룹은 기존과 동일하게 유지 -->
             <div class="btn-group">
-                <button class="btn btn-red" th:if="${eventId != null}" th:onclick="|goToManualReport(${eventId})|">
+                <button class="btn btn-red" th:onclick="|goToManualReport(${eventId})|">
                     🚨 119 수동 신고
                 </button>
 
@@ -93,7 +93,6 @@
                 </button>
 
                 <button class="btn btn-success"
-                        th:if="${eventId != null}"
                         th:onclick="|closeSituation(${eventId})|">
                     상황 종료
                 </button>
