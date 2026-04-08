@@ -19,10 +19,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/** 관리자 통계 집계를 제공하는 서비스. */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-/** 관리자 통계 집계를 제공하는 서비스. */
 public class AdminStatsService {
 
     private static final String UNKNOWN_AGE_GROUP = "미상";
@@ -38,6 +38,7 @@ public class AdminStatsService {
     private final ResidentRepository residentRepository;
     private final EventRepository eventRepository;
 
+    /** 회원 수, 연령대, 가입 목적 통계를 조합한다. */
     public AdminStatsDTO.UserStatsResponse getUserStats() {
         List<MemberRepository.AdminStatsView> members = memberRepository.findAllForAdminStats();
         return new AdminStatsDTO.UserStatsResponse(
@@ -48,6 +49,7 @@ public class AdminStatsService {
         );
     }
 
+    /** 거주자 수, 평균 나이, 연령대 통계를 조합한다. */
     public AdminStatsDTO.ResidentStatsResponse getResidentStats() {
         List<ResidentRepository.AdminStatsView> residents = residentRepository.findAllForAdminStats();
         return new AdminStatsDTO.ResidentStatsResponse(
@@ -58,6 +60,7 @@ public class AdminStatsService {
         );
     }
 
+    /** 연도·월 필터를 반영해 이벤트 통계를 조합한다. */
     public AdminStatsDTO.EventStatsResponse getEventStats(Integer year, Integer month) {
         List<EventRepository.AdminStatsView> events = getFilteredEvents(year, month);
         return new AdminStatsDTO.EventStatsResponse(
@@ -69,6 +72,7 @@ public class AdminStatsService {
         );
     }
 
+    /** 유효한 생년월일만 대상으로 평균 나이를 계산한다. */
     private double calculateAverageAge(List<ResidentRepository.AdminStatsView> residents) {
         LocalDate today = LocalDate.now();
         double averageAge = residents.stream()
@@ -81,6 +85,7 @@ public class AdminStatsService {
         return Math.round(averageAge * 10) / 10.0;
     }
 
+    /** 회원 birthYear를 차트용 연령대 배열로 변환한다. */
     private List<List<Object>> buildUserAgeGroups(List<MemberRepository.AdminStatsView> members) {
         Map<String, Long> ageGroups = new LinkedHashMap<>();
         ageGroups.put("10대", 0L);
@@ -101,6 +106,7 @@ public class AdminStatsService {
         return response;
     }
 
+    /** 회원 purpose를 정규화해 목적별 집계 배열을 만든다. */
     private List<List<Object>> buildUserPurposes(List<MemberRepository.AdminStatsView> members) {
         Map<String, Long> purposeCounts = members.stream()
                 .map(view -> normalizePurpose(view.getPurpose()))
@@ -120,6 +126,7 @@ public class AdminStatsService {
         return response;
     }
 
+    /** 거주자 birthDate를 기준으로 고령층 연령대 분포를 만든다. */
     private List<List<Object>> buildResidentAgeGroups(List<ResidentRepository.AdminStatsView> residents) {
         Map<String, Long> ageGroups = new LinkedHashMap<>();
         ageGroups.put("60대", 0L);
@@ -137,6 +144,7 @@ public class AdminStatsService {
         return response;
     }
 
+    /** 회원 출생연도를 10년 단위 연령대로 매핑한다. */
     private String resolveUserAgeGroup(Integer birthYear, int currentYear) {
         if (birthYear == null || birthYear > currentYear) {
             return UNKNOWN_AGE_GROUP;
@@ -161,6 +169,7 @@ public class AdminStatsService {
         return "60대 이상";
     }
 
+    /** null·blank 목적값을 미지정으로 통일한다. */
     private String normalizePurpose(String purpose) {
         if (purpose == null) {
             return UNSPECIFIED_PURPOSE;
@@ -170,6 +179,7 @@ public class AdminStatsService {
         return trimmedPurpose.isEmpty() ? UNSPECIFIED_PURPOSE : trimmedPurpose;
     }
 
+    /** 미래 날짜나 null은 제외할 수 있게 -1로 처리한다. */
     private int calculateResidentAge(LocalDate birthDate, LocalDate today) {
         if (birthDate == null || birthDate.isAfter(today)) {
             return -1;
@@ -178,6 +188,7 @@ public class AdminStatsService {
         return Period.between(birthDate, today).getYears();
     }
 
+    /** 거주자 나이를 60대, 70대, 80대 이상, 기타로 구분한다. */
     private String resolveResidentAgeGroup(LocalDate birthDate, LocalDate today) {
         int age = calculateResidentAge(birthDate, today);
 
@@ -193,6 +204,7 @@ public class AdminStatsService {
         return "기타";
     }
 
+    /** year/month 조합에 맞는 이벤트 조회 범위를 결정한다. */
     private List<EventRepository.AdminStatsView> getFilteredEvents(Integer year, Integer month) {
         if (year == null) {
             return eventRepository.findAllForAdminStats();
@@ -209,6 +221,7 @@ public class AdminStatsService {
         return eventRepository.findAllForAdminStatsBetween(start, end);
     }
 
+    /** 이벤트 타입을 고정 라벨 기준으로 집계한다. */
     private List<List<Object>> buildEventTypes(List<EventRepository.AdminStatsView> events) {
         Map<String, Long> typeCounts = new LinkedHashMap<>();
         typeCounts.put("낙상", 0L);
@@ -226,6 +239,7 @@ public class AdminStatsService {
         return response;
     }
 
+    /** 운영 완료 상태만 상태 차트용으로 집계한다. */
     private List<List<Object>> buildEventStatuses(List<EventRepository.AdminStatsView> events) {
         Map<String, Long> statusCounts = new LinkedHashMap<>();
         statusCounts.put("수동신고", 0L);
@@ -243,6 +257,7 @@ public class AdminStatsService {
         return response;
     }
 
+    /** 필터 조건에 맞는 월별 이벤트 추이 배열을 만든다. */
     private List<List<Object>> buildMonthlyTrend(List<EventRepository.AdminStatsView> events, Integer year, Integer month) {
         List<List<Object>> response = new ArrayList<>();
         response.add(row("월", "낙상", "움직임 없음", "폭행"));
@@ -294,6 +309,7 @@ public class AdminStatsService {
         return response;
     }
 
+    /** 원본 이벤트 타입을 차트 라벨로 변환한다. */
     private String toEventTypeLabel(String eventType) {
         return switch (eventType) {
             case FALL_DETECTED -> "낙상";
@@ -303,6 +319,7 @@ public class AdminStatsService {
         };
     }
 
+    /** 월별 추이 배열에서 타입별 컬럼 위치를 반환한다. */
     private Integer toEventTypeIndex(String eventType) {
         return switch (eventType) {
             case FALL_DETECTED -> 0;
@@ -312,6 +329,7 @@ public class AdminStatsService {
         };
     }
 
+    /** 원본 이벤트 상태를 상태 차트 라벨로 변환한다. */
     private String toEventStatusLabel(String status) {
         return switch (status) {
             case CONFIRMED -> "수동신고";
@@ -321,6 +339,7 @@ public class AdminStatsService {
         };
     }
 
+    /** 전체 기준과 연도 기준에 맞춰 월 라벨 형식을 맞춘다. */
     private String formatMonthLabel(YearMonth yearMonth, Integer requestedYear) {
         if (requestedYear != null) {
             return yearMonth.getMonthValue() + "월";
@@ -328,10 +347,12 @@ public class AdminStatsService {
         return "%d-%02d".formatted(yearMonth.getYear(), yearMonth.getMonthValue());
     }
 
+    /** month 파라미터가 실제 월 범위인지 확인한다. */
     private boolean isValidMonth(Integer month) {
         return month != null && month >= 1 && month <= 12;
     }
 
+    /** Google Charts용 2차원 배열의 한 행을 만든다. */
     private List<Object> row(Object... values) {
         return Arrays.asList(values);
     }
