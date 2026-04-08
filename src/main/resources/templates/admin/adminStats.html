@@ -119,6 +119,8 @@
     </div>
 </div>
 
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script th:src="@{/js/dropdown.js}"></script>
 <script>
     google.charts.load('current', {'packages':['corechart', 'bar']});
     google.charts.setOnLoadCallback(fetchDataAndDrawCharts);
