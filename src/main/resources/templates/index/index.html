@@ -102,7 +102,8 @@
 
     <section class="content-card">
         <div class="wrap">
-            <div class="resident-name">김순자 어르신</div>
+            <!-- resident 객체가 존재할 경우 이름을 출력하고, 없을 경우 '거주자 미등록'을 출력합니다 -->
+            <div class="resident-name" th:text="${resident != null ? resident.name + ' 어르신' : '거주자 미등록'}">김순자 어르신</div>
             <div class="section-title">
                 이벤트 타임라인
                 <input type="date" class="date-input" id="timelineDateInput">
