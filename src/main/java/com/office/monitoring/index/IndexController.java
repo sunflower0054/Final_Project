@@ -1,7 +1,10 @@
 package com.office.monitoring.index;
 
+import com.office.monitoring.event.Event;
+import com.office.monitoring.event.EventRepository;
 import com.office.monitoring.resident.Resident;
 import com.office.monitoring.resident.ResidentRepository;
+import com.office.monitoring.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,43 +12,55 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 public class IndexController {
 
     private final ResidentRepository residentRepository;
+    private final CurrentUserService currentUserService; // 1. CurrentUserService 주입 추가
+    private final EventRepository eventRepository; // 1. CurrentUserService 주입 추가
 
     @GetMapping({"", "/", "/index", "/index/index"})
     public String index(@RequestParam(name = "residentId", required = false) Long residentId, Model model) {
 
         Resident resident = null;
 
-        // 1. 파라미터로 ID가 넘어온 경우
+        // 1. 주소창에 직접 id를 치고 들어온 경우 (관리자 확인용 등)
         if (residentId != null) {
-            // orElseThrow 대신 orElse(null)을 사용하여 에러를 막습니다.
             resident = residentRepository.findById(residentId).orElse(null);
         }
-        // 2. 파라미터 없이 그냥 접속한 경우 (예: 기본으로 첫 번째 사람을 보여줌)
+        // 2. 주소창에 id가 없는 경우 (일반적인 접속)
         else {
-            List<Resident> residents = residentRepository.findAll();
-            if (!residents.isEmpty()) {
-                resident = residents.get(0); // DB의 가장 첫 번째 어르신
+            try {
+                // 2. 로그인한 사용자의 residentId를 가져옵니다.
+                Long loggedInResidentId = currentUserService.getResidentId();
+                resident = residentRepository.findById(loggedInResidentId).orElse(null);
+            }  catch (Exception e) {
+            // 수정 전: return "redirect:/member/login";
+            // 수정 후: 거주자 없어도 홈 화면 보여줌
+            model.addAttribute("resident", null);
+            return "index/index";
             }
         }
 
-        // 3. 최종적으로 어르신 정보가 DB에 하나도 없거나, 잘못된 ID인 경우
         if (resident == null) {
-            model.addAttribute("errorMessage", "⚠️ 회원정보를 불러올 수 없습니다. 등록된 어르신이 있는지 확인해 주세요.");
-        } else {
-            model.addAttribute("resident", resident);
+            model.addAttribute("errorMessage", "⚠️ 거주자 정보를 찾을 수 없습니다.");
+            return "index/index";
         }
 
-        return "index/index";
-    }
+        // --- 백단 추가 작업: 현재 거주자의 가장 최근 미처리(PENDING) 이벤트 조회 ---
+        Optional<Event> pendingEvent = eventRepository.findTopByResidentIdAndStatusOrderByCreatedAtDesc(resident.getId(), "PENDING");
 
-    @GetMapping({"/test"})
-    public String test() {
-        return "send_message/test";
+        // 이벤트가 존재하면 앞단(HTML)에서 쓸 수 있도록 모델에 담아줍니다.
+        if (pendingEvent.isPresent()) {
+            model.addAttribute("event", pendingEvent.get());      // 알림창 세부 정보용
+            model.addAttribute("eventId", pendingEvent.get().getId()); // 기존 버튼 클릭(상황종료 등) 호환용
+        }
+        // ------------------------------------------------------------------------
+
+        model.addAttribute("resident", resident);
+        return "index/index";
     }
 }

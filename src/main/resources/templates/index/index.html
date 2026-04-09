@@ -8,61 +8,6 @@
     <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0}
-        .wrap{background:#f5f2e8;padding:20px;border-radius:12px}
-        .resident-name{font-size:13px;color:#5a6e3a;font-weight:500;margin-bottom:2px}
-        .section-title{font-size:20px;font-weight:500;color:#2d3a1e;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-        .date-input{border:1px solid #b8c9a0;border-radius:8px;padding:5px 10px;font-size:15px;background:#fff;color:#2d3a1e}
-        .risk-card{background:#fff;border-radius:12px;border:1px solid #d4e0bc;padding:16px;margin-bottom:14px}
-        .risk-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-        .risk-label{font-size:15px;color:#5a6e3a;font-weight:500}
-        .risk-date-range{font-size:13px;color:#8a9a70}
-        .risk-score-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-        .risk-badge{font-size:14px;font-weight:500;padding:4px 12px;border-radius:20px;background:#fde8e8;color:#a32d2d}
-        .risk-score-num{font-size:26px;font-weight:500;color:#a32d2d}
-        .gauge-bg{height:14px;border-radius:7px;background:#e8e4d8;overflow:hidden}
-        .gauge-fill{height:100%;border-radius:7px;background:#a32d2d;width:55%}
-        .gauge-ends{display:flex;justify-content:space-between;font-size:13px;color:#8a9a70;margin-top:4px}
-        .summary-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-        .chip{padding:8px 18px;border-radius:20px;font-size:15px;font-weight:500;border:none}
-        .chip-all{background:#3b6d11;color:#eaf3de}
-        .chip-fall{background:#fde8e8;color:#791f1f}
-        .chip-nomotion{background:#faeeda;color:#633806}
-        .chip-fight{background:#EEEDFE;color:#3C3489}
-        .sort-row{display:flex;justify-content:flex-end;margin-bottom:12px}
-        .sort-select{padding:7px 12px;border-radius:8px;border:1px solid #b8c9a0;font-size:14px;background:#fff;color:#2d3a1e}
-
-        .all-btn-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-        .all-btn{border-radius:10px;border:none;padding:13px 0;font-size:16px;font-weight:500;cursor:pointer;text-align:center}
-        .all-btn-fall{background:#fde8e8;color:#791f1f}
-        .all-btn-nomotion{background:#faeeda;color:#633806}
-        .all-btn-fight{background:#EEEDFE;color:#3C3489}
-
-        .timeline{position:relative;padding-left:28px}
-        .timeline-line{position:absolute;left:9px;top:0;bottom:0;width:2px;background:#d4e0bc}
-        .event-item{position:relative;margin-bottom:14px}
-        .event-dot{position:absolute;left:-23px;top:20px;width:13px;height:13px;border-radius:50%;border:2px solid #fff}
-        .dot-red{background:#a32d2d}
-        .dot-amber{background:#854F0B}
-        .dot-purple{background:#534AB7}
-        .event-card{background:#fff;border-radius:12px;border:1px solid #d4e0bc;padding:14px}
-        .event-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px}
-        .tag{font-size:13px;font-weight:500;padding:4px 12px;border-radius:20px}
-        .tag-fall{background:#fde8e8;color:#791f1f}
-        .tag-nomotion{background:#faeeda;color:#633806}
-        .tag-fight{background:#EEEDFE;color:#3C3489}
-        .event-time{font-size:14px;color:#8a9a70}
-        .event-body{display:flex;gap:14px;align-items:flex-start}
-        .event-img{width:76px;height:76px;border-radius:8px;background:#e8e4d8;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid #d4e0bc}
-        .img-label{font-size:11px;color:#8a9a70}
-        .event-info{flex:1}
-        .event-date-txt{font-size:14px;color:#8a9a70;margin-bottom:4px}
-        .event-title{font-size:17px;font-weight:500;color:#2d3a1e}
-        .event-status{font-size:17px;font-weight:500;margin-top:6px;color:#2d3a1e}
-    </style>
-
 </head>
 <body>
 
@@ -71,406 +16,414 @@
 <div class="main-container">
     <div class="top-row">
         <section class="content-card">
-            <div class="monitoring-box green-border" id="monitoringContainer">
+            <!--
+              수정 완료:
+              eventId가 없으면(상황 발생 X) -> 'green-border'
+              eventId가 있으면(상황 발생 O) -> 'red-border'
+            -->
+            <div class="monitoring-box" id="monitoringContainer"
+                 th:classappend="${eventId == null} ? 'green-border' : 'red-border'">
+
                 <div id="videoLoader" class="video-loader">
                     <div class="spinner"></div>
                     <p>실시간 화면을 불러오는 중입니다...</p>
                 </div>
 
-<!--                <img id="videoFeed" src="http://localhost:5005/video_feed" alt="Realtime Video"-->
-<!--                                     style="display: none;" onload="showVideo()">-->
+                <img id="videoFeed" src="http://192.168.0.23:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">
 
-                <div class="live-indicator"><div class="live-dot"></div> LIVE MONITORING</div>
+                <!-- 라이브 인디케이터 점 색상도 eventId 기준으로 변경 -->
+                <div class="live-indicator">
+                    <div class="live-dot" th:style="${eventId == null} ? 'background: #2ecc71;' : 'background: #e74c3c;'"></div>
+                    LIVE MONITORING
+                </div>
             </div>
         </section>
+
         <aside class="content-card control-panel">
             <h2 style="font-size: 14px; color: var(--gray-500); margin-bottom: 15px;">실시간 감지 정보</h2>
 
-            <!-- [추가된 부분] 에러 메시지가 있을 때 보여줄 안내창 -->
-            <div th:if="${errorMessage != null}" class="urgent-alert" style="background: var(--gray-100); border: 2px solid var(--gray-300);">
-                <p style="color: var(--gray-600); font-weight: 700; text-align: center;" th:text="${errorMessage}">
-                    회원정보를 불러올 수 없습니다.
+            <!--
+              수정 완료:
+              event 객체의 데이터를 활용하여 상황에 맞는 동적 알림창을 띄웁니다.
+            -->
+            <div th:if="${event != null}" class="urgent-alert">
+
+                <!-- 1. 이벤트 타입에 따른 제목 표시 -->
+                <th:block th:switch="${event.eventType}">
+                    <h3 th:case="'FALL_DETECTED'">🚨 낙상 발생</h3>
+                    <h3 th:case="'NO_MOTION_DETECTED'">🚨 무응답 감지</h3>
+                    <h3 th:case="'VIOLENT_MOTION_DETECTED'">🚨 폭행 의심 감지</h3>
+                    <h3 th:case="*">🚨 이상 상황 발생</h3>
+                </th:block>
+
+                <!-- 2. 거주자 이름 표시 -->
+                <p><b th:text="${resident.name} + ' 어르신'">김영희 어르신</b></p>
+
+                <!-- 3. 실제 신뢰도와 감지 시간 표시 -->
+                <p style="font-size:13px; margin-top:5px;">
+                    <span th:if="${event.confidence != null}" th:text="'신뢰도 ' + ${#numbers.formatDecimal(event.confidence * 100, 1, 0)} + '% | '"></span>
+                    <span th:text="${#temporals.format(event.timestamp, 'HH:mm:ss')}"></span>
+                </p>
+
+                <!-- 4. 폭행(폭행 등)일 경우 최대 속도 및 인원수 표시 -->
+                <p style="font-size:12px; margin-top:5px; color: var(--gray-600);"
+                   th:if="${event.eventType == 'VIOLENT_MOTION_DETECTED' and event.maxVelocity != null}">
+                    <span th:text="'최대 속도: ' + ${event.maxVelocity} + 'm/s'"></span>
+                    <span th:if="${event.personCount != null}" th:text="' | 인원: ' + ${event.personCount} + '명'"></span>
                 </p>
             </div>
 
-            <!-- 기존 알림창 (데이터가 있을 때만 보이도록 th:if 추가) -->
-            <div th:if="${resident != null}" class="urgent-alert">
-                <h3>🚨 낙상 발생</h3>
-                <p><b th:text="${resident.name} + ' (거실)'">김영희 (거실)</b></p>
-                <p style="font-size:13px; margin-top:5px;">신뢰도 98% | 15:28:05</p>
-            </div>
-
+            <!-- 버튼 그룹은 기존과 동일하게 유지 -->
             <div class="btn-group">
-                <!-- 119 수동 신고 버튼 -->
-                <button class="btn btn-red" th:if="${resident != null}" th:onclick="|goToManualReport(${resident.id})|">
+                <button class="btn btn-red" th:onclick="|goToManualReport(${eventId})|">
                     🚨 119 수동 신고
                 </button>
 
-                <!-- 시설 찾기 버튼: 데이터가 있을 때 정상 동작 -->
                 <button class="btn btn-info"
-                        th:if="${resident != null}"
-                        th:onclick="|location.href='/facility/search?residentId=' + ${resident.id}|"
-                        style="background-color: #3182ce; color: white;">
+                        th:if="${currentUser != null and currentUser.residentId != null}"
+                        th:onclick="|location.href='/facility/search?residentId=' + ${currentUser.residentId}|">
                     📍 주변 안심 시설 찾기
                 </button>
 
-                <!-- 데이터가 없을 때의 버튼: 누르면 경고창 띄우기 -->
                 <button class="btn btn-info"
-                        th:unless="${resident != null}"
-                        onclick="alert('회원정보를 불러올 수 없어 해당 기능을 사용할 수 없습니다.')"
-                        style="background-color: var(--gray-400); color: white; cursor: not-allowed;">
+                        th:unless="${currentUser != null and currentUser.residentId != null}"
+                        onclick="alert('등록된 거주자 정보가 없어 해당 기능을 사용할 수 없습니다. 먼저 어르신을 등록해 주세요.')"
+                        style="background-color: var(--gray-400) !important; cursor: not-allowed;">
                     📍 주변 안심 시설 찾기
                 </button>
 
-                <button class="btn btn-outline">보호자 비상 연락</button>
-                <button class="btn btn-success">상황 종료 및 복구</button>
+                <button class="btn btn-success"
+                        th:onclick="|closeSituation(${eventId})|">
+                    상황 종료
+                </button>
             </div>
         </aside>
     </div>
 
     <section class="content-card">
         <div class="wrap">
-            <div class="resident-name">김순자 어르신</div>
+            <!-- resident 객체가 존재할 경우 이름을 출력하고, 없을 경우 '거주자 미등록'을 출력합니다 -->
+            <div class="resident-name" th:text="${resident != null ? resident.name + ' 어르신' : '거주자 미등록'}">김순자 어르신</div>
             <div class="section-title">
                 이벤트 타임라인
-                <input type="date" class="date-input" value="2026-03-25">
+                <input type="date" class="date-input" id="timelineDateInput">
             </div>
 
             <div class="risk-card">
                 <div class="risk-header">
                     <div class="risk-label">최근 7일 위험 지수</div>
-                    <div class="risk-date-range">3/19 ~ 3/25</div>
+                    <div class="risk-date-range" id="riskDateRange">-</div>
                 </div>
                 <div class="risk-score-row">
-                    <span class="risk-badge">위험</span>
-                    <span class="risk-score-num">110점</span>
+                    <span class="risk-badge" id="riskLevelBadge">확인중</span>
+                    <span class="risk-score-num" id="riskScoreNum">0점</span>
                 </div>
-                <div class="gauge-bg"><div class="gauge-fill"></div></div>
+                <div class="gauge-bg"><div class="gauge-fill" id="riskGaugeFill" style="width: 0%;"></div></div>
                 <div class="gauge-ends"><span>0</span><span>200</span></div>
             </div>
 
             <div class="summary-chips">
-                <span class="chip chip-all">전체 3건</span>
-                <span class="chip chip-fall">낙상 1건</span>
-                <span class="chip chip-nomotion">무응답 1건</span>
-                <span class="chip chip-fight">폭행 1건</span>
+                <span class="chip chip-all" id="chipAllCount">전체 0건</span>
+                <span class="chip chip-fall" id="chipFallCount">낙상 0건</span>
+                <span class="chip chip-nomotion" id="chipNomotionCount">무응답 0건</span>
+                <span class="chip chip-fight" id="chipFightCount">폭행 0건</span>
             </div>
 
             <div class="sort-row">
                 <select class="sort-select"><option>최신순</option><option>오래된순</option></select>
             </div>
 
-            <!-- 전체 기간 조회 버튼 -->
-            <div class="all-btn-row">
-                <button class="all-btn all-btn-fall">낙상 전체 보기</button>
-                <button class="all-btn all-btn-nomotion">무응답 전체 보기</button>
-                <button class="all-btn all-btn-fight">폭행 전체 보기</button>
+            <div class="all-btn-row filter-pills">
+                <button class="all-btn all-btn-fall pill" data-filter="FALL_DETECTED">낙상만 보기</button>
+                <button class="all-btn all-btn-nomotion pill" data-filter="NO_MOTION_DETECTED">무응답만 보기</button>
+                <button class="all-btn all-btn-fight pill" data-filter="VIOLENT_MOTION_DETECTED">폭행만 보기</button>
+                <button class="all-btn chip-all pill active" data-filter="all" style="grid-column: span 3;">전체 보기</button>
             </div>
 
-            <div class="timeline">
+            <div class="timeline timeline-container" id="timelineContainer">
                 <div class="timeline-line"></div>
-
-                <div class="event-item">
-                    <div class="event-dot dot-red"></div>
-                    <div class="event-card">
-                        <div class="event-card-top">
-                            <span class="tag tag-fall">낙상</span>
-                            <div class="event-time">07:22</div>
-                        </div>
-                        <div class="event-body">
-                            <div class="event-img"><span class="img-label">캡처사진</span></div>
-                            <div class="event-info">
-                                <div class="event-date-txt">2026-03-25</div>
-                                <div class="event-title">낙상 / 기절 감지</div>
-                                <div class="event-status">신고완료 (가족신고)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="event-item">
-                    <div class="event-dot dot-amber"></div>
-                    <div class="event-card">
-                        <div class="event-card-top">
-                            <span class="tag tag-nomotion">무응답</span>
-                            <div class="event-time">09:00</div>
-                        </div>
-                        <div class="event-body">
-                            <div class="event-img"><span class="img-label">캡처사진</span></div>
-                            <div class="event-info">
-                                <div class="event-date-txt">2026-03-25</div>
-                                <div class="event-title">장시간 무응답 감지</div>
-                                <div class="event-status">신고완료 (자동신고)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="event-item">
-                    <div class="event-dot dot-purple"></div>
-                    <div class="event-card">
-                        <div class="event-card-top">
-                            <span class="tag tag-fight">폭행</span>
-                            <div class="event-time">19:47</div>
-                        </div>
-                        <div class="event-body">
-                            <div class="event-img"><span class="img-label">캡처사진</span></div>
-                            <div class="event-info">
-                                <div class="event-date-txt">2026-03-25</div>
-                                <div class="event-title">폭행 의심 감지</div>
-                                <div class="event-status">정상확인 (이상없음)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <!-- JS에서 동적 렌더링 -->
             </div>
         </div>
     </section>
 </div>
 
-<footer class="service-footer">
-    <div class="footer-content">
-        <div class="footer-logo">
-            <span class="brand-name">늘봄</span>
-            <span class="footer-tagline">언제나 봄날 같은 안전한 일상</span>
-        </div>
-        <div class="footer-info">
-            <p>© 2026 Goldenomis. All rights reserved.</p>
-            <p>고객센터: 1588-0000 | 이메일: support@neulbom.ai</p>
-        </div>
-    </div>
-</footer>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 <script th:src="@{/js/app-api.js}"></script>
 <script th:inline="javascript">
+    // 1. 초기화 및 이벤트 리스너 설정
+    window.addEventListener('load', initialize);
 
-    document.addEventListener('click', async (event) => {
-        // 1. 클릭된 요소가 로그아웃 버튼(js-logout-btn)인지 확인
-        const logoutButton = event.target.closest('.js-logout-btn');
-        if (!logoutButton) return; // 아니면 무시
-
-        // 2. 서버로 로그아웃 fetch 요청
-        try {
-            const response = await fetch('/api/v1/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            // 3. 응답이 성공적이면 로그인 페이지로 강제 이동
-            if (response.ok) {
-                window.location.href = '/member/login?logout';
-            } else {
-                alert('로그아웃 처리에 실패했습니다.');
-            }
-        } catch (error) {
-            console.error('Logout error:', error);
-            alert('로그아웃 중 오류가 발생했습니다.');
+    function showVideo() {
+        // 1. 로딩 UI 숨기기
+        const loader = document.getElementById('videoLoader');
+        if (loader) {
+            loader.style.display = 'none';
         }
-    });
 
+        // 2. 영상 피드 보여주기
+        const videoFeed = document.getElementById('videoFeed');
+        if (videoFeed) {
+            videoFeed.style.display = 'block'; // 숨겨진 영상을 나타나게 함
+        }
+    }
+
+    function initialize() {
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        setupDropdown('profileBtn', 'profileDropdown');
+        document.addEventListener('click', closeDropdownsOnOutside);
+        preventCloseInsideDropdown();
+
+        // 필터 버튼(Pills) 이벤트 바인딩
+        setupTimelineFilter();
+
+        // 날짜 입력창 초기화 (오늘 날짜)
+        const dateInput = document.getElementById('timelineDateInput');
+        if (dateInput) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            dateInput.value = todayStr;
+
+            // 날짜 변경 시 API 호출 (페이지 새로고침 없음)
+            dateInput.addEventListener('change', (e) => fetchTimelineData(e.target.value));
+
+            // 첫 진입 시 데이터 자동 로드
+            fetchTimelineData(todayStr);
+        }
+    }
+
+    // 2. 서버 API 데이터 연동 (JSON만 주고받음)
+    async function fetchTimelineData(date) {
+        const container = document.getElementById('timelineContainer');
+        container.innerHTML = '<div style="text-align:center; padding:30px;">데이터를 분석 중입니다...</div>';
+
+        try {
+            // 정렬 값이 필요하다면 여기에 쿼리 파라미터로 추가 가능
+            const response = await fetch(`/api/v1/eventsTimeline?date=${date}`);
+            if (!response.ok) throw new Error('서버 응답 오류');
+
+            const data = await response.json(); // EventTimelineDto 구조체 수신
+
+            // [핵심] 받은 데이터로 UI 각 부분 업데이트
+            updateRiskCard(data.riskSummary);   // 위험 지수 연동
+            updateSummaryChips(data.daySummary); // 요약 건수 연동
+            renderTimeline(data.events);        // 타임라인 리스트 연동 (이미지 포함)
+
+            // 데이터 렌더링 후 현재 선택된 필터 다시 적용
+            applyActiveFilter();
+
+        } catch (error) {
+            console.error('Data Fetch Error:', error);
+            container.innerHTML = '<div style="text-align:center; color:red; padding:30px;">데이터 로드 실패</div>';
+        }
+    }
+
+    // 3. 위험 지수 카드 업데이트 (RiskSummary 연동)
+    function updateRiskCard(risk) {
+        if (!risk) return;
+        document.getElementById('riskDateRange').innerText = risk.dateRange || '-';
+        document.getElementById('riskLevelBadge').innerText = risk.riskLevel || '확인중';
+        document.getElementById('riskScoreNum').innerText = (risk.totalScore || 0) + '점';
+
+        // 200점 만점 기준 게이지 바 너비 계산
+        const percent = Math.min(((risk.totalScore || 0) / 200) * 100, 100);
+        document.getElementById('riskGaugeFill').style.width = percent + '%';
+
+        // 위험 수준별 색상 변경
+        const badge = document.getElementById('riskLevelBadge');
+        if (risk.riskLevel === '안전') {
+            badge.style.background = '#e7f7ed'; badge.style.color = '#2ecc71';
+        } else if (risk.riskLevel === '주의') {
+            badge.style.background = '#fff4e5'; badge.style.color = '#ff9800';
+        } else {
+            badge.style.background = '#ffebee'; badge.style.color = '#e74c3c';
+        }
+    }
+
+    // 4. 요약 칩 숫자 업데이트 (DaySummary 연동)
+    function updateSummaryChips(summary) {
+        if (!summary) return;
+        document.getElementById('chipAllCount').innerText = `전체 ${summary.totalCount || 0}건`;
+        document.getElementById('chipFallCount').innerText = `낙상 ${summary.fallCount || 0}건`;
+        document.getElementById('chipNomotionCount').innerText = `무응답 ${summary.noMotionCount || 0}건`;
+        document.getElementById('chipFightCount').innerText = `폭행 ${summary.violentCount || 0}건`;
+    }
+
+    // 5. 타임라인 리스트 렌더링 (이미지 및 상세정보 포함)
+    function renderTimeline(events) {
+        const container = document.getElementById('timelineContainer');
+        if (!events || events.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">감지된 이벤트가 없습니다.</div>';
+            return;
+        }
+
+        container.innerHTML = '<div class="timeline-line"></div>' + events.map(event => `
+            <div class="tl-item" data-type="${event.eventType}">
+                <div class="tl-time">${event.timestamp}</div>
+
+                <div class="tl-content" style="display: flex; gap: 15px; align-items: flex-start;">
+
+                    <div class="tl-image-box" style="flex: 0 0 120px; width: 120px; height: 90px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; background: #f5f5f5;">
+                        <img src="${event.imagePath || 'https://placehold.co/400x300?text=No+Image'}"
+                             onerror="this.src='https://placehold.co/400x300?text=No+Image'"
+                             alt="감지장면"
+                             style="width: 100%; height: 100%; object-fit: cover;"> </div>
+
+                    <div class="tl-text-box" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="tl-title" style="font-weight: 700;">${getEventTitle(event.eventType)}</span>
+                            <span class="tl-status" style="font-size: 12px; color: #888;">${event.status}</span>
+                        </div>
+
+                        <div class="tl-detail" style="font-size: 13px; color: #666;">
+                            ${event.maxVelocity ? `<span>최대 속도: ${event.maxVelocity}m/s</span>` : ''}
+                            ${event.personCount ? `<span style="margin-left: 15px;">인원: ${event.personCount}명</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // 필터 상태 유지
+        applyActiveFilter();
+    }
+
+    // 6. 필터 버튼 이벤트 연동
     function setupTimelineFilter() {
         const pills = document.querySelectorAll('.filter-pills .pill');
-        const timelineItems = document.querySelectorAll('.timeline-container .tl-item');
-
         pills.forEach(pill => {
             pill.addEventListener('click', () => {
-                // 모든 pill에서 active 제거
                 pills.forEach(p => p.classList.remove('active'));
-                // 클릭한 pill에 active 추가
                 pill.classList.add('active');
-
-                const filterType = pill.dataset.filter;
-
-                timelineItems.forEach(item => {
-                    if (filterType === 'all') {
-                        item.style.display = 'flex';
-                    } else {
-                        if (item.dataset.type === filterType) {
-                            item.style.display = 'flex';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    }
-                });
+                applyActiveFilter();
             });
         });
     }
 
+    function applyActiveFilter() {
+        const activePill = document.querySelector('.filter-pills .pill.active');
+        if (!activePill) return;
+
+        const filterType = activePill.dataset.filter;
+        const items = document.querySelectorAll('.tl-item');
+
+        items.forEach(item => {
+            if (filterType === 'all') {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = (item.dataset.type === filterType) ? 'flex' : 'none';
+            }
+        });
+    }
+
+    // 기타 유틸리티 (기존 로직 유지)
+    function getEventTitle(type) {
+        const titles = { 'FALL_DETECTED': '낙상 감지', 'NO_MOTION_DETECTED': '무응답', 'VIOLENT_MOTION_DETECTED': '폭행' };
+        return titles[type] || type;
+    }
+
+    function updateClock() {
+        const timeEl = document.getElementById('currentTime');
+        if(timeEl) timeEl.innerText = new Date().toLocaleString();
+    }
+
+    function setupDropdown(btnId, dropdownId) {
+        const btn = document.getElementById(btnId);
+        const menu = document.getElementById(dropdownId);
+        if (btn && menu) {
+            btn.onclick = (e) => { e.stopPropagation(); menu.classList.toggle('open'); };
+        }
+    }
+
+    function closeDropdownsOnOutside() {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+    }
+
+    function preventCloseInsideDropdown() {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.onclick = (e) => e.stopPropagation());
+    }
+
+    // 로그아웃 (CSRF 토큰 대응)
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.js-logout-btn');
+        if (!btn) return;
+        const token = document.querySelector('meta[name="_csrf"]')?.content;
+        const header = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+        const response = await fetch('/api/v1/auth/logout', {
+            method: 'POST',
+            headers: { [header]: token }
+        });
+        if (response.ok) window.location.href = '/member/login?logout';
+    });
+
+    // 119 수동 신고 페이지 이동 및 문자 전송 함수
     function goToManualReport(eventId) {
-        const isConfirmed = confirm("🚨 정말 119에 수동으로 신고하시겠습니까?\n확인을 누르면 즉시 신고 페이지로 이동합니다.");
-        if (isConfirmed) {
-            // backend SmsController의 confirm 메서드와 정확히 맞춤
+        if (!eventId) {
+            alert("이벤트 정보가 없어 신고를 진행할 수 없습니다.");
+            return;
+        }
+
+        // 사용자의 실수를 방지하기 위해 한 번 더 확인창을 띄워주는 것이 좋습니다.
+        if (confirm("119 수동 신고를 진행하시겠습니까? 관련 정보가 문자로 전송됩니다.")) {
+            // SmsController의 @GetMapping("/confirm") 경로로 이동하며 eventId 전달
             location.href = `/report/confirm?eventId=${eventId}`;
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const successBtn = document.querySelector('.btn-success');
-        const urgentAlert = document.querySelector('.urgent-alert');
-        const monitoringContainer = document.getElementById('monitoringContainer');
 
-        function updateBorder() {
-            const isEventActive = urgentAlert && urgentAlert.style.display !== 'none';
-            if (isEventActive) {
-                monitoringContainer.classList.remove('green-border');
-                monitoringContainer.classList.add('red-border');
-            } else {
-                monitoringContainer.classList.remove('red-border');
-                monitoringContainer.classList.add('green-border');
+    // 상황 종료 처리 함수 (비동기 통신)
+    async function closeSituation(eventId) {
+        if (!eventId) {
+            alert("이벤트 정보가 없어 상황을 종료할 수 없습니다.");
+            return;
+        }
+
+        // 오작동 방지를 위한 확인창
+        if (confirm("오탐지이거나 상황이 해제되었습니까? 상황을 종료 처리합니다.")) {
+            try {
+                // SmsController의 @GetMapping("/close") 경로로 비동기 요청
+                const response = await fetch(`/report/close?eventId=${eventId}`);
+
+                if (response.ok) {
+                    // 컨트롤러에서 반환한 문자열("상황이 종료되었습니다.")을 받아옴
+                    const message = await response.text();
+                    alert(message);
+
+                    // 긴급 알림창 숨기기
+                    const alertBox = document.querySelector('.urgent-alert');
+                    if (alertBox) {
+                        alertBox.style.display = 'none';
+                    }
+
+                    // --- 추가된 부분: 모니터링 테두리를 녹색으로 원상복구 ---
+                    const monitoringContainer = document.getElementById('monitoringContainer');
+                    if (monitoringContainer) {
+                        monitoringContainer.classList.remove('red-border');
+                        monitoringContainer.classList.add('green-border');
+
+                        // 라이브 인디케이터 색상도 녹색으로 변경
+                        const liveDot = monitoringContainer.querySelector('.live-dot');
+                        if(liveDot) {
+                            liveDot.style.background = '#2ecc71';
+                        }
+                    }
+
+                    // (선택) 처리 완료 후 우측의 수동신고 / 상황종료 버튼들도 숨기거나 비활성화 처리할 수 있습니다.
+                    // const actionBtns = document.querySelectorAll('.btn-red, .btn-success');
+                    // actionBtns.forEach(btn => btn.style.display = 'none');
+
+                } else {
+                    alert("상황 종료 처리에 실패했습니다. 서버 상태를 확인해 주세요.");
+                }
+            } catch (error) {
+                console.error('Close Situation Error:', error);
+                alert("서버와 통신 중 오류가 발생했습니다.");
             }
         }
-
-        updateBorder();
-
-        // 3. 상황 종료 버튼 클릭 이벤트 (fetch 연동 부분)
-        successBtn.addEventListener('click', function() {
-            const isCurrentlyActive = urgentAlert && urgentAlert.style.display !== 'none';
-
-            if (!isCurrentlyActive) {
-                alert("현재 발생한 감지 이벤트가 없습니다.");
-                return;
-            }
-
-            if (confirm("해당 상황을 종료 처리하시겠습니까?")) {
-
-                // TODO: 실제 환경에 맞게 타임리프 변수나 데이터 속성에서 값을 가져오도록 수정하세요.
-                // 예: const eventId = /*[[${eventId}]]*/ 1;
-                const eventId = 1;
-
-                // 백엔드 API 호출
-                fetch(`/report/close?eventId=${eventId}`)
-                    .then(res => {
-                        if (!res.ok) throw new Error("서버 응답 오류");
-                        return res.text();
-                    })
-                    .then(msg => {
-                        // 서버 성공 응답 메시지 알림
-                        alert(msg);
-
-                        // 통신 성공 시 기존 UI 복구 로직 실행
-                        const originalText = "상황 종료 및 복구";
-
-                        successBtn.innerText = "상황 종료됨 ✓";
-                        successBtn.classList.remove('btn-success');
-                        successBtn.style.backgroundColor = "var(--gray-400)";
-                        successBtn.disabled = true;
-
-                        if (urgentAlert) urgentAlert.style.display = 'none';
-                        updateBorder();
-
-                        setTimeout(() => {
-                            successBtn.innerText = originalText;
-                            successBtn.style.backgroundColor = "var(--success)";
-                            successBtn.classList.add('btn-success');
-                            successBtn.disabled = false;
-                        }, 5000);
-                    })
-                    .catch(err => {
-                        console.error('Fetch Error:', err);
-                        alert("상황 종료 처리 중 오류가 발생했습니다.");
-                    });
-            }
-        });
-    });
-
-    // 비디오 로딩 완료 시 호출되는 함수
-        function showVideo() {
-            document.getElementById('videoLoader').style.display = 'none';
-            document.getElementById('videoFeed').style.display = 'block';
-        }
-
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('currentTime').innerText =
-                now.getFullYear() + '. ' +
-                (now.getMonth() + 1).toString().padStart(2, '0') + '. ' +
-                now.getDate().toString().padStart(2, '0') + ' ' +
-                now.getHours().toString().padStart(2, '0') + ':' +
-                now.getMinutes().toString().padStart(2, '0') + ':' +
-                now.getSeconds().toString().padStart(2, '0');
-        }
-
-        function updateRiskUI(score) {
-            const bar = document.getElementById('progressBar');
-            const text = document.getElementById('scoreText');
-            const label = document.getElementById('statusLabel');
-            const percent = (score / 200) * 100;
-            bar.style.width = percent + '%';
-
-            if (score < 70) {
-                bar.className = 'progress-bar safe'; text.style.color = 'var(--success)';
-                label.innerText = '상태: 안전'; label.style.color = 'var(--success)';
-            } else if (score < 140) {
-                bar.className = 'progress-bar caution'; text.style.color = 'var(--warning)';
-                label.innerText = '상태: 주의'; label.style.color = 'var(--warning)';
-            } else {
-                bar.className = 'progress-bar danger'; text.style.color = 'var(--error)';
-                label.innerText = '상태: 위험'; label.style.color = 'var(--error)';
-            }
-        }
-
-        function setupDropdown(btnId, dropdownId) {
-            const btn = document.getElementById(btnId);
-            const dropdown = document.getElementById(dropdownId);
-            if (!btn || !dropdown) return;
-            btn.addEventListener('click', (e) => {
-                e.stopImmediatePropagation();
-                document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                    if (menu.id !== dropdownId) menu.classList.remove('open');
-                });
-                dropdown.classList.toggle('open');
-            });
-        }
-
-        function closeDropdownsOnOutside(e) {
-            if (!e.target.closest('.dropdown-wrap')) {
-                document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('open'));
-            }
-        }
-
-        function preventCloseInsideDropdown() {
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.addEventListener('click', e => e.stopImmediatePropagation());
-            });
-        }
-
-        function updateDateRangeLabel(dateStr) {
-            const end = new Date(dateStr);
-            const start = new Date(dateStr);
-            start.setDate(start.getDate() - 6);
-            const fmt = (d) => (d.getMonth() + 1) + '/' + d.getDate();
-            document.getElementById('dateRangeLabel').innerText = '(' + fmt(start) + ' ~ ' + fmt(end) + ')';
-        }
-
-        function initialize() {
-            updateClock();
-            setInterval(updateClock, 1000);
-            setTimeout(() => updateRiskUI(130), 300);
-            setupDropdown('notiBtn', 'notiDropdown');
-            setupDropdown('profileBtn', 'profileDropdown');
-            document.addEventListener('click', closeDropdownsOnOutside);
-            preventCloseInsideDropdown();
-            setupTimelineFilter();
-
-            const dateInput = document.getElementById('eventDate');
-            if (dateInput) {
-                // 초기 날짜 범위 표시
-                updateDateRangeLabel(dateInput.value);
-                // 날짜 변경 이벤트 (change + input 둘 다 감지)
-                dateInput.addEventListener('change', function() {
-                    updateDateRangeLabel(this.value);
-                    if (typeof fetchDataByDate === 'function') fetchDataByDate(this.value);
-                });
-                dateInput.addEventListener('input', function() {
-                    updateDateRangeLabel(this.value);
-                });
-            }
-        }
-
-        window.addEventListener('load', initialize);
+    }
 </script>
 </body>
 </html>

@@ -22,7 +22,6 @@ public class EventScheduler {
     @Value("${scheduler.timeout-ms:600000}")
     private long timeoutMs;
 
-    // 30초마다 PENDING 이벤트 체크
     // ※ 발표 시연 시 fixedDelay = 5000 (5초) 으로 변경
     @Scheduled(fixedDelay = 5000)
     public void checkPendingEvents() {
