@@ -1,5 +1,6 @@
 package com.office.monitoring.admin;
 
+import com.office.monitoring.admin.dto.AdminCreatedAtStatsFilter;
 import com.office.monitoring.admin.dto.AdminEventStatsFilter;
 import com.office.monitoring.admin.dto.AdminStatsDTO;
 import com.office.monitoring.event.EventRepository;
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -346,11 +349,134 @@ class AdminStatsServiceTest {
         );
     }
 
+    @Test
+    void getUserStats_year만_있으면_createdAt_해당연도_기준으로_집계한다() {
+        when(memberRepository.findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2027, 1, 1, 0, 0)
+        )).thenReturn(List.of(
+                memberStats(1990, "보호자", LocalDateTime.of(2026, 1, 5, 9, 0)),
+                memberStats(1988, "초기 목적", LocalDateTime.of(2026, 12, 31, 23, 59))
+        ));
+
+        AdminStatsDTO.UserStatsResponse response =
+                adminStatsService.getUserStats(new AdminCreatedAtStatsFilter(2026, null));
+
+        assertThat(response.totalUsers()).isEqualTo(2);
+        verify(memberRepository).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2027, 1, 1, 0, 0)
+        );
+    }
+
+    @Test
+    void getUserStats_month만_있으면_createdAt_전체기준으로_안전처리한다() {
+        when(memberRepository.findAllForAdminStats()).thenReturn(List.of(
+                memberStats(1990, "보호자", LocalDateTime.of(2025, 12, 1, 8, 0)),
+                memberStats(1988, "초기 목적", LocalDateTime.of(2026, 1, 1, 8, 0))
+        ));
+
+        AdminStatsDTO.UserStatsResponse response =
+                adminStatsService.getUserStats(new AdminCreatedAtStatsFilter(null, 4));
+
+        assertThat(response.totalUsers()).isEqualTo(2);
+        verify(memberRepository).findAllForAdminStats();
+        verify(memberRepository, never()).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        );
+    }
+
+    @Test
+    void getResidentStats_year와_month가_있으면_createdAt_해당월_기준으로_집계한다() {
+        LocalDate today = LocalDate.now();
+        when(residentRepository.findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        )).thenReturn(List.of(
+                residentStats(today.minusYears(84), LocalDateTime.of(2026, 4, 2, 9, 0)),
+                residentStats(today.minusYears(74), LocalDateTime.of(2026, 4, 20, 9, 0))
+        ));
+
+        AdminStatsDTO.ResidentStatsResponse response =
+                adminStatsService.getResidentStats(new AdminCreatedAtStatsFilter(2026, 4));
+
+        assertThat(response.totalResidents()).isEqualTo(2);
+        verify(residentRepository).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        );
+    }
+
+    @Test
+    void getUserStats_yearAndMonth_filtersMembersByCreatedAtMonth() {
+        when(memberRepository.findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        )).thenReturn(List.of(
+                memberStats(1991, "PURPOSE_A", LocalDateTime.of(2026, 4, 3, 9, 0)),
+                memberStats(1987, "PURPOSE_B", LocalDateTime.of(2026, 4, 27, 9, 0))
+        ));
+
+        AdminStatsDTO.UserStatsResponse response =
+                adminStatsService.getUserStats(new AdminCreatedAtStatsFilter(2026, 4));
+
+        assertThat(response.totalUsers()).isEqualTo(2);
+        verify(memberRepository).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        );
+    }
+
+    @Test
+    void getResidentStats_year_filtersResidentsByCreatedAtYear() {
+        LocalDate today = LocalDate.now();
+        when(residentRepository.findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2027, 1, 1, 0, 0)
+        )).thenReturn(List.of(
+                residentStats(today.minusYears(84), LocalDateTime.of(2026, 1, 8, 9, 0)),
+                residentStats(today.minusYears(74), LocalDateTime.of(2026, 11, 1, 9, 0))
+        ));
+
+        AdminStatsDTO.ResidentStatsResponse response =
+                adminStatsService.getResidentStats(new AdminCreatedAtStatsFilter(2026, null));
+
+        assertThat(response.totalResidents()).isEqualTo(2);
+        verify(residentRepository).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2027, 1, 1, 0, 0)
+        );
+    }
+
+    @Test
+    void getResidentStats_monthOnly_fallsBackToAllResidents() {
+        LocalDate today = LocalDate.now();
+        when(residentRepository.findAllForAdminStats()).thenReturn(List.of(
+                residentStats(today.minusYears(84), LocalDateTime.of(2025, 12, 15, 9, 0)),
+                residentStats(today.minusYears(74), LocalDateTime.of(2026, 1, 10, 9, 0))
+        ));
+
+        AdminStatsDTO.ResidentStatsResponse response =
+                adminStatsService.getResidentStats(new AdminCreatedAtStatsFilter(null, 4));
+
+        assertThat(response.totalResidents()).isEqualTo(2);
+        verify(residentRepository).findAllForAdminStats();
+        verify(residentRepository, never()).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        );
+    }
+
     private AdminEventStatsFilter filter(Integer year, Integer month, String eventType, String status) {
         return new AdminEventStatsFilter(year, month, eventType, status);
     }
 
     private MemberRepository.AdminStatsView memberStats(Integer birthYear, String purpose) {
+        return memberStats(birthYear, purpose, null);
+    }
+
+    private MemberRepository.AdminStatsView memberStats(Integer birthYear, String purpose, LocalDateTime createdAt) {
         return new MemberRepository.AdminStatsView() {
             @Override
             public Integer getBirthYear() {
@@ -361,14 +487,28 @@ class AdminStatsServiceTest {
             public String getPurpose() {
                 return purpose;
             }
+
+            @Override
+            public LocalDateTime getCreatedAt() {
+                return createdAt;
+            }
         };
     }
 
     private ResidentRepository.AdminStatsView residentStats(LocalDate birthDate) {
+        return residentStats(birthDate, null);
+    }
+
+    private ResidentRepository.AdminStatsView residentStats(LocalDate birthDate, LocalDateTime createdAt) {
         return new ResidentRepository.AdminStatsView() {
             @Override
             public LocalDate getBirthDate() {
                 return birthDate;
+            }
+
+            @Override
+            public LocalDateTime getCreatedAt() {
+                return createdAt;
             }
         };
     }

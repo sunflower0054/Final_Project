@@ -1,5 +1,6 @@
 package com.office.monitoring.admin;
 
+import com.office.monitoring.admin.dto.AdminCreatedAtStatsFilter;
 import com.office.monitoring.admin.dto.AdminEventStatsFilter;
 import com.office.monitoring.admin.dto.AdminStatsDTO;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +19,18 @@ public class AdminStatsController {
 
     /** 회원 통계 집계 결과를 반환한다. */
     @GetMapping("/users")
-    public AdminStatsDTO.UserStatsResponse getUserStats() {
-        return adminStatsService.getUserStats();
+    public AdminStatsDTO.UserStatsResponse getUserStats(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        return adminStatsService.getUserStats(new AdminCreatedAtStatsFilter(year, month));
     }
 
     /** 거주자 통계 집계 결과를 반환한다. */
     @GetMapping("/residents")
-    public AdminStatsDTO.ResidentStatsResponse getResidentStats() {
-        return adminStatsService.getResidentStats();
+    public AdminStatsDTO.ResidentStatsResponse getResidentStats(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        return adminStatsService.getResidentStats(new AdminCreatedAtStatsFilter(year, month));
     }
 
     /** 연도·월 조건에 맞는 이벤트 통계를 반환한다. */

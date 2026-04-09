@@ -1,7 +1,11 @@
 package com.office.monitoring.admin;
 
+import com.office.monitoring.member.Member;
+import com.office.monitoring.member.Role;
+import com.office.monitoring.resident.Resident;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.hasKey;
@@ -250,5 +254,142 @@ class AdminStatsIntegrationTest extends AdminIntegrationTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.totalEvents").value(2));
+    }
+
+    @Test
+    void ADMIN은_year와_month로_회원_createdAt_통계를_조회할_수_있다() throws Exception {
+        memberRepository.deleteAll();
+        LocalDateTime filteredCreatedAt = LocalDateTime.of(2026, 4, 8, 9, 0);
+
+        memberRepository.save(Member.builder()
+                .username("filtered-user")
+                .password(passwordEncoder.encode("user1234!"))
+                .name("필터 회원")
+                .phone("010-1111-1111")
+                .birthYear(1990)
+                .purpose("보호자")
+                .role(Role.FAMILY)
+                .createdAt(filteredCreatedAt)
+                .build());
+
+        memberRepository.save(Member.builder()
+                .username("out-of-range-user")
+                .password(passwordEncoder.encode("user1234!"))
+                .name("범위 밖 회원")
+                .phone("010-2222-2222")
+                .birthYear(1985)
+                .purpose("초기 목적")
+                .role(Role.FAMILY)
+                .createdAt(LocalDateTime.of(2026, 5, 1, 0, 0))
+                .build());
+
+        mockMvc.perform(get("/api/v1/admin/stats/users")
+                        .param("year", "2026")
+                        .param("month", "4")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.totalUsers").value(1));
+    }
+
+    @Test
+    void ADMIN은_month만_있어도_독거노인_createdAt_통계를_전체기준으로_안전하게_조회할_수_있다() throws Exception {
+        residentRepository.deleteAll();
+        LocalDate today = LocalDate.now();
+
+        residentRepository.save(Resident.builder()
+                .name("전체 기준 1")
+                .birthDate(today.minusYears(84))
+                .address("서울시 종로구")
+                .phone("010-1111-3333")
+                .disease("고혈압")
+                .latitude(37.57)
+                .longitude(126.98)
+                .createdAt(LocalDateTime.of(2025, 12, 15, 9, 0))
+                .build());
+
+        residentRepository.save(Resident.builder()
+                .name("전체 기준 2")
+                .birthDate(today.minusYears(74))
+                .address("서울시 중구")
+                .phone("010-1111-4444")
+                .disease("당뇨")
+                .latitude(37.56)
+                .longitude(126.99)
+                .createdAt(LocalDateTime.of(2026, 1, 10, 9, 0))
+                .build());
+
+        mockMvc.perform(get("/api/v1/admin/stats/residents")
+                        .param("month", "4")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.totalResidents").value(2));
+    }
+    @Test
+    void usersApi_yearFilter_returnsOnlyMembersInRequestedYear() throws Exception {
+        memberRepository.deleteAll();
+
+        saveMemberForStats("year-2026-a", 1990, "PURPOSE_A", LocalDateTime.of(2026, 1, 8, 9, 0));
+        saveMemberForStats("year-2026-b", 1988, "PURPOSE_B", LocalDateTime.of(2026, 11, 1, 9, 0));
+        saveMemberForStats("year-2025", 1985, "PURPOSE_C", LocalDateTime.of(2025, 12, 31, 23, 59));
+
+        mockMvc.perform(get("/api/v1/admin/stats/users")
+                        .param("year", "2026")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.totalUsers").value(2));
+    }
+
+    @Test
+    void usersApi_monthOnly_fallsBackToWholeRange() throws Exception {
+        memberRepository.deleteAll();
+
+        saveMemberForStats("month-only-a", 1990, "PURPOSE_A", LocalDateTime.of(2025, 12, 15, 9, 0));
+        saveMemberForStats("month-only-b", 1988, "PURPOSE_B", LocalDateTime.of(2026, 1, 10, 9, 0));
+
+        mockMvc.perform(get("/api/v1/admin/stats/users")
+                        .param("month", "4")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.totalUsers").value(2));
+    }
+
+    @Test
+    void residentsApi_yearFilter_returnsOnlyResidentsInRequestedYear() throws Exception {
+        eventRepository.deleteAll();
+        residentRepository.deleteAll();
+        LocalDate today = LocalDate.now();
+
+        saveResidentForStats("resident-2026-a", today.minusYears(84), LocalDateTime.of(2026, 1, 8, 9, 0));
+        saveResidentForStats("resident-2026-b", today.minusYears(74), LocalDateTime.of(2026, 11, 1, 9, 0));
+        saveResidentForStats("resident-2025", today.minusYears(64), LocalDateTime.of(2025, 12, 31, 23, 59));
+
+        mockMvc.perform(get("/api/v1/admin/stats/residents")
+                        .param("year", "2026")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.totalResidents").value(2));
+    }
+
+    @Test
+    void residentsApi_yearAndMonthFilter_returnsOnlyResidentsInRequestedMonth() throws Exception {
+        eventRepository.deleteAll();
+        residentRepository.deleteAll();
+        LocalDate today = LocalDate.now();
+
+        saveResidentForStats("resident-april", today.minusYears(84), LocalDateTime.of(2026, 4, 8, 9, 0));
+        saveResidentForStats("resident-may", today.minusYears(74), LocalDateTime.of(2026, 5, 1, 0, 0));
+
+        mockMvc.perform(get("/api/v1/admin/stats/residents")
+                        .param("year", "2026")
+                        .param("month", "4")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.totalResidents").value(1));
     }
 }

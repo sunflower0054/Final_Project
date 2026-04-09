@@ -1,5 +1,6 @@
 package com.office.monitoring.admin;
 
+import com.office.monitoring.admin.dto.AdminCreatedAtStatsFilter;
 import com.office.monitoring.admin.dto.AdminEventStatsFilter;
 import com.office.monitoring.admin.dto.AdminStatsDTO;
 import com.office.monitoring.event.EventRepository;
@@ -49,7 +50,11 @@ public class AdminStatsService {
 
     /** 회원 수, 연령대, 가입 목적 통계를 조합한다. */
     public AdminStatsDTO.UserStatsResponse getUserStats() {
-        List<MemberRepository.AdminStatsView> members = memberRepository.findAllForAdminStats();
+        return getUserStats(new AdminCreatedAtStatsFilter(null, null));
+    }
+
+    public AdminStatsDTO.UserStatsResponse getUserStats(AdminCreatedAtStatsFilter filter) {
+        List<MemberRepository.AdminStatsView> members = getFilteredMembers(filter);
         return new AdminStatsDTO.UserStatsResponse(
                 true,
                 members.size(),
@@ -60,7 +65,11 @@ public class AdminStatsService {
 
     /** 거주자 수, 평균 나이, 연령대 통계를 조합한다. */
     public AdminStatsDTO.ResidentStatsResponse getResidentStats() {
-        List<ResidentRepository.AdminStatsView> residents = residentRepository.findAllForAdminStats();
+        return getResidentStats(new AdminCreatedAtStatsFilter(null, null));
+    }
+
+    public AdminStatsDTO.ResidentStatsResponse getResidentStats(AdminCreatedAtStatsFilter filter) {
+        List<ResidentRepository.AdminStatsView> residents = getFilteredResidents(filter);
         return new AdminStatsDTO.ResidentStatsResponse(
                 true,
                 residents.size(),
@@ -214,6 +223,44 @@ public class AdminStatsService {
     }
 
     /** year/month 조합에 맞는 이벤트 조회 범위를 결정한다. */
+    private List<MemberRepository.AdminStatsView> getFilteredMembers(AdminCreatedAtStatsFilter filter) {
+        Integer year = filter.year();
+        Integer month = filter.month();
+
+        if (year == null) {
+            return memberRepository.findAllForAdminStats();
+        }
+
+        boolean monthFilterEnabled = isValidMonth(month);
+        LocalDateTime start = monthFilterEnabled
+                ? LocalDateTime.of(year, month, 1, 0, 0)
+                : LocalDateTime.of(year, 1, 1, 0, 0);
+        LocalDateTime end = monthFilterEnabled
+                ? start.plusMonths(1)
+                : start.plusYears(1);
+
+        return memberRepository.findAllForAdminStatsByCreatedAtBetween(start, end);
+    }
+
+    private List<ResidentRepository.AdminStatsView> getFilteredResidents(AdminCreatedAtStatsFilter filter) {
+        Integer year = filter.year();
+        Integer month = filter.month();
+
+        if (year == null) {
+            return residentRepository.findAllForAdminStats();
+        }
+
+        boolean monthFilterEnabled = isValidMonth(month);
+        LocalDateTime start = monthFilterEnabled
+                ? LocalDateTime.of(year, month, 1, 0, 0)
+                : LocalDateTime.of(year, 1, 1, 0, 0);
+        LocalDateTime end = monthFilterEnabled
+                ? start.plusMonths(1)
+                : start.plusYears(1);
+
+        return residentRepository.findAllForAdminStatsByCreatedAtBetween(start, end);
+    }
+
     private List<EventRepository.AdminStatsView> getFilteredEvents(AdminEventStatsFilter filter) {
         Integer year = filter.year();
         Integer month = filter.month();

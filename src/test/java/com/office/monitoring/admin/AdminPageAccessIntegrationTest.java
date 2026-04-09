@@ -34,10 +34,16 @@ class AdminPageAccessIntegrationTest extends AdminIntegrationTestSupport {
                 .andExpect(content().string(containsString("/api/v1/admin/stats/users")))
                 .andExpect(content().string(containsString("/api/v1/admin/stats/residents")))
                 .andExpect(content().string(containsString("/api/v1/admin/stats/events")))
+                .andExpect(content().string(containsString("createdAtYearFilter")))
+                .andExpect(content().string(containsString("createdAtMonthFilter")))
+                .andExpect(content().string(containsString("resetCreatedAtFiltersBtn")))
                 .andExpect(content().string(containsString("eventYearFilter")))
                 .andExpect(content().string(containsString("eventMonthFilter")))
                 .andExpect(content().string(containsString("eventTypeFilter")))
                 .andExpect(content().string(containsString("eventStatusFilter")))
+                .andExpect(content().string(containsString("buildUserStatsUrl")))
+                .andExpect(content().string(containsString("buildResidentStatsUrl")))
+                .andExpect(content().string(containsString("reloadCreatedAtStats")))
                 .andExpect(content().string(containsString("buildEventStatsUrl")));
     }
 }

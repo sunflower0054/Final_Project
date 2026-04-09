@@ -2,8 +2,10 @@ package com.office.monitoring.resident;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /** 거주자 데이터 조회·등록·수정·삭제 흐름을 담당하는 구성 요소. */
@@ -13,9 +15,17 @@ public interface ResidentRepository extends JpaRepository<Resident, Long> {
     interface AdminStatsView {
         /** 생년월일 값을 반환한다. */
         LocalDate getBirthDate();
+
+        LocalDateTime getCreatedAt();
     }
 
     /** 관리자 통계에 필요한 최소 거주자 컬럼만 projection으로 조회한다. */
-    @Query("select r.birthDate as birthDate from Resident r")
+    @Query("select r.birthDate as birthDate, r.createdAt as createdAt from Resident r")
     List<AdminStatsView> findAllForAdminStats();
+
+    @Query("select r.birthDate as birthDate, r.createdAt as createdAt " +
+            "from Resident r " +
+            "where r.createdAt >= :start and r.createdAt < :end")
+    List<AdminStatsView> findAllForAdminStatsByCreatedAtBetween(@Param("start") LocalDateTime start,
+                                                                @Param("end") LocalDateTime end);
 }

@@ -51,6 +51,31 @@
             text-align: center;
         }
 
+        .filter-panel {
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .filter-panel-header {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .filter-panel-helper {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .created-at-filter-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
         .event-chart-header {
             display: flex;
             flex-direction: column;
@@ -77,6 +102,7 @@
             align-items: center;
         }
 
+        .created-at-filter-row select,
         .event-filter-row select {
             min-width: 140px;
             height: 40px;
@@ -123,6 +149,7 @@
                 grid-column: auto;
             }
 
+            .created-at-filter-row select,
             .event-filter-row select,
             .filter-reset-btn {
                 width: 100%;
@@ -159,6 +186,41 @@
         <div class="stat-card">
             <div class="stat-title">AI 오탐지율</div>
             <div class="stat-value red" id="falseAlarmRate">로딩중...</div>
+        </div>
+    </div>
+
+    <div class="content-card filter-panel">
+        <div class="filter-panel-header">
+            <div class="section-title">
+                [ 회원/독거노인 등록 일자 ]
+            </div>
+            <div class="filter-panel-helper">
+                아래 필터는 회원/독거노인 통계에만 적용되며 이벤트 통계에는 영향을 주지 않습니다.
+            </div>
+        </div>
+
+        <div class="created-at-filter-row">
+            <select id="createdAtYearFilter" aria-label="회원 및 독거노인 연도 필터">
+                <option value="">전체 연도</option>
+            </select>
+
+            <select id="createdAtMonthFilter" aria-label="회원 및 독거노인 월 필터">
+                <option value="">전체 월</option>
+                <option value="1">1월</option>
+                <option value="2">2월</option>
+                <option value="3">3월</option>
+                <option value="4">4월</option>
+                <option value="5">5월</option>
+                <option value="6">6월</option>
+                <option value="7">7월</option>
+                <option value="8">8월</option>
+                <option value="9">9월</option>
+                <option value="10">10월</option>
+                <option value="11">11월</option>
+                <option value="12">12월</option>
+            </select>
+
+            <button type="button" id="resetCreatedAtFiltersBtn" class="filter-reset-btn">초기화</button>
         </div>
     </div>
 
@@ -259,6 +321,10 @@
         userError: null,
         residentError: null,
         eventError: null,
+        createdAtFilters: {
+            year: '',
+            month: ''
+        },
         eventFilters: {
             year: '',
             month: '',
@@ -269,7 +335,9 @@
 
     function initAdminStatsPage() {
         colors = readChartColors();
+        initializeCreatedAtFilterOptions();
         initializeEventFilterOptions();
+        bindCreatedAtFilterControls();
         bindEventFilterControls();
         setLoadingState();
         loadDashboardData();
@@ -294,8 +362,16 @@
         };
     }
 
+    function initializeCreatedAtFilterOptions() {
+        populateYearFilterOptions('createdAtYearFilter');
+    }
+
     function initializeEventFilterOptions() {
-        const yearSelect = document.getElementById('eventYearFilter');
+        populateYearFilterOptions('eventYearFilter');
+    }
+
+    function populateYearFilterOptions(selectId) {
+        const yearSelect = document.getElementById(selectId);
         if (!yearSelect) {
             return;
         }
@@ -307,6 +383,45 @@
             option.textContent = `${year}년`;
             yearSelect.appendChild(option);
         }
+    }
+
+    function bindCreatedAtFilterControls() {
+        const filterIds = ['createdAtYearFilter', 'createdAtMonthFilter'];
+
+        filterIds.forEach((id) => {
+            const element = document.getElementById(id);
+            if (!element) {
+                return;
+            }
+
+            element.addEventListener('change', () => {
+                dashboardState.createdAtFilters = {
+                    year: document.getElementById('createdAtYearFilter')?.value || '',
+                    month: document.getElementById('createdAtMonthFilter')?.value || ''
+                };
+                reloadCreatedAtStats();
+            });
+        });
+
+        const resetButton = document.getElementById('resetCreatedAtFiltersBtn');
+        if (resetButton) {
+            resetButton.addEventListener('click', resetCreatedAtFilters);
+        }
+    }
+
+    function resetCreatedAtFilters() {
+        const yearFilter = document.getElementById('createdAtYearFilter');
+        const monthFilter = document.getElementById('createdAtMonthFilter');
+
+        if (yearFilter) yearFilter.value = '';
+        if (monthFilter) monthFilter.value = '';
+
+        dashboardState.createdAtFilters = {
+            year: '',
+            month: ''
+        };
+
+        reloadCreatedAtStats();
     }
 
     function bindEventFilterControls() {
@@ -356,6 +471,29 @@
         reloadEventStats();
     }
 
+    function buildUserStatsUrl() {
+        return buildCreatedAtStatsUrl('/api/v1/admin/stats/users');
+    }
+
+    function buildResidentStatsUrl() {
+        return buildCreatedAtStatsUrl('/api/v1/admin/stats/residents');
+    }
+
+    function buildCreatedAtStatsUrl(path) {
+        const params = new URLSearchParams();
+        const { year, month } = dashboardState.createdAtFilters;
+
+        if (year) {
+            params.set('year', year);
+        }
+        if (month) {
+            params.set('month', month);
+        }
+
+        const query = params.toString();
+        return query ? `${path}?${query}` : path;
+    }
+
     function buildEventStatsUrl() {
         const params = new URLSearchParams();
         const { year, month, eventType, status } = dashboardState.eventFilters;
@@ -379,8 +517,8 @@
 
     async function loadDashboardData() {
         const [userResult, residentResult, eventResult] = await Promise.allSettled([
-            fetchStats('/api/v1/admin/stats/users'),
-            fetchStats('/api/v1/admin/stats/residents'),
+            fetchStats(buildUserStatsUrl()),
+            fetchStats(buildResidentStatsUrl()),
             fetchStats(buildEventStatsUrl())
         ]);
 
@@ -389,6 +527,25 @@
         applySectionResult('eventData', 'eventError', eventResult);
 
         renderDashboard();
+    }
+
+    async function reloadCreatedAtStats() {
+        setCardText('totalUsers', '濡쒕뵫以?..');
+        setCardText('totalResidents', '濡쒕뵫以?..');
+        document.getElementById('avgAge').innerText = '0';
+        showChartMessage('userAgeChart', '?뚯썝 ?곕졊? ?곗씠?곕? 遺덈윭?ㅻ뒗 以묒엯?덈떎.');
+        showChartMessage('userPurposeChart', '?뚯썝 媛??紐⑹쟻 ?곗씠?곕? 遺덈윭?ㅻ뒗 以묒엯?덈떎.');
+        showChartMessage('residentAgeChart', '嫄곗＜???곗씠?곕? 遺덈윭?ㅻ뒗 以묒엯?덈떎.');
+
+        const [userResult, residentResult] = await Promise.allSettled([
+            fetchStats(buildUserStatsUrl()),
+            fetchStats(buildResidentStatsUrl())
+        ]);
+
+        applySectionResult('userData', 'userError', userResult);
+        applySectionResult('residentData', 'residentError', residentResult);
+        renderUserSection();
+        renderResidentSection();
     }
 
     async function reloadEventStats() {
