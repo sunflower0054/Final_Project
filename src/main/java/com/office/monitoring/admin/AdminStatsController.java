@@ -1,5 +1,7 @@
 package com.office.monitoring.admin;
 
+import com.office.monitoring.admin.dto.AdminEventStatsFilter;
+import com.office.monitoring.admin.dto.AdminStatsDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +32,11 @@ public class AdminStatsController {
     @GetMapping("/events")
     public AdminStatsDTO.EventStatsResponse getEventStats(
             @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer month) {
-        return adminStatsService.getEventStats(year, month);
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) String eventType,
+            @RequestParam(required = false) String status) {
+        return adminStatsService.getEventStats(
+                new AdminEventStatsFilter(year, month, eventType, status)
+        );
     }
 }

@@ -165,4 +165,90 @@ class AdminStatsIntegrationTest extends AdminIntegrationTestSupport {
                 .andExpect(jsonPath("$.monthlyTrend[1][0]").value("2025-12"))
                 .andExpect(jsonPath("$.monthlyTrend[2][0]").value("2026-01"));
     }
+
+    @Test
+    void ADMIN은_eventType_필터로_이벤트통계를_조회할_수_있다() throws Exception {
+        eventRepository.deleteAll();
+        saveEvent("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 4, 8, 9, 0));
+        saveEvent("FALL_DETECTED", "PENDING", LocalDateTime.of(2026, 4, 9, 9, 0));
+        saveEvent("NO_MOTION_DETECTED", "AUTO_REPORTED", LocalDateTime.of(2026, 4, 10, 9, 0));
+
+        mockMvc.perform(get("/api/v1/admin/stats/events")
+                        .param("eventType", "FALL_DETECTED")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.totalEvents").value(2))
+                .andExpect(jsonPath("$.byType[1][1]").value(2))
+                .andExpect(jsonPath("$.byType[2][1]").value(0))
+                .andExpect(jsonPath("$.byType[3][1]").value(0))
+                .andExpect(jsonPath("$.byStatus[1][1]").value(1))
+                .andExpect(jsonPath("$.byStatus[2][1]").value(0))
+                .andExpect(jsonPath("$.byStatus[3][1]").value(0));
+    }
+
+    @Test
+    void ADMIN은_status_필터로_이벤트통계를_조회할_수_있다() throws Exception {
+        eventRepository.deleteAll();
+        saveEvent("FALL_DETECTED", "CLOSED", LocalDateTime.of(2026, 4, 8, 9, 0));
+        saveEvent("VIOLENT_MOTION_DETECTED", "CLOSED", LocalDateTime.of(2026, 4, 9, 9, 0));
+        saveEvent("NO_MOTION_DETECTED", "AUTO_REPORTED", LocalDateTime.of(2026, 4, 10, 9, 0));
+
+        mockMvc.perform(get("/api/v1/admin/stats/events")
+                        .param("status", "CLOSED")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.totalEvents").value(2))
+                .andExpect(jsonPath("$.byType[1][1]").value(1))
+                .andExpect(jsonPath("$.byType[2][1]").value(0))
+                .andExpect(jsonPath("$.byType[3][1]").value(1))
+                .andExpect(jsonPath("$.byStatus[1][1]").value(0))
+                .andExpect(jsonPath("$.byStatus[2][1]").value(0))
+                .andExpect(jsonPath("$.byStatus[3][1]").value(2));
+    }
+
+    @Test
+    void ADMIN은_복합필터로_이벤트통계를_조회할_수_있다() throws Exception {
+        eventRepository.deleteAll();
+        saveEvent("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 4, 8, 9, 0));
+        saveEvent("FALL_DETECTED", "PENDING", LocalDateTime.of(2026, 4, 9, 9, 0));
+        saveEvent("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 5, 1, 9, 0));
+        saveEvent("NO_MOTION_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 4, 10, 9, 0));
+
+        mockMvc.perform(get("/api/v1/admin/stats/events")
+                        .param("year", "2026")
+                        .param("month", "4")
+                        .param("eventType", "FALL_DETECTED")
+                        .param("status", "CONFIRMED")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.totalEvents").value(1))
+                .andExpect(jsonPath("$.byType[1][1]").value(1))
+                .andExpect(jsonPath("$.byType[2][1]").value(0))
+                .andExpect(jsonPath("$.byType[3][1]").value(0))
+                .andExpect(jsonPath("$.byStatus[1][1]").value(1))
+                .andExpect(jsonPath("$.byStatus[2][1]").value(0))
+                .andExpect(jsonPath("$.byStatus[3][1]").value(0))
+                .andExpect(jsonPath("$.monthlyTrend.length()").value(2))
+                .andExpect(jsonPath("$.monthlyTrend[1][0]").value("4월"))
+                .andExpect(jsonPath("$.monthlyTrend[1][1]").value(1))
+                .andExpect(jsonPath("$.monthlyTrend[1][2]").value(0))
+                .andExpect(jsonPath("$.monthlyTrend[1][3]").value(0));
+    }
+
+    @Test
+    void ADMIN은_알수없는_eventType이어도_전체기준으로_안전하게_조회할_수_있다() throws Exception {
+        eventRepository.deleteAll();
+        saveEvent("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 4, 8, 9, 0));
+        saveEvent("VIOLENT_MOTION_DETECTED", "AUTO_REPORTED", LocalDateTime.of(2026, 4, 9, 9, 0));
+
+        mockMvc.perform(get("/api/v1/admin/stats/events")
+                        .param("eventType", "UNKNOWN")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.totalEvents").value(2));
+    }
 }

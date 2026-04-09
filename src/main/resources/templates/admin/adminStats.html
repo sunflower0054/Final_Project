@@ -51,11 +51,69 @@
             text-align: center;
         }
 
+        .event-filter-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 14px;
+        }
+
+        .event-filter-row select {
+            min-width: 140px;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 10px;
+            background: #fff;
+            color: var(--gray-900);
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .event-filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        .filter-reset-btn {
+            height: 38px;
+            padding: 0 16px;
+            border: none;
+            border-radius: 10px;
+            background: var(--navy, #94D05C);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .filter-reset-btn:hover {
+            opacity: 0.92;
+        }
+
         #userAgeChart {
             background: var(--navy-light);
         }
+
         #monthlyTrendChart {
             height: 350px;
+        }
+
+        @media (max-width: 900px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-card-wide {
+                grid-column: auto;
+            }
+
+            .event-filter-row select {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -115,6 +173,53 @@
 
         <div class="content-card chart-card">
             <div class="section-title">
+                [ 이벤트 필터 ]
+            </div>
+
+            <div class="event-filter-row">
+                <select id="eventYearFilter" aria-label="이벤트 연도 필터">
+                    <option value="">전체 연도</option>
+                </select>
+
+                <select id="eventMonthFilter" aria-label="이벤트 월 필터">
+                    <option value="">전체 월</option>
+                    <option value="1">1월</option>
+                    <option value="2">2월</option>
+                    <option value="3">3월</option>
+                    <option value="4">4월</option>
+                    <option value="5">5월</option>
+                    <option value="6">6월</option>
+                    <option value="7">7월</option>
+                    <option value="8">8월</option>
+                    <option value="9">9월</option>
+                    <option value="10">10월</option>
+                    <option value="11">11월</option>
+                    <option value="12">12월</option>
+                </select>
+
+                <select id="eventTypeFilter" aria-label="이벤트 유형 필터">
+                    <option value="">전체 유형</option>
+                    <option value="FALL_DETECTED">낙상</option>
+                    <option value="NO_MOTION_DETECTED">움직임 없음</option>
+                    <option value="VIOLENT_MOTION_DETECTED">폭행</option>
+                </select>
+
+                <select id="eventStatusFilter" aria-label="이벤트 상태 필터">
+                    <option value="">전체 상태</option>
+                    <option value="PENDING">대기중</option>
+                    <option value="CONFIRMED">수동신고</option>
+                    <option value="AUTO_REPORTED">자동신고</option>
+                    <option value="CLOSED">오탐지</option>
+                </select>
+            </div>
+
+            <div class="event-filter-actions">
+                <button type="button" id="resetEventFiltersBtn" class="filter-reset-btn">초기화</button>
+            </div>
+        </div>
+
+        <div class="content-card chart-card">
+            <div class="section-title">
                 [ 이벤트 처리 상태 ]
             </div>
             <div id="eventStatusChart" class="chart-container"></div>
@@ -140,11 +245,19 @@
         eventData: null,
         userError: null,
         residentError: null,
-        eventError: null
+        eventError: null,
+        eventFilters: {
+            year: '',
+            month: '',
+            eventType: '',
+            status: ''
+        }
     };
 
     function initAdminStatsPage() {
         colors = readChartColors();
+        initializeEventFilterOptions();
+        bindEventFilterControls();
         setLoadingState();
         loadDashboardData();
     }
@@ -168,11 +281,94 @@
         };
     }
 
+    function initializeEventFilterOptions() {
+        const yearSelect = document.getElementById('eventYearFilter');
+        if (!yearSelect) {
+            return;
+        }
+
+        const currentYear = new Date().getFullYear();
+        for (let year = currentYear; year >= currentYear - 4; year--) {
+            const option = document.createElement('option');
+            option.value = String(year);
+            option.textContent = `${year}년`;
+            yearSelect.appendChild(option);
+        }
+    }
+
+    function bindEventFilterControls() {
+        const filterIds = ['eventYearFilter', 'eventMonthFilter', 'eventTypeFilter', 'eventStatusFilter'];
+
+        filterIds.forEach((id) => {
+            const element = document.getElementById(id);
+            if (!element) {
+                return;
+            }
+
+            element.addEventListener('change', () => {
+                dashboardState.eventFilters = {
+                    year: document.getElementById('eventYearFilter')?.value || '',
+                    month: document.getElementById('eventMonthFilter')?.value || '',
+                    eventType: document.getElementById('eventTypeFilter')?.value || '',
+                    status: document.getElementById('eventStatusFilter')?.value || ''
+                };
+                reloadEventStats();
+            });
+        });
+
+        const resetButton = document.getElementById('resetEventFiltersBtn');
+        if (resetButton) {
+            resetButton.addEventListener('click', resetEventFilters);
+        }
+    }
+
+    function resetEventFilters() {
+        const yearFilter = document.getElementById('eventYearFilter');
+        const monthFilter = document.getElementById('eventMonthFilter');
+        const typeFilter = document.getElementById('eventTypeFilter');
+        const statusFilter = document.getElementById('eventStatusFilter');
+
+        if (yearFilter) yearFilter.value = '';
+        if (monthFilter) monthFilter.value = '';
+        if (typeFilter) typeFilter.value = '';
+        if (statusFilter) statusFilter.value = '';
+
+        dashboardState.eventFilters = {
+            year: '',
+            month: '',
+            eventType: '',
+            status: ''
+        };
+
+        reloadEventStats();
+    }
+
+    function buildEventStatsUrl() {
+        const params = new URLSearchParams();
+        const { year, month, eventType, status } = dashboardState.eventFilters;
+
+        if (year) {
+            params.set('year', year);
+        }
+        if (month) {
+            params.set('month', month);
+        }
+        if (eventType) {
+            params.set('eventType', eventType);
+        }
+        if (status) {
+            params.set('status', status);
+        }
+
+        const query = params.toString();
+        return query ? `/api/v1/admin/stats/events?${query}` : '/api/v1/admin/stats/events';
+    }
+
     async function loadDashboardData() {
         const [userResult, residentResult, eventResult] = await Promise.allSettled([
             fetchStats('/api/v1/admin/stats/users'),
             fetchStats('/api/v1/admin/stats/residents'),
-            fetchStats('/api/v1/admin/stats/events')
+            fetchStats(buildEventStatsUrl())
         ]);
 
         applySectionResult('userData', 'userError', userResult);
@@ -180,6 +376,20 @@
         applySectionResult('eventData', 'eventError', eventResult);
 
         renderDashboard();
+    }
+
+    async function reloadEventStats() {
+        setCardText('totalEvents', '로딩중...');
+        setCardText('falseAlarmRate', '로딩중...');
+        showChartMessage('eventStatusChart', '이벤트 상태 데이터를 불러오는 중입니다.');
+        showChartMessage('monthlyTrendChart', '월별 이벤트 추이를 불러오는 중입니다.');
+
+        const [eventResult] = await Promise.allSettled([
+            fetchStats(buildEventStatsUrl())
+        ]);
+
+        applySectionResult('eventData', 'eventError', eventResult);
+        renderEventSection();
     }
 
     function applySectionResult(dataKey, errorKey, result) {
@@ -318,6 +528,9 @@
     function normalizeEventStats(data) {
         return {
             totalEvents: asNumber(data?.totalEvents),
+            byType: normalizeChartData(data?.byType, [
+                ['유형', '건수']
+            ]),
             byStatus: normalizeChartData(data?.byStatus, [
                 ['상태', '건수']
             ]),
@@ -512,7 +725,7 @@
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
             renderDashboard();
-        }, 250);   // 250ms 디바운스
+        }, 250);
     });
 </script>
 </body>

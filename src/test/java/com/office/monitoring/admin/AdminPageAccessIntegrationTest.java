@@ -27,13 +27,17 @@ class AdminPageAccessIntegrationTest extends AdminIntegrationTestSupport {
     }
 
     @Test
-    void ADMIN은_관리자통계_페이지에_접근하고_실제_API연결_스크립트를_받는다() throws Exception {
+    void ADMIN은_관리자통계_페이지에_접근하고_필터가포함된_실제_API연결_스크립트를_받는다() throws Exception {
         mockMvc.perform(get("/admin/stats")
                         .with(user("admin").roles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("/api/v1/admin/stats/users")))
                 .andExpect(content().string(containsString("/api/v1/admin/stats/residents")))
                 .andExpect(content().string(containsString("/api/v1/admin/stats/events")))
-                .andExpect(content().string(containsString("Promise.allSettled")));
+                .andExpect(content().string(containsString("eventYearFilter")))
+                .andExpect(content().string(containsString("eventMonthFilter")))
+                .andExpect(content().string(containsString("eventTypeFilter")))
+                .andExpect(content().string(containsString("eventStatusFilter")))
+                .andExpect(content().string(containsString("buildEventStatsUrl")));
     }
 }

@@ -1,4 +1,4 @@
-package com.office.monitoring.admin;
+package com.office.monitoring.admin.dto;
 
 import java.util.List;
 
