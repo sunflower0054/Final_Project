@@ -1,6 +1,7 @@
 package com.office.monitoring.member;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,11 +48,17 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(status().isOk())
                 .andReturn();
 
+        MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
+        assertThat(session).isNotNull();
+
         mockMvc.perform(post("/api/v1/auth/logout")
-                        .session((org.springframework.mock.web.MockHttpSession) loginResult.getRequest().getSession(false)))
+                        .session(session))
                 .andExpect(status().isOk())
+                .andExpect(cookie().maxAge("JSESSIONID", 0))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("로그아웃되었습니다."));
+
+        assertThat(session.isInvalid()).isTrue();
     }
 
     @Test
@@ -127,6 +134,22 @@ class AuthIntegrationTest extends MemberIntegrationTestSupport {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("이미 사용 중인 아이디입니다."));
+    }
+
+    @Test
+    void 회원가입시_CSRF_없으면_403() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/register")
+                        .contentType("application/json")
+                        .content("""
+                    {
+                      "username": "no-csrf-user",
+                      "password": "pass-1234!",
+                      "name": "무토큰 사용자",
+                      "phone": "010-1234-5678",
+                      "purpose": "csrf 검증"
+                    }
+                    """))
+                .andExpect(status().isForbidden());
     }
 
     @Test

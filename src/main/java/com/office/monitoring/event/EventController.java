@@ -17,4 +17,10 @@ public class EventController {
     public String eventDetail() {
         return "events/event_detail";
     }
+
+
+
+
+
+
 }

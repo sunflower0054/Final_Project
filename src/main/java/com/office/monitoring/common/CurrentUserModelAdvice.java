@@ -23,25 +23,41 @@ public class CurrentUserModelAdvice {
 
     @ModelAttribute("currentUser")
     public Map<String, Object> currentUser() {
+        System.out.println("=== currentUser() 실행됨 ===");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        System.out.println("=== authentication: " + authentication);
+        System.out.println("=== isAuthenticated: " + (authentication != null ? authentication.isAuthenticated() : "null"));
+        System.out.println("=== isAnonymous: " + (authentication instanceof AnonymousAuthenticationToken));
 
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || authentication instanceof AnonymousAuthenticationToken) {
+            System.out.println("=== 인증 실패 → false 반환");
             return createDefaultModel(false);
         }
 
-        Member member = currentUserService.getCurrentMember();
+        try {
+            Member member = currentUserService.getCurrentMember();
+            System.out.println("=== member 조회 성공: " + member);
 
-        Map<String, Object> model = createDefaultModel(true);
-        model.put("username", display(member.getUsername()));
-        model.put("name", display(member.getName()));
-        model.put("phone", display(member.getPhone()));
-        model.put("purpose", display(member.getPurpose()));
-        model.put("role", member.getRole() != null ? member.getRole().name() : NOT_REGISTERED);
-        model.put("roleLabel", toRoleLabel(member.getRole()));
+            Map<String, Object> model = createDefaultModel(true);
+            model.put("username", display(member.getUsername()));
+            model.put("name", display(member.getName()));
+            model.put("phone", display(member.getPhone()));
+            model.put("purpose", display(member.getPurpose()));
+            model.put("residentId", member.getResidentId());
+            model.put("role", member.getRole() != null ? member.getRole().name() : NOT_REGISTERED);
+            model.put("roleLabel", toRoleLabel(member.getRole()));
 
-        return model;
+            System.out.println("=== 최종 model: " + model);
+            return model;
+
+        } catch (Exception e) {
+            System.out.println("=== 예외 발생: " + e.getMessage());
+            e.printStackTrace();
+            return createDefaultModel(false);
+        }
     }
 
     private Map<String, Object> createDefaultModel(boolean authenticated) {
@@ -52,6 +68,7 @@ public class CurrentUserModelAdvice {
         model.put("name", NOT_REGISTERED);
         model.put("phone", NOT_REGISTERED);
         model.put("purpose", NOT_REGISTERED);
+        model.put("residentId", null);
         model.put("role", NOT_REGISTERED);
         model.put("roleLabel", NOT_REGISTERED);
 

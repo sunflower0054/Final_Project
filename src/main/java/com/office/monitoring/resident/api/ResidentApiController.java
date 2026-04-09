@@ -1,12 +1,15 @@
 package com.office.monitoring.resident.api;
 
 import com.office.monitoring.resident.ResidentService;
+import com.office.monitoring.resident.ResidentDeletionBlockedException;
 import com.office.monitoring.resident.dto.ResidentCreateRequest;
 import com.office.monitoring.resident.dto.ResidentCreateResponse;
 import com.office.monitoring.resident.dto.ResidentResponse;
 import com.office.monitoring.resident.dto.ResidentUpdateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -42,6 +45,15 @@ public class ResidentApiController {
         );
     }
 
+    @DeleteMapping("/{id}")
+    public Map<String, Object> deleteResident(@PathVariable Long id) {
+        residentService.deleteResident(id);
+        return Map.of(
+                "success", true,
+                "message", "거주자 정보가 삭제되었습니다."
+        );
+    }
+
     @GetMapping("/{id}")
     public Map<String, Object> getResident(@PathVariable Long id) {
         ResidentResponse resident = residentService.getResident(id);
@@ -49,5 +61,13 @@ public class ResidentApiController {
                 "success", true,
                 "resident", resident
         );
+    }
+
+    @ExceptionHandler(ResidentDeletionBlockedException.class)
+    public ResponseEntity<Map<String, Object>> handleResidentDeletionBlockedException(ResidentDeletionBlockedException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "success", false,
+                "message", exception.getMessage()
+        ));
     }
 }

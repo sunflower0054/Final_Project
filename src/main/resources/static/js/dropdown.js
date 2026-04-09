@@ -1,3 +1,4 @@
+/*
 
 function updateClock() {
     const now = new Date();
@@ -38,10 +39,34 @@ function initialize() {
     updateClock();
     setInterval(updateClock, 1000);
 
-    setupDropdown('notiBtn', 'notiDropdown');
     setupDropdown('profileBtn', 'profileDropdown');
 
     document.addEventListener('click', closeDropdownsOnOutside);
 }
 
+window.addEventListener('load', initialize);
+*/
+
+// dropdown.js (수정 후)
+
+function updateClock() {
+    const now = new Date();
+    const timeEl = document.getElementById('currentTime');
+    if(!timeEl) return;
+    timeEl.innerText =
+        now.getFullYear() + '. ' +
+        (now.getMonth() + 1).toString().padStart(2, '0') + '. ' +
+        now.getDate().toString().padStart(2, '0') + ' ' +
+        now.getHours().toString().padStart(2, '0') + ':' +
+        now.getMinutes().toString().padStart(2, '0') + ':' +
+        now.getSeconds().toString().padStart(2, '0');
+}
+
+function initialize() {
+    // 시계 1초마다 갱신
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
+// 페이지가 로드될 때 실행
 window.addEventListener('load', initialize);

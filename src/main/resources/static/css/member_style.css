@@ -1,39 +1,88 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* 색상이 한층 연하고 부드러워진 네이비 톤 */
-  --navy:        #3B5B9D; 
-  --navy-mid:    #4E71B8;
-  --navy-light:  #F0F4FB;
-  --navy-subtle: #F6F8FC;
-  --accent:      #2563EB;
-  --accent-hover:#1D4ED8;
-  --accent-light:#DBEAFE;
-  --success:     #059669;
-  --success-bg:  #D1FAE5;
-  --error:       #DC2626;
-  --error-bg:    #FEE2E2;
-  --gray-50:  #F8FAFC;
-  --gray-100: #F1F5F9;
-  --gray-200: #E2E8F0;
-  --gray-300: #CBD5E1;
-  --gray-400: #94A3B8;
-  --gray-500: #64748B;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1E293B;
-  --gray-900: #0F172A;
-  --radius-sm: 8px;
-  --radius:    12px;
-  --radius-lg: 16px;
-  /* 네이버처럼 그림자를 제거하고 플랫하게 */
-  --shadow-sm: none; 
-  --shadow:    none;
+    /* =========================================
+       1. Main Theme Colors (올리브/카키 베이스)
+       ========================================= */
+    /* 가장 강조되는 핵심 색상 (기본 버튼, 헤더 등) */
+    --primary: #556B2F;
+    --navy: #556B2F;
+
+    /* 중간 톤 (호버 상태, 서브 버튼, 낙상 뱃지 등) */
+    --primary-mid: #6B8E23;
+    --navy-mid: #6B8E23;
+
+    /* 포인트 색상 (경고성 알림, 체크박스 액센트 등) */
+    --accent: #808000;
+    --accent-hover: #556B2F;
+
+    /* 배경 베이스 (아주 연한 올리브 톤으로 눈을 편안하게) */
+    --primary-light: #F5F6F1;
+    --navy-light: #F5F6F1;
+    --accent-light: #F5F6F1;
+    --navy-subtle: #FAFBFA;
+
+    /* =========================================
+       2. Gray Scale (테마에 맞춘 따뜻한 웜 그레이)
+       ========================================= */
+    --gray-50:  #FAFBFA;     /* 가장 밝은 배경 */
+    --gray-100: #F5F6F1;     /* 메인 페이지 배경 (primary-light와 통일) */
+    --gray-200: #E6E8DE;     /* 연한 테두리, 카드 경계선 */
+    --gray-300: #D0D4C5;     /* 인풋창 테두리, 비활성 요소 */
+    --gray-400: #A4A999;     /* 플레이스홀더, 부가 설명 텍스트 */
+    --gray-500: #787D6C;     /* 서브 텍스트, 아이콘 */
+    --gray-600: #595E4F;     /* 본문 텍스트 2 */
+    --gray-700: #404536;     /* 강조 텍스트 */
+    --gray-800: #292D21;     /* 진한 제목 */
+    --gray-900: #1B1E15;     /* 가장 어두운 텍스트 (블랙 대체) */
+
+    /* Text & Background Colors */
+    --text-main: var(--gray-900);
+    --text-sub: var(--gray-600);
+    --text-muted: var(--gray-400);
+
+    --bg-page: var(--gray-100);
+    --bg-card: #ffffff;
+    --border-color: var(--gray-200);
+
+    /* =========================================
+       3. Semantic Colors (상태 표시)
+       - 메인 테마를 해치지 않도록 채도를 살짝 낮춤
+       ========================================= */
+    --success: #3E8A42;
+    --success-bg: #E8F5E9;
+    --error: #C92A2A;
+    --error-bg: #FFF5F5;
+    --warning: #D97706;      /* #808000과 겹치지 않도록 주황빛 앰버 톤 유지 */
+    --warning-bg: #FEF3C7;
+    --purple: #6741D9;
+    --purple-bg: #F3F0FF;
+
+    /* =========================================
+       4. Design Elements (그림자, 라운드 등)
+       ========================================= */
+    --shadow-sm: 0 2px 8px rgba(27, 30, 21, 0.04);
+    --shadow-md: 0 8px 30px rgba(27, 30, 21, 0.06);
+    --shadow: 0 4px 12px rgba(27, 30, 21, 0.05);
+
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 16px;
+    --transition: all 0.25s ease;
+
+    /* =========================================
+       5. Charts (차트 전용 색상)
+       ========================================= */
+    --chart-grid-line: var(--gray-200);
+    --chart-pie-green-1: #6B8E23;
+    --chart-pie-green-2: #E6E8DE;
+    --chart-pie-yellow-1: #808000;
+    --chart-pie-yellow-2: #F5F6F1;
 }
 
 body {
   font-family: 'Noto Sans KR', sans-serif;
-  background: #FFFFFF; /* 배경을 완전히 하얗게 */
+  background: var(--gray-100) !important;
   color: var(--gray-900);
   font-size: 14px;
   line-height: 1.5;
@@ -299,14 +348,26 @@ body {
 /* 모달 (기존과 동일하게 유지하되 약간 다듬음) */
 .modal-overlay {
   display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-  z-index: 1000; align-items: flex-end; justify-content: center;
+  z-index: 1000;
+  align-items: center; /* flex-end에서 center로 변경하여 수직 중앙 정렬 */
+  justify-content: center;
 }
 .modal-overlay.open { display: flex; }
 .modal-card {
-  background: #fff; border-radius: 20px 20px 0 0;
-  width: 100%; max-width: 460px; max-height: 75vh;
+  background: #fff;
+  border-radius: 16px; /* 모든 모서리를 동일하게 둥글게 처리 */
+  width: 90%; /* 화면이 작아졌을 때 꽉 차지 않고 좌우 여백이 생기도록 조정 */
+  max-width: 460px;
+  max-height: 75vh;
   display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* PC 팝업 느낌을 위한 부드러운 그림자 추가 */
 }
+
+/* PC 팝업 스타일이므로 모바일용 드래그 핸들은 숨김 처리 */
+.modal-handle {
+  display: none;
+}
+
 /* ...나머지 모달 CSS는 기존과 동일하게 적용가능... */
 .modal-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--gray-300); margin: 12px auto; }
 .modal-topbar { padding: 10px 20px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gray-200); }
@@ -317,4 +378,152 @@ body {
 @media (max-width: 480px) {
   .card { border: none; padding: 20px 16px; border-radius: 0; }
   .step-container { padding: 0; }
+}
+
+
+/* =============================================
+   login.html 전용 스타일 (기존 코드 영향 없음)
+   ============================================= */
+
+.login-container {
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+}
+
+.logo {
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--navy);
+    margin-bottom: 30px;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+}
+
+.login-box {
+    background: #FFFFFF;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 40px 32px;
+}
+
+.input-group {
+    margin-top: 10px;
+}
+
+.input-box {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--gray-900);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.input-box::placeholder {
+    color: var(--gray-400);
+}
+
+.input-box:focus {
+    border-color: var(--accent);
+}
+
+.login-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.15s;
+    margin-top: 16px;
+}
+
+.login-btn:hover {
+    background: var(--navy-mid);
+}
+
+.login-links {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--gray-500);
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.login-links a {
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+
+.login-links .divider {
+    color: var(--gray-300);
+}
+
+.footer-text {
+    margin-top: 30px;
+    font-size: 12px;
+    color: var(--gray-500);
+    letter-spacing: -0.3px;
+}
+
+
+/* =============================================
+   login.html 전용 중앙 정렬 스타일 (member_style.css 안전하게 추가)
+   ============================================= */
+
+body.login-page {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    background: var(--gray-100) !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    overflow-y: auto;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+}
+
+/* 로그인 페이지 전용 간격 및 디자인 미세 조정 */
+.logo {
+    font-size: 42px;                    /* 조금 더 크게 조정 */
+    font-weight: 900;
+    color: var(--navy);
+    margin-bottom: 36px;
+    letter-spacing: -1.5px;
+}
+
+.login-box {
+    background: #ffffff;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 44px 36px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);   /* 부드러운 그림자 추가 */
+}
+
+.footer-text {
+    margin-top: 48px;
+    font-size: 12.5px;
+    color: var(--gray-500);
 }

@@ -7,6 +7,7 @@ public record MyInfoResponse(
         String username,
         String name,
         String phone,
+        Integer birthYear,
         String purpose,
         String role
 ) {
@@ -17,6 +18,7 @@ public record MyInfoResponse(
                 member.getUsername(),
                 member.getName(),
                 member.getPhone(),
+                member.getBirthYear(),
                 member.getPurpose(),
                 member.getRole() != null ? member.getRole().name() : null
         );

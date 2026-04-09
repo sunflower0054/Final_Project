@@ -43,6 +43,7 @@ public class MemberService {
                 .password(passwordEncoder.encode(request.password().trim()))
                 .name(request.name().trim())
                 .phone(request.phone().trim())
+                .birthYear(request.birthYear())
                 .purpose(request.purpose().trim())
                 .role(Role.FAMILY)
                 .build();

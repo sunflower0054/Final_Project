@@ -3,6 +3,7 @@ package com.office.monitoring.resident.dto;
 import com.office.monitoring.resident.Resident;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record ResidentResponse(
         Long id,
@@ -12,7 +13,8 @@ public record ResidentResponse(
         String phone,
         String disease,
         Double latitude,
-        Double longitude
+        Double longitude,
+        LocalDateTime createdAt
 ) {
     public static ResidentResponse from(Resident resident) {
         return new ResidentResponse(
@@ -23,7 +25,8 @@ public record ResidentResponse(
                 resident.getPhone(),
                 resident.getDisease(),
                 resident.getLatitude(),
-                resident.getLongitude()
+                resident.getLongitude(),
+                resident.getCreatedAt()
         );
     }
 }

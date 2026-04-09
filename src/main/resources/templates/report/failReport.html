@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관제 시스템 - 119 신고 실패</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=05dea7c839bf99daaa3a652b70da85fe&libraries=services"></script>
+
+    <style>
+        .report-result-layout {
+            display: flex; flex-direction: column; gap: 24px;
+            max-width: 900px; margin: 0 auto; padding-bottom: 40px;
+        }
+
+        /* 공통 배너 스타일 */
+        .banner-card {
+            background: #fff; border-radius: var(--radius); padding: 32px;
+            text-align: center; display: none; /* 기본 숨김, JS에서 제어 */
+        }
+        .banner-icon-wrap {
+            width: 64px; height: 64px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+        }
+
+        /* 수동 신고 (Success) 스타일 */
+        .success-banner { border: 1px solid var(--success); box-shadow: 0 4px 20px rgba(5, 150, 105, 0.08); }
+        .success-banner .banner-icon-wrap { background: var(--success-bg); color: var(--success); }
+        .success-text { color: var(--success); }
+
+        /* 자동 신고 (Error/Auto) 스타일 */
+        .auto-banner { border: 2px solid var(--error); box-shadow: 0 4px 20px rgba(220, 38, 38, 0.1); }
+        .auto-banner .banner-icon-wrap { background: var(--error-bg); color: var(--error); }
+        .error-text { color: var(--error); }
+
+        /* 119 전화하기 경고 박스 (자동 신고 전용) */
+        .emergency-call-card {
+            background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 12px;
+            padding: 24px; text-align: center; display: none; /* 기본 숨김 */
+        }
+        .btn-119 {
+            display: inline-flex; align-items: center; gap: 8px; background: var(--error); color: white;
+            padding: 14px 28px; border-radius: 8px; font-weight: 800; font-size: 18px;
+            text-decoration: none; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        .btn-119:hover { background: #B91C1C; transform: translateY(-2px); }
+
+        /* 문자 내용 미리보기 */
+        .sms-preview-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 24px; }
+        .sms-bubble {
+            background: #F1F5F9; border-radius: 12px; padding: 20px; font-size: 15px;
+            color: var(--gray-900); line-height: 1.6; border-left: 4px solid var(--navy); white-space: pre-wrap;
+        }
+
+        /* 지도 영역 스타일 (위) */
+        .map-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 24px; }
+        .map-wrap { width: 100%; height: 350px; background: #E2E8F0; border-radius: 12px; margin-bottom: 20px; }
+
+        /* 🏠 거주자 위치 마커 (남색 둥근 라벨) */
+        .resident-label {
+            padding: 8px 16px;
+            background: var(--navy);
+            color: white;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 14px;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+
+        /* 💬 병원 지도 말풍선 (CustomOverlay) */
+        .custom-infowindow {
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .custom-infowindow::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+        .custom-infowindow-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 5px;
+        }
+        .custom-infowindow-desc {
+            font-size: 13px;
+            color: var(--gray-600);
+        }
+
+        /* 🏥 병원 리스트 카드 (아래 - search.html 스타일) */
+        .hospital-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+        .facility-item {
+            padding: 18px;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            cursor: pointer;
+            background: #fff;
+            transition: 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .facility-item:hover {
+            border-color: var(--navy);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .f-info-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .f-name { font-weight: 800; color: #1a202c; font-size: 17px; }
+        .f-dist { font-size: 14px; color: var(--navy-mid); font-weight: 700; }
+        .f-info { font-size: 14px; color: var(--gray-600); }
+
+        /* 전화 걸기 버튼 스타일 */
+        .h-call-btn {
+            display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px;
+            background: var(--gray-100); color: var(--gray-700); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--gray-200);
+        }
+        .h-call-btn:hover { background: #e2e8f0; }
+
+        .bottom-actions { text-align: center; padding-top: 16px; }
+        .btn-home {
+            display: inline-flex; align-items: center; gap: 8px; background: var(--navy); color: white;
+            padding: 14px 32px; border-radius: 12px; font-weight: 600; text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="app-wrapper">
+    <div class="main-content" style="padding: 40px 20px;">
+        <div class="report-result-layout">
+
+            <!-- 신고 실패 배너 -->
+            <div id="fail-banner" class="banner-card auto-banner" style="display: block;">
+                <div class="banner-icon-wrap">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <h2 class="error-text" style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">119 신고 실패</h2>
+                <p style="color: var(--gray-600); font-size: 16px;">관제 센터에서 119 상황실로 문자를 발송하지 못했습니다.<br>안전을 위해 아래 버튼을 눌러 직접 전화해 주세요.</p>
+            </div>
+
+            <!-- SMS, 지도, 하단 버튼은 그대로 -->
+            <div class="sms-preview-card">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--error);">발송 내용 요약 (전송 실패)</h3>
+                <div class="sms-bubble" id="sms-content" style="background-color: #FEF2F2; border-left-color: var(--error);">
+                    <strong style="color: var(--error);">[발송 실패]</strong>
+                    통신사 장애 등의 원인으로 아래 내용의 119 신고 문자 전송에 실패했습니다. 직접 전화 신고가 필요합니다.
+                    이름: <span th:text="${resident?.name}">이름</span> / <span th:text="${resident?.age}">00</span>세
+                    기저질환: <span th:text="${resident?.disease}">없음</span>
+                    주소: <span th:text="${resident?.address}">주소 정보 없음</span>
+                    거주자 연락처: <span th:text="${resident?.phone}">010-0000-0000</span>
+                    보호자 연락처: <span th:text="${resident?.guardianPhone}">010-0000-0000</span>
+                </div>
+            </div>
+
+            <div id="emergency-call-card" class="emergency-call-card" style="display: block;">
+                <p style="color: #991B1B; font-weight: 600; font-size: 15px; margin-bottom: 16px;">
+                    ⚠️ 문자 접수가 지연되거나 통신사 문제로 누락되었을 수 있습니다.<br>안전을 위해 아래 버튼을 눌러 직접 119 상황실에 전화로 확인해 주세요.
+                </p>
+                <a href="tel:119" class="btn-119">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    119 바로 전화하기
+                </a>
+            </div>
+
+
+            <div class="map-card">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">사고 발생 위치 & 주변 응급실 정보</h3>
+                <div class="map-wrap" id="map"></div>
+                <ul class="hospital-list" id="hospital-list"></ul>
+            </div>
+
+            <div class="bottom-actions">
+                <a href="/index/index" class="btn-home">관제 화면(Home)으로 돌아가기</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:src="@{/js/map_utils.js}"></script>
+<script th:src="@{/js/app-api.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        let finalAddress = [[${resident?.address}]];
+        let finalName = [[${resident?.name}]];
+
+        if (finalAddress && finalName) {
+            if (typeof initMapAndHospitals === 'function') {
+                initMapAndHospitals(finalAddress, finalName);
+            }
+        } else {
+            console.warn("⚠️ 주소 정보가 없습니다.");
+        }
+    });
+</script>
+</body>
+</html>

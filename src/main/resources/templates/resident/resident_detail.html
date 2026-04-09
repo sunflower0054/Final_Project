@@ -3,57 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>관제 시스템 - 거주자 상세</title>
     <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
+    <title>관제 시스템 - 거주자 상세</title>
     <link rel="stylesheet" th:href="@{/css/myinfo.css}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        .hidden { display: none; }
-
-        .birth-row {
-            display: grid;
-            grid-template-columns: 1fr 0.75fr 0.75fr;
-            gap: 8px;
-            max-width: 260px;
-        }
-
-        .birth-row select {
-            font-size: 14.5px !important;
-            padding: 7px 8px !important;
-            height: 38px !important;
-            border-radius: 6px;
-        }
-
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1.6fr;
-            gap: 20px;
-        }
-
-        .coordinate-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 16px;
-        }
-
-        .form-group label {
-            margin-bottom: 6px;
-        }
-
-        .form-hint {
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 6px;
-            display: block;
-        }
-    </style>
 </head>
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
+<input type="hidden" id="current-user-resident-id" th:value="${currentUser.residentId}">
 
 <div class="main-container">
     <main class="content-area">
@@ -63,14 +22,16 @@
         </div>
 
         <div class="info-grid" style="grid-template-columns: 280px 1fr; gap: 24px;">
+
+            <!-- 프로필 카드 -->
             <div class="profile-card">
                 <div class="profile-header">
                     <div class="profile-avatar-xl" id="avatar"
-                         style="font-size: 48px; background: linear-gradient(135deg, #FFEBEE, #FFCDD2); color: #E53935;">
+                         style="font-size: 48px; background: linear-gradient(135deg, var(--primary-light), var(--primary-mid)); color: var(--primary);">
                         ?
                     </div>
                     <h3 class="profile-name-lg" id="profile-name">신규 등록</h3>
-                    <p class="profile-email" id="profile-summary" style="margin-top: 4px; font-size: 15px;">정보를 입력해주세요</p>
+                    <p class="profile-email" id="profile-age-gender" style="margin-top: 4px; font-size: 15px;">정보를 입력해주세요</p>
                 </div>
 
                 <div class="profile-stats">
@@ -79,25 +40,29 @@
                         <div class="stat-label">등록일</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" id="coord-status" style="color:#1E3A5F;">-</div>
-                        <div class="stat-label">좌표 상태</div>
+                        <div class="stat-value" id="last-fall" style="color:var(--error);">-</div>
+                        <div class="stat-label">최근 낙상</div>
                     </div>
                 </div>
 
                 <div class="profile-actions" style="padding:20px; display:flex; gap:12px; flex-direction:column;">
-                    <button class="btn-profile-detail" id="btn-save" onclick="saveResident()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                            <polyline points="17 9 9 17 5 13"/>
-                        </svg>
+                    <button class="btn-profile-detail" id="btn-save" onclick="handlePrimaryAction()">
+                        <!-- 기존 아이콘 생략 -->
                         <span id="save-btn-text">등록하기</span>
                     </button>
-                    <button class="btn-profile-detail" style="background:#757575; color:white;" onclick="history.back()">
-                        취소
+
+                    <!-- ▼ 추가된 삭제 버튼 (기본 숨김) ▼ -->
+                    <button class="btn-profile-detail btn-profile-delete" id="btn-delete" style="display:none;" onclick="deleteResident()">
+                        삭제하기
+                    </button>
+
+                    <button class="btn-profile-detail" style="background:var(--secondary); color:var(--text-sub);" onclick="history.back()">
+                        뒤로가기
                     </button>
                 </div>
             </div>
 
+            <!-- 기본 정보 카드 -->
             <div class="content-card">
                 <div class="card-header">
                     <h3 class="card-title">기본 정보</h3>
@@ -108,6 +73,7 @@
                         <input type="text" class="form-control" id="name" placeholder="이름을 입력하세요">
                     </div>
 
+                    <!-- 생년월일 -->
                     <div class="form-group">
                         <label class="form-label">생년월일 <span style="color:red;">*</span></label>
                         <div class="birth-row">
@@ -124,38 +90,33 @@
                         <input type="hidden" id="birthDate" value="">
                     </div>
 
-                    <div class="two-column">
-                        <div class="form-group">
-                            <label class="form-label">전화번호</label>
-                            <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">기저질환</label>
-                            <input type="text" class="form-control" id="disease" placeholder="기저질환을 입력하세요">
-                        </div>
+                    <!-- 전화번호 -->
+                    <div class="form-group">
+                        <label class="form-label">전화번호</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="010-XXXX-XXXX" oninput="formatPhone(this)">
                     </div>
 
-                    <div class="form-group">
+                    <!-- 주소 -->
+                    <div class="form-group address-group">
                         <label class="form-label">주소 <span style="color:red;">*</span></label>
-                        <div style="display:flex; gap:8px; margin-bottom:8px;">
-                            <button type="button" onclick="execDaumPostcode()"
-                                    style="padding:8px 16px; background:#1e3a5f; color:white; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">
+                        <div id="postcode-wrapper" style="display:flex; gap:8px; margin-bottom:8px;">
+                            <input type="text" id="postcode" class="form-control" placeholder="우편번호" readonly style="max-width:140px;">
+                            <button type="button" id="address-search-btn" onclick="execDaumPostcode()"
+                                    style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; cursor:pointer;">
                                 주소 검색
                             </button>
                         </div>
-                        <input type="text" id="address" class="form-control" placeholder="주소를 입력하세요">
-                        <span class="form-hint">주소 검색 또는 직접 입력 후 좌표를 확인해주세요.</span>
+                        <input type="text" id="address" class="form-control" placeholder="기본 주소 (도로명 또는 지번)" readonly>
+                        <input type="text" id="detailAddress" class="form-control" placeholder="상세 주소 (예: 301호, 2층)" style="margin-top: 8px;">
                     </div>
 
-                    <div class="coordinate-row">
-                        <div class="form-group">
-                            <label class="form-label">위도 <span style="color:red;">*</span></label>
-                            <input type="number" step="any" class="form-control" id="latitude" placeholder="예: 37.5665">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">경도 <span style="color:red;">*</span></label>
-                            <input type="number" step="any" class="form-control" id="longitude" placeholder="예: 126.9780">
-                        </div>
+                    <!-- [추가] 기저질환 및 건강 상태 입력 -->
+                    <div class="form-group">
+                        <label class="form-label">기저질환 및 건강 상태</label>
+                        <textarea class="form-control" id="disease" rows="4"
+                                  placeholder="고혈압, 당뇨 등 기저질환이나 참고해야 할 건강 상태를 자유롭게 입력해주세요."
+                                  style="resize: vertical;"></textarea>
+                        <p style="font-size: 12px; color: var(--gray-500); margin-top: 6px;">※ 여러 질환이 있을 경우 줄바꿈(Enter)이나 쉼표(,)로 구분하여 입력해주세요.</p>
                     </div>
                 </div>
             </div>
@@ -163,220 +124,45 @@
     </main>
 </div>
 
+<div th:replace="~{fragments/footer :: footer}"></div>
+
 <script th:src="@{/js/dropdown.js}"></script>
-<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=05dea7c839bf99daaa3a652b70da85fe&libraries=services"></script>
+<script th:src="@{/js/app-api.js}"></script>
+<!-- 우편번호 서비스 -->
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<!-- 카카오맵 API (본인 JavaScript 키 입력, libraries=services 필수) -->
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=05dea7c839bf99daaa3a652b70da85fe&libraries=services"></script>
+
 <script>
     let isEditMode = false;
     let residentId = null;
+    let selectedLat = null;
+    let selectedLon = null;
 
     function getUrlParameter(name) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(name);
     }
 
-    function getCsrfHeaders() {
-        const tokenMeta = document.querySelector('meta[name="_csrf"]');
-        const headerMeta = document.querySelector('meta[name="_csrf_header"]');
-        if (!tokenMeta || !headerMeta) {
-            return {};
-        }
-        return { [headerMeta.content]: tokenMeta.content };
+    function getCurrentUserResidentId() {
+        const value = document.getElementById('current-user-resident-id')?.value;
+        return value && value.trim() ? value.trim() : null;
     }
 
-    async function parseJsonResponse(response) {
-        const text = await response.text();
-        if (!text) {
-            return {};
-        }
-
-        try {
-            return JSON.parse(text);
-        } catch (error) {
-            return { message: text };
-        }
+    function extractResident(payload) {
+        return payload?.resident || payload || {};
     }
 
-    document.addEventListener('DOMContentLoaded', async function() {
-        initBirthDateSelects();
-        bindAddressEvents();
-
-        const idParam = getUrlParameter('id');
-        if (idParam && idParam !== 'new') {
-            residentId = idParam;
-            setEditMode();
-            await loadResidentData(residentId);
-            return;
+    function getErrorMessage(error, fallbackMessage) {
+        if (error?.message && error.message.trim()) {
+            return error.message;
         }
 
-        if (idParam === 'new') {
-            setCreateMode();
-            clearForm();
-            return;
+        if (error?.data?.message && error.data.message.trim()) {
+            return error.data.message;
         }
 
-        await loadDefaultResident();
-    });
-
-    function initBirthDateSelects() {
-        const yearSelect = document.getElementById('birthYear');
-        const monthSelect = document.getElementById('birthMonth');
-        const daySelect = document.getElementById('birthDay');
-        const currentYear = new Date().getFullYear();
-
-        for (let i = currentYear; i >= 1920; i--) {
-            const option = document.createElement('option');
-            option.value = String(i);
-            option.textContent = i + '년';
-            yearSelect.appendChild(option);
-        }
-
-        for (let i = 1; i <= 12; i++) {
-            const value = String(i).padStart(2, '0');
-            const option = document.createElement('option');
-            option.value = value;
-            option.textContent = i + '월';
-            monthSelect.appendChild(option);
-        }
-
-        for (let i = 1; i <= 31; i++) {
-            const value = String(i).padStart(2, '0');
-            const option = document.createElement('option');
-            option.value = value;
-            option.textContent = i + '일';
-            daySelect.appendChild(option);
-        }
-
-        [yearSelect, monthSelect, daySelect].forEach(select => {
-            select.addEventListener('change', updateBirthDateHidden);
-        });
-    }
-
-    function bindAddressEvents() {
-        const addressInput = document.getElementById('address');
-        addressInput.addEventListener('input', clearCoordinates);
-        addressInput.addEventListener('blur', async function() {
-            if (addressInput.value.trim() && (!document.getElementById('latitude').value || !document.getElementById('longitude').value)) {
-                await resolveCoordinates(addressInput.value.trim());
-            }
-        });
-    }
-
-    function updateBirthDateHidden() {
-        const year = document.getElementById('birthYear').value;
-        const month = document.getElementById('birthMonth').value;
-        const day = document.getElementById('birthDay').value;
-        document.getElementById('birthDate').value = (year && month && day) ? `${year}-${month}-${day}` : '';
-    }
-
-    function execDaumPostcode() {
-        new daum.Postcode({
-            oncomplete: async function(data) {
-                const address = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
-                document.getElementById('address').value = address;
-                await resolveCoordinates(address);
-            }
-        }).open();
-    }
-
-    function setCreateMode() {
-        isEditMode = false;
-        residentId = null;
-        document.getElementById('page-title').textContent = '거주자 등록';
-        document.getElementById('page-subtitle').textContent = '새로운 거주자 정보를 입력해주세요.';
-        document.getElementById('save-btn-text').textContent = '등록하기';
-    }
-
-    function setEditMode() {
-        isEditMode = true;
-        document.getElementById('page-title').textContent = '거주자 상세 정보';
-        document.getElementById('page-subtitle').textContent = '거주자 정보를 확인 및 수정할 수 있습니다.';
-        document.getElementById('save-btn-text').textContent = '수정하기';
-    }
-
-    async function loadDefaultResident() {
-        try {
-            const response = await fetch('/api/v1/residents', {
-                method: 'GET',
-                credentials: 'same-origin'
-            });
-            const result = await parseJsonResponse(response);
-
-            if (!response.ok || result.success !== true || !Array.isArray(result.residents) || result.residents.length === 0) {
-                setCreateMode();
-                clearForm();
-                return;
-            }
-
-            const resident = result.residents[0];
-            residentId = resident.id;
-            setEditMode();
-            fillResidentForm(resident);
-        } catch (error) {
-            setCreateMode();
-            clearForm();
-        }
-    }
-
-    async function loadResidentData(id) {
-        try {
-            const response = await fetch(`/api/v1/residents/${id}`, {
-                method: 'GET',
-                credentials: 'same-origin'
-            });
-            const result = await parseJsonResponse(response);
-
-            if (!response.ok || result.success !== true || !result.resident) {
-                throw new Error(result.message || '로드 실패');
-            }
-
-            fillResidentForm(result.resident);
-        } catch (error) {
-            alert(error.message || '거주자 정보를 불러오는 데 실패했습니다.');
-        }
-    }
-
-    function fillResidentForm(data) {
-        document.getElementById('name').value = data.name || '';
-        document.getElementById('phone').value = data.phone || '';
-        document.getElementById('disease').value = data.disease || '';
-        document.getElementById('address').value = data.address || '';
-        document.getElementById('latitude').value = data.latitude ?? '';
-        document.getElementById('longitude').value = data.longitude ?? '';
-
-        if (data.birthDate) {
-            const parts = data.birthDate.split('-');
-            document.getElementById('birthYear').value = parts[0] || '';
-            document.getElementById('birthMonth').value = parts[1] || '';
-            document.getElementById('birthDay').value = parts[2] || '';
-            document.getElementById('birthDate').value = data.birthDate;
-        } else {
-            document.getElementById('birthYear').value = '';
-            document.getElementById('birthMonth').value = '';
-            document.getElementById('birthDay').value = '';
-            document.getElementById('birthDate').value = '';
-        }
-
-        updateProfileUI(data);
-    }
-
-    function updateProfileUI(data) {
-        const name = data.name || '신규 등록';
-        document.getElementById('profile-name').textContent = name;
-        document.getElementById('avatar').textContent = name.charAt(0) || '?';
-
-        const summaryParts = [];
-        const age = calculateAge(data.birthDate);
-        if (age !== null) {
-            summaryParts.push(`만 ${age}세`);
-        }
-        if (data.phone) {
-            summaryParts.push(data.phone);
-        }
-        document.getElementById('profile-summary').textContent = summaryParts.length > 0 ? summaryParts.join(' · ') : '정보를 입력해주세요';
-
-        document.getElementById('reg-date').textContent = '-';
-        document.getElementById('coord-status').textContent = hasCoordinates(data) ? '입력됨' : '미입력';
+        return fallbackMessage;
     }
 
     function calculateAge(birthDate) {
@@ -384,189 +170,342 @@
             return null;
         }
 
-        const today = new Date();
         const birth = new Date(birthDate);
         if (Number.isNaN(birth.getTime())) {
             return null;
         }
 
+        const today = new Date();
         let age = today.getFullYear() - birth.getFullYear();
-        const monthDiff = today.getMonth() - birth.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-            age--;
+        const birthdayPassed =
+            today.getMonth() > birth.getMonth()
+            || (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate());
+
+        if (!birthdayPassed) {
+            age -= 1;
         }
-        return age >= 0 ? age : null;
+
+        return age;
     }
 
-    function hasCoordinates(data) {
-        return data.latitude !== null && data.latitude !== undefined && data.latitude !== '' &&
-            data.longitude !== null && data.longitude !== undefined && data.longitude !== '';
+    function updateProfileUI(resident) {
+        const name = resident.name || '신규 등록';
+        const age = calculateAge(resident.birthDate);
+
+        document.getElementById('profile-name').textContent = name;
+        document.getElementById('avatar').textContent = name.charAt(0) || '?';
+        document.getElementById('profile-age-gender').textContent =
+            age !== null ? `만 ${age}세` : '정보를 입력해주세요';
+
+        // 📅 등록일 표시 (연도를 두 자리로)
+        if (resident.createdAt) {
+            const dateObj = new Date(resident.createdAt);
+            // getFullYear()에서 문자열로 바꾼 뒤 뒤의 두 자리만 가져옵니다
+            const yy = String(dateObj.getFullYear()).slice(-2);
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            document.getElementById('reg-date').textContent = `${yy}.${mm}.${dd}`;
+        } else {
+            document.getElementById('reg-date').textContent = '-';
+        }
+
+        // 📅 최근 낙상일 표시 (백엔드 변수명이 lastFallDate라고 가정)
+        // 만약 변수명이 다르면 resident.lastFallDate 부분을 맞춰서 수정해주세요
+        if (resident.lastFallDate) {
+            const fallDateObj = new Date(resident.lastFallDate);
+            const fallYy = String(fallDateObj.getFullYear()).slice(-2);
+            const fallMm = String(fallDateObj.getMonth() + 1).padStart(2, '0');
+            const fallDd = String(fallDateObj.getDate()).padStart(2, '0');
+            document.getElementById('last-fall').textContent = `${fallYy}.${fallMm}.${fallDd}`;
+        } else {
+            document.getElementById('last-fall').textContent = '-';
+        }
+    }
+
+    function syncDiseaseCheckboxes(disease) {
+        const selectedDiseases = new Set(
+            (disease || '')
+                .split(',')
+                .map(value => value.trim())
+                .filter(Boolean)
+        );
+
+        document.querySelectorAll('#underlying-diseases input[type="checkbox"]').forEach((checkbox) => {
+            checkbox.checked = selectedDiseases.has(checkbox.value);
+        });
+    }
+
+function setDetailViewMode(enabled) {
+        const isReadOnly = Boolean(enabled);
+
+        document.getElementById('name').readOnly = isReadOnly;
+        document.getElementById('phone').readOnly = isReadOnly;
+        document.getElementById('detailAddress').readOnly = isReadOnly;
+        document.getElementById('disease').readOnly = isReadOnly; // 기저질환 읽기 전용
+
+        document.getElementById('birthYear').disabled = isReadOnly;
+        document.getElementById('birthMonth').disabled = isReadOnly;
+        document.getElementById('birthDay').disabled = isReadOnly;
+        document.getElementById('address-search-btn').disabled = isReadOnly;
+
+        // 읽기 전용(상세 보기)일 때 불필요한 입력칸 숨기기
+        const postcodeWrapper = document.getElementById('postcode-wrapper');
+        const detailAddressInput = document.getElementById('detailAddress');
+
+        if (isReadOnly) {
+            if (postcodeWrapper) postcodeWrapper.style.display = 'none';
+            if (detailAddressInput) detailAddressInput.style.display = 'none';
+        } else {
+            if (postcodeWrapper) postcodeWrapper.style.display = 'flex';
+            if (detailAddressInput) detailAddressInput.style.display = 'block';
+        }
+    }
+
+    function handlePrimaryAction() {
+        if (isEditMode) {
+            window.location.href = `/resident/edit?id=${residentId}`;
+            return;
+        }
+
+        saveResident();
+    }
+
+    async function deleteResident() {
+        if (!isEditMode || !residentId) {
+            return;
+        }
+
+        if (!window.confirm('정말로 이 거주자 정보를 삭제하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            const result = await AppApi.del(`/api/v1/residents/${residentId}`);
+            alert(result?.message || '거주자 정보가 삭제되었습니다.');
+            window.location.href = '/resident/detail';
+        } catch (error) {
+            alert(getErrorMessage(error, '삭제에 실패했습니다.'));
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initBirthDateSelects();
+        const idParam = getUrlParameter('id');
+        const currentUserResidentId = getCurrentUserResidentId();
+        const resolvedResidentId = idParam && idParam !== 'new'
+            ? idParam
+            : currentUserResidentId;
+
+        if (resolvedResidentId) {
+            residentId = resolvedResidentId;
+            isEditMode = true;
+            document.getElementById('page-title').textContent = '거주자 상세 정보';
+            document.getElementById('page-subtitle').textContent = '거주자 정보를 확인하고 수정 화면으로 이동할 수 있습니다.';
+            document.getElementById('save-btn-text').textContent = '수정하기';
+            document.getElementById('btn-delete').style.display = 'block';
+            setDetailViewMode(true);
+            loadResidentData(residentId);
+        } else {
+            isEditMode = false;
+            document.getElementById('page-title').textContent = '거주자 등록';
+            document.getElementById('page-subtitle').textContent = '새로운 거주자 정보를 입력해주세요.';
+            document.getElementById('save-btn-text').textContent = '등록하기';
+            document.getElementById('btn-delete').style.display = 'none';
+            setDetailViewMode(false);
+            clearForm();
+        }
+    });
+
+    // ==================== 생년월일 ====================
+    function initBirthDateSelects() {
+        const yearSelect = document.getElementById('birthYear');
+        const monthSelect = document.getElementById('birthMonth');
+        const daySelect = document.getElementById('birthDay');
+        const currentYear = new Date().getFullYear();
+
+        for (let i = currentYear; i >= 1920; i--) {
+            const opt = document.createElement('option');
+            opt.value = i; opt.textContent = i + '년';
+            yearSelect.appendChild(opt);
+        }
+        for (let i = 1; i <= 12; i++) {
+            const opt = document.createElement('option');
+            opt.value = i < 10 ? '0' + i : i;
+            opt.textContent = i + '월';
+            monthSelect.appendChild(opt);
+        }
+        for (let i = 1; i <= 31; i++) {
+            const opt = document.createElement('option');
+            opt.value = i < 10 ? '0' + i : i;
+            opt.textContent = i + '일';
+            daySelect.appendChild(opt);
+        }
+
+        [yearSelect, monthSelect, daySelect].forEach(s => s.addEventListener('change', updateBirthDateHidden));
+    }
+
+    function updateBirthDateHidden() {
+        const y = document.getElementById('birthYear').value;
+        const m = document.getElementById('birthMonth').value;
+        const d = document.getElementById('birthDay').value;
+        document.getElementById('birthDate').value = (y && m && d) ? `${y}-${m}-${d}` : '';
+    }
+
+    // ==================== Daum 주소 검색 ====================
+    function execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+
+                document.getElementById('postcode').value = data.zonecode;
+                document.getElementById('address').value = addr;
+
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(addr, function(result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        selectedLat = result[0].y;
+                        selectedLon = result[0].x;
+                    } else {
+                        alert('주소 좌표 변환에 실패했습니다. 주소를 다시 검색해주세요.');
+                        selectedLat = null;
+                        selectedLon = null;
+                    }
+                });
+
+                document.getElementById('detailAddress').focus();
+            }
+        }).open();
+    }
+
+    async function loadResidentData(id) {
+        try {
+            const payload = await AppApi.get(`/api/v1/residents/${id}`);
+            const resident = extractResident(payload);
+
+            document.getElementById('name').value = resident.name || '';
+            document.getElementById('phone').value = resident.phone || '';
+            document.getElementById('address').value = resident.address || '';
+            document.getElementById('detailAddress').value = '';
+
+            selectedLat = resident.latitude ?? null;
+            selectedLon = resident.longitude ?? null;
+
+            if (resident.birthDate) {
+                const [y, m, d] = resident.birthDate.split('-');
+                document.getElementById('birthYear').value = y || '';
+                document.getElementById('birthMonth').value = m || '';
+                document.getElementById('birthDay').value = d || '';
+                document.getElementById('birthDate').value = resident.birthDate;
+            } else {
+                document.getElementById('birthYear').value = '';
+                document.getElementById('birthMonth').value = '';
+                document.getElementById('birthDay').value = '';
+                document.getElementById('birthDate').value = '';
+            }
+
+            // 기저질환 textarea 값 바인딩
+            document.getElementById('disease').value = resident.disease || '';
+
+            updateProfileUI(resident);
+        } catch (error) {
+            alert(getErrorMessage(error, '거주자 정보를 불러오는 데 실패했습니다.'));
+        }
     }
 
     function clearForm() {
-        document.querySelectorAll('input:not([type=hidden]), select').forEach(element => {
+        document.querySelectorAll('input:not([type=hidden]), select, textarea').forEach((element) => {
+            if (element.type === 'checkbox') {
+                element.checked = false;
+                return;
+            }
+
             element.value = '';
         });
-        document.getElementById('birthDate').value = '';
+
+        selectedLat = null;
+        selectedLon = null;
         updateProfileUI({});
     }
 
-    function clearCoordinates() {
-        document.getElementById('latitude').value = '';
-        document.getElementById('longitude').value = '';
-        document.getElementById('coord-status').textContent = '미입력';
-    }
-
-    function getCoordinateValue(id) {
-        const value = document.getElementById(id).value.trim();
-        if (!value) {
-            return null;
-        }
-
-        const number = Number(value);
-        return Number.isNaN(number) ? Number.NaN : number;
-    }
-
-    function getPayload() {
-        return {
-            name: document.getElementById('name').value.trim(),
-            birthDate: document.getElementById('birthDate').value,
-            address: document.getElementById('address').value.trim(),
-            phone: document.getElementById('phone').value.trim() || null,
-            disease: document.getElementById('disease').value.trim() || null,
-            latitude: getCoordinateValue('latitude'),
-            longitude: getCoordinateValue('longitude')
-        };
-    }
-
-    function validatePayload(payload) {
-        if (!payload.name) {
-            alert('이름은 필수입니다.');
-            document.getElementById('name').focus();
-            return false;
-        }
-
-        if (!payload.birthDate) {
-            alert('생년월일을 선택해주세요.');
-            document.getElementById('birthYear').focus();
-            return false;
-        }
-
-        if (!payload.address) {
-            alert('주소는 필수입니다.');
-            document.getElementById('address').focus();
-            return false;
-        }
-
-        if (payload.latitude === null || payload.longitude === null) {
-            alert('위도와 경도는 필수입니다.');
-            if (payload.latitude === null) {
-                document.getElementById('latitude').focus();
-            } else {
-                document.getElementById('longitude').focus();
-            }
-            return false;
-        }
-
-        if (Number.isNaN(payload.latitude) || Number.isNaN(payload.longitude)) {
-            alert('위도와 경도는 숫자로 입력해주세요.');
-            return false;
-        }
-
-        return true;
-    }
-
-    function geocodeAddress(address) {
-        return new Promise(resolve => {
-            if (!address) {
-                resolve(null);
-                return;
-            }
-
-            const runGeocode = function() {
-                const geocoder = new kakao.maps.services.Geocoder();
-                geocoder.addressSearch(address, function(result, status) {
-                    if (status === kakao.maps.services.Status.OK && result.length > 0) {
-                        resolve({
-                            latitude: Number(result[0].y),
-                            longitude: Number(result[0].x)
-                        });
-                        return;
-                    }
-                    resolve(null);
-                });
-            };
-
-            if (window.kakao && kakao.maps && kakao.maps.services) {
-                runGeocode();
-                return;
-            }
-
-            if (window.kakao && kakao.maps && typeof kakao.maps.load === 'function') {
-                kakao.maps.load(runGeocode);
-                return;
-            }
-
-            resolve(null);
-        });
-    }
-
-    async function resolveCoordinates(address) {
-        const coordinates = await geocodeAddress(address);
-        if (!coordinates) {
-            document.getElementById('coord-status').textContent = '직접 입력 필요';
+    async function saveResident() {
+        if (isEditMode) {
+            alert('수정 기능은 2차 작업에서 진행합니다.');
             return;
         }
 
-        document.getElementById('latitude').value = coordinates.latitude;
-        document.getElementById('longitude').value = coordinates.longitude;
-        document.getElementById('coord-status').textContent = '입력됨';
-    }
-
-    async function saveResident() {
         updateBirthDateHidden();
 
+        const name = document.getElementById('name').value.trim();
+        const birthDate = document.getElementById('birthDate').value;
         const address = document.getElementById('address').value.trim();
-        if (address && (!document.getElementById('latitude').value || !document.getElementById('longitude').value)) {
-            await resolveCoordinates(address);
-        }
+        const detailAddress = document.getElementById('detailAddress').value.trim();
+        const latitude = Number.parseFloat(selectedLat);
+        const longitude = Number.parseFloat(selectedLon);
+        // textarea 기저질환 값 가져오기
+        const disease = document.getElementById('disease').value.trim();
 
-        const payload = getPayload();
-        if (!validatePayload(payload)) {
+        if (!name) {
+            alert('이름은 필수입니다.');
             return;
         }
 
-        const url = isEditMode ? `/api/v1/residents/${residentId}` : '/api/v1/residents';
-        const method = isEditMode ? 'PUT' : 'POST';
+        if (!birthDate) {
+            alert('생년월일을 선택해주세요.');
+            return;
+        }
+
+        if (!address) {
+            alert('주소를 입력해주세요.');
+            return;
+        }
+
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+            alert('주소 검색을 완료해 좌표를 먼저 확보해주세요.');
+            return;
+        }
+
+        const payload = {
+            name,
+            birthDate,
+            address: detailAddress ? `${address} ${detailAddress}` : address,
+            phone: document.getElementById('phone').value.trim() || null,
+            disease: disease || null, // 기저질환 값 저장
+            latitude,
+            longitude
+        };
+
+        const successMessage = '등록이 완료되었습니다.';
+        const fallbackMessage = '저장에 실패했습니다.';
 
         try {
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...getCsrfHeaders()
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify(payload)
-            });
-            const result = await parseJsonResponse(response);
+            const result = await AppApi.post('/api/v1/residents', payload);
+            const createdResidentId = result?.residentId;
 
-            if (!response.ok || result.success !== true) {
-                throw new Error(result.message || '저장에 실패했습니다.');
+            if (!createdResidentId) {
+                throw new Error('등록된 거주자 ID를 확인할 수 없습니다.');
             }
 
-            alert(result.message || (isEditMode ? '수정이 완료되었습니다.' : '등록이 완료되었습니다.'));
-
-            if (!isEditMode && result.residentId) {
-                location.href = `/resident/detail?id=${result.residentId}`;
-                return;
-            }
-
-            await loadResidentData(residentId);
+            alert(successMessage);
+            window.location.href = `/resident/detail?id=${createdResidentId}`;
         } catch (error) {
-            alert(error.message || '저장에 실패했습니다. 다시 시도해주세요.');
+            alert(getErrorMessage(error, fallbackMessage));
         }
     }
+
+    // ==================== 전화번호 포맷팅 ====================
+    function formatPhone(el) {
+        let v = el.value.replace(/\D/g, '');
+        if (v.length > 3 && v.length <= 7) {
+            v = v.slice(0, 3) + '-' + v.slice(3);
+        } else if (v.length > 7) {
+            v = v.slice(0, 3) + '-' + v.slice(3, 7) + '-' + v.slice(7, 11);
+        }
+        el.value = v;
+    }
+</script>
+
+<script>
+    (function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e5403568d8930a3',t:'MTc3NTAwODk2MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
 </script>
 </body>
 </html>

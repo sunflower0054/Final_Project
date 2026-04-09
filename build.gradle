@@ -27,6 +27,9 @@ dependencies {
     // 웹 서버 (HTTP 요청 받기)
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // 스프링이 FastAPI한테 설정값 전달할 때
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
     // JPA (DB 연동)
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
@@ -60,7 +63,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     // 솔라피 SDK
-//    implementation 'net.nurigo:sdk:4.3.0'
+    implementation 'net.nurigo:sdk:4.3.0'
+
 }
 
 tasks.named('test') {
