@@ -128,8 +128,9 @@
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
             // 드롭다운 설정
-            setupDropdown('notiBtn', 'notiDropdown');
             setupDropdown('profileBtn', 'profileDropdown');
+            // [1. 여기에 추가] 알림 버튼(notiBtn)도 클릭 시 열리도록 설정
+            setupDropdown('notiBtn', 'notiDropdown');
 
             // 알림 데이터 불러오기
             const currentResidentId = /*[[${currentUser != null ? currentUser['residentId'] : null}]]*/ null;
@@ -167,7 +168,8 @@
             // fetchNotificationStatus 함수는 그대로 유지
             async function fetchNotificationStatus(residentId) {
                 try {
-                    const response = await fetch(`/api/v1/recovery-status?residentId=${residentId}`);
+                    // [2. 여기 수정] 고정된 22 대신 백엔드에서 받은 residentId 변수 사용
+                    const response = await fetch(`/api/v1/notifications/fall-activity-alert?residentId=${residentId}`);
                     if (!response.ok) throw new Error('불러오기 실패');
                     const data = await response.json();
 
@@ -181,6 +183,14 @@
                                 <div class="noti-detail-row"><span>활동량</span><span class="value">평소 대비 ${data.recentPercent || 0}%</span></div>
                                 <div class="noti-alert-box">${data.message?.replace(/\n/g, '<br>') || '병원 방문을 권장합니다.'}</div>
                             </div>`;
+
+                        // [3. 여기에 추가] 받아온 데이터를 팝업창에도 넣어주고 화면에 띄움
+                        document.getElementById('popupFallDate').innerText = data.lastFallTimestamp || '확인불가';
+                        document.getElementById('popupAvgBefore').innerText = (data.avgBefore || 0) + ' 걸음';
+                        document.getElementById('popupAvgAfter').innerText = (data.avgAfter || 0) + ' 걸음';
+                        document.getElementById('popupDropPercent').innerText = (100 - (data.recentPercent || 0)) + '% ↓';
+                        document.getElementById('popupMessage').innerHTML = data.message?.replace(/\n/g, '<br>') || '병원 방문을 권장합니다.';
+                        document.getElementById('fallAlertPopup').style.display = 'flex';
                     }
                 } catch (e) {
                     console.error(e);
@@ -217,10 +227,51 @@
                 console.error("통신 에러:", error);
             }
         }
+
+        // [4. 여기에 추가] X 버튼 누르면 팝업 닫히는 함수
+        function closeFallAlertPopup() {
+            document.getElementById('fallAlertPopup').style.display = 'none';
+        }
     </script>
+
+    <!-- [5. 여기에 추가] 팝업 HTML 요소. 기존 코드 그대로 삽입됨 -->
+    <div id="fallAlertPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+     background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:16px; padding:30px; width:380px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="font-size:16px; font-weight:700; color:#e74c3c;">🚨 낙상 후 활동량 경고</h3>
+                <button onclick="closeFallAlertPopup()"
+                        style="background:none; border:none; font-size:20px; cursor:pointer; color:#999;">✕</button>
+            </div>
+
+            <div style="background:#fff5f5; border-radius:10px; padding:15px; margin-bottom:15px;">
+                <div style="font-size:12px; color:#999; margin-bottom:4px;">낙상 발생 일시</div>
+                <div style="font-size:15px; font-weight:700; color:#333;" id="popupFallDate">-</div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                <div style="background:#f8f9fa; border-radius:10px; padding:15px; text-align:center;">
+                    <div style="font-size:11px; color:#999; margin-bottom:6px;">낙상 전 7일 평균</div>
+                    <div style="font-size:18px; font-weight:700; color:#2ecc71;" id="popupAvgBefore">-</div>
+                </div>
+                <div style="background:#fff5f5; border-radius:10px; padding:15px; text-align:center;">
+                    <div style="font-size:11px; color:#999; margin-bottom:6px;">낙상 후 3일 평균</div>
+                    <div style="font-size:18px; font-weight:700; color:#e74c3c;" id="popupAvgAfter">-</div>
+                </div>
+            </div>
+
+            <div style="background:#fff5f5; border-radius:10px; padding:15px; text-align:center; margin-bottom:15px;">
+                <div style="font-size:12px; color:#999; margin-bottom:4px;">활동량 감소율</div>
+                <div style="font-size:28px; font-weight:800; color:#e74c3c;" id="popupDropPercent">-</div>
+            </div>
+
+            <div style="background:#f8f9fa; border-radius:10px; padding:15px; font-size:13px;
+                    color:#555; line-height:1.6; text-align:center;" id="popupMessage">-</div>
+        </div>
+    </div>
+
 </header>
-
-
 
 </body>
 </html>
