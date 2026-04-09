@@ -84,4 +84,27 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<AdminStatsView> findAllForAdminStatsBetween(@Param("start") LocalDateTime start,
                                                      @Param("end") LocalDateTime end);
 
+    /** 기간이 없는 필터 조회 */
+    @Query("""
+            select e.eventType as eventType, e.status as status, e.timestamp as timestamp
+            from Event e
+            where (:eventType is null or e.eventType = :eventType)
+              and (:status is null or e.status = :status)
+            """)
+    List<AdminStatsView> findAllForAdminStatsByFilter(@Param("eventType") String eventType,
+                                                      @Param("status") String status);
+
+    /** 기간이 있는 필터 조회*/
+    @Query("""
+            select e.eventType as eventType, e.status as status, e.timestamp as timestamp
+            from Event e
+            where e.timestamp >= :start
+              and e.timestamp < :end
+              and (:eventType is null or e.eventType = :eventType)
+              and (:status is null or e.status = :status)
+            """)
+    List<AdminStatsView> findAllForAdminStatsBetweenByFilter(@Param("start") LocalDateTime start,
+                                                             @Param("end") LocalDateTime end,
+                                                             @Param("eventType") String eventType,
+                                                             @Param("status") String status);
 }

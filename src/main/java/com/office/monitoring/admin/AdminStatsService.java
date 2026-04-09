@@ -1,5 +1,8 @@
 package com.office.monitoring.admin;
 
+import com.office.monitoring.admin.dto.AdminCreatedAtStatsFilter;
+import com.office.monitoring.admin.dto.AdminEventStatsFilter;
+import com.office.monitoring.admin.dto.AdminStatsDTO;
 import com.office.monitoring.event.EventRepository;
 import com.office.monitoring.member.MemberRepository;
 import com.office.monitoring.resident.ResidentRepository;
@@ -33,6 +36,13 @@ public class AdminStatsService {
     private static final String CONFIRMED = "CONFIRMED";
     private static final String AUTO_REPORTED = "AUTO_REPORTED";
     private static final String CLOSED = "CLOSED";
+    private static final String PENDING = "PENDING";
+    private static final List<String> ALLOWED_EVENT_TYPES = List.of(
+            FALL_DETECTED, NO_MOTION_DETECTED, VIOLENT_MOTION_DETECTED
+    );
+    private static final List<String> ALLOWED_STATUSES = List.of(
+            PENDING, CONFIRMED, AUTO_REPORTED, CLOSED
+    );
 
     private final MemberRepository memberRepository;
     private final ResidentRepository residentRepository;
@@ -40,7 +50,11 @@ public class AdminStatsService {
 
     /** 회원 수, 연령대, 가입 목적 통계를 조합한다. */
     public AdminStatsDTO.UserStatsResponse getUserStats() {
-        List<MemberRepository.AdminStatsView> members = memberRepository.findAllForAdminStats();
+        return getUserStats(new AdminCreatedAtStatsFilter(null, null));
+    }
+
+    public AdminStatsDTO.UserStatsResponse getUserStats(AdminCreatedAtStatsFilter filter) {
+        List<MemberRepository.AdminStatsView> members = getFilteredMembers(filter);
         return new AdminStatsDTO.UserStatsResponse(
                 true,
                 members.size(),
@@ -51,7 +65,11 @@ public class AdminStatsService {
 
     /** 거주자 수, 평균 나이, 연령대 통계를 조합한다. */
     public AdminStatsDTO.ResidentStatsResponse getResidentStats() {
-        List<ResidentRepository.AdminStatsView> residents = residentRepository.findAllForAdminStats();
+        return getResidentStats(new AdminCreatedAtStatsFilter(null, null));
+    }
+
+    public AdminStatsDTO.ResidentStatsResponse getResidentStats(AdminCreatedAtStatsFilter filter) {
+        List<ResidentRepository.AdminStatsView> residents = getFilteredResidents(filter);
         return new AdminStatsDTO.ResidentStatsResponse(
                 true,
                 residents.size(),
@@ -61,14 +79,14 @@ public class AdminStatsService {
     }
 
     /** 연도·월 필터를 반영해 이벤트 통계를 조합한다. */
-    public AdminStatsDTO.EventStatsResponse getEventStats(Integer year, Integer month) {
-        List<EventRepository.AdminStatsView> events = getFilteredEvents(year, month);
+    public AdminStatsDTO.EventStatsResponse getEventStats(AdminEventStatsFilter filter) {
+        List<EventRepository.AdminStatsView> events = getFilteredEvents(filter);
         return new AdminStatsDTO.EventStatsResponse(
                 true,
                 events.size(),
                 buildEventTypes(events),
                 buildEventStatuses(events),
-                buildMonthlyTrend(events, year, month)
+                buildMonthlyTrend(events, filter.year(), filter.month())
         );
     }
 
@@ -205,9 +223,12 @@ public class AdminStatsService {
     }
 
     /** year/month 조합에 맞는 이벤트 조회 범위를 결정한다. */
-    private List<EventRepository.AdminStatsView> getFilteredEvents(Integer year, Integer month) {
+    private List<MemberRepository.AdminStatsView> getFilteredMembers(AdminCreatedAtStatsFilter filter) {
+        Integer year = filter.year();
+        Integer month = filter.month();
+
         if (year == null) {
-            return eventRepository.findAllForAdminStats();
+            return memberRepository.findAllForAdminStats();
         }
 
         boolean monthFilterEnabled = isValidMonth(month);
@@ -218,7 +239,47 @@ public class AdminStatsService {
                 ? start.plusMonths(1)
                 : start.plusYears(1);
 
-        return eventRepository.findAllForAdminStatsBetween(start, end);
+        return memberRepository.findAllForAdminStatsByCreatedAtBetween(start, end);
+    }
+
+    private List<ResidentRepository.AdminStatsView> getFilteredResidents(AdminCreatedAtStatsFilter filter) {
+        Integer year = filter.year();
+        Integer month = filter.month();
+
+        if (year == null) {
+            return residentRepository.findAllForAdminStats();
+        }
+
+        boolean monthFilterEnabled = isValidMonth(month);
+        LocalDateTime start = monthFilterEnabled
+                ? LocalDateTime.of(year, month, 1, 0, 0)
+                : LocalDateTime.of(year, 1, 1, 0, 0);
+        LocalDateTime end = monthFilterEnabled
+                ? start.plusMonths(1)
+                : start.plusYears(1);
+
+        return residentRepository.findAllForAdminStatsByCreatedAtBetween(start, end);
+    }
+
+    private List<EventRepository.AdminStatsView> getFilteredEvents(AdminEventStatsFilter filter) {
+        Integer year = filter.year();
+        Integer month = filter.month();
+        String eventType = normalizeEventType(filter.eventType());
+        String status = normalizeStatus(filter.status());
+
+        if (year == null) {
+            return eventRepository.findAllForAdminStatsByFilter(eventType, status);
+        }
+
+        boolean monthFilterEnabled = isValidMonth(month);
+        LocalDateTime start = monthFilterEnabled
+                ? LocalDateTime.of(year, month, 1, 0, 0)
+                : LocalDateTime.of(year, 1, 1, 0, 0);
+        LocalDateTime end = monthFilterEnabled
+                ? start.plusMonths(1)
+                : start.plusYears(1);
+
+        return eventRepository.findAllForAdminStatsBetweenByFilter(start, end, eventType, status);
     }
 
     /** 이벤트 타입을 고정 라벨 기준으로 집계한다. */
@@ -345,6 +406,24 @@ public class AdminStatsService {
             return yearMonth.getMonthValue() + "월";
         }
         return "%d-%02d".formatted(yearMonth.getYear(), yearMonth.getMonthValue());
+    }
+
+    /** 문자열 값이 ALLOWED_EVENT_TYPES 안에 없으면 null 반환 */
+    private String normalizeEventType(String eventType) {
+        if (eventType == null || eventType.isBlank()) {
+            return null;
+        }
+        String trimmed = eventType.trim();
+        return ALLOWED_EVENT_TYPES.contains(trimmed) ? trimmed : null;
+    }
+
+    /** 문자열 값이 ALLOWED_STATUSES 안에 없으면 null 반환 */
+    private String normalizeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+        String trimmed = status.trim();
+        return ALLOWED_STATUSES.contains(trimmed) ? trimmed : null;
     }
 
     /** month 파라미터가 실제 월 범위인지 확인한다. */

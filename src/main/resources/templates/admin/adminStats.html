@@ -51,11 +51,109 @@
             text-align: center;
         }
 
+        .filter-panel {
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .filter-panel-header {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .filter-panel-helper {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .created-at-filter-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .event-chart-header {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .event-chart-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .event-chart-helper {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .event-filter-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .created-at-filter-row select,
+        .event-filter-row select {
+            min-width: 140px;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 10px;
+            background: #fff;
+            color: var(--gray-900);
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .filter-reset-btn {
+            height: 40px;
+            padding: 0 16px;
+            border: none;
+            border-radius: 10px;
+            background: var(--navy, #94D05C);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .filter-reset-btn:hover {
+            opacity: 0.92;
+        }
+
         #userAgeChart {
             background: var(--navy-light);
         }
+
         #monthlyTrendChart {
             height: 350px;
+        }
+
+        @media (max-width: 900px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-card-wide {
+                grid-column: auto;
+            }
+
+            .created-at-filter-row select,
+            .event-filter-row select,
+            .filter-reset-btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -91,6 +189,41 @@
         </div>
     </div>
 
+    <div class="content-card filter-panel">
+        <div class="filter-panel-header">
+            <div class="section-title">
+                [ 회원/독거노인 등록 일자 ]
+            </div>
+            <div class="filter-panel-helper">
+                아래 필터는 회원/독거노인 통계에만 적용되며 이벤트 통계에는 영향을 주지 않습니다.
+            </div>
+        </div>
+
+        <div class="created-at-filter-row">
+            <select id="createdAtYearFilter" aria-label="회원 및 독거노인 연도 필터">
+                <option value="">전체 연도</option>
+            </select>
+
+            <select id="createdAtMonthFilter" aria-label="회원 및 독거노인 월 필터">
+                <option value="">전체 월</option>
+                <option value="1">1월</option>
+                <option value="2">2월</option>
+                <option value="3">3월</option>
+                <option value="4">4월</option>
+                <option value="5">5월</option>
+                <option value="6">6월</option>
+                <option value="7">7월</option>
+                <option value="8">8월</option>
+                <option value="9">9월</option>
+                <option value="10">10월</option>
+                <option value="11">11월</option>
+                <option value="12">12월</option>
+            </select>
+
+            <button type="button" id="resetCreatedAtFiltersBtn" class="filter-reset-btn">초기화</button>
+        </div>
+    </div>
+
     <div class="chart-grid">
         <div class="content-card chart-card">
             <div class="section-title">
@@ -114,9 +247,56 @@
         </div>
 
         <div class="content-card chart-card">
-            <div class="section-title">
-                [ 이벤트 처리 상태 ]
+            <div class="event-chart-header">
+                <div class="event-chart-title-group">
+                    <div class="section-title">
+                        [ 이벤트 처리 상태 ]
+                    </div>
+                    <div class="event-chart-helper">
+                        아래 이벤트 차트 전체에 적용
+                    </div>
+                </div>
+
+                <div class="event-filter-row">
+                    <select id="eventYearFilter" aria-label="이벤트 연도 필터">
+                        <option value="">전체 연도</option>
+                    </select>
+
+                    <select id="eventMonthFilter" aria-label="이벤트 월 필터">
+                        <option value="">전체 월</option>
+                        <option value="1">1월</option>
+                        <option value="2">2월</option>
+                        <option value="3">3월</option>
+                        <option value="4">4월</option>
+                        <option value="5">5월</option>
+                        <option value="6">6월</option>
+                        <option value="7">7월</option>
+                        <option value="8">8월</option>
+                        <option value="9">9월</option>
+                        <option value="10">10월</option>
+                        <option value="11">11월</option>
+                        <option value="12">12월</option>
+                    </select>
+
+                    <select id="eventTypeFilter" aria-label="이벤트 유형 필터">
+                        <option value="">전체 유형</option>
+                        <option value="FALL_DETECTED">낙상</option>
+                        <option value="NO_MOTION_DETECTED">움직임 없음</option>
+                        <option value="VIOLENT_MOTION_DETECTED">폭행</option>
+                    </select>
+
+                    <select id="eventStatusFilter" aria-label="이벤트 상태 필터">
+                        <option value="">전체 상태</option>
+                        <option value="PENDING">대기중</option>
+                        <option value="CONFIRMED">수동신고</option>
+                        <option value="AUTO_REPORTED">자동신고</option>
+                        <option value="CLOSED">오탐지</option>
+                    </select>
+
+                    <button type="button" id="resetEventFiltersBtn" class="filter-reset-btn">초기화</button>
+                </div>
             </div>
+
             <div id="eventStatusChart" class="chart-container"></div>
         </div>
 
@@ -140,11 +320,25 @@
         eventData: null,
         userError: null,
         residentError: null,
-        eventError: null
+        eventError: null,
+        createdAtFilters: {
+            year: '',
+            month: ''
+        },
+        eventFilters: {
+            year: '',
+            month: '',
+            eventType: '',
+            status: ''
+        }
     };
 
     function initAdminStatsPage() {
         colors = readChartColors();
+        initializeCreatedAtFilterOptions();
+        initializeEventFilterOptions();
+        bindCreatedAtFilterControls();
+        bindEventFilterControls();
         setLoadingState();
         loadDashboardData();
     }
@@ -168,11 +362,164 @@
         };
     }
 
+    function initializeCreatedAtFilterOptions() {
+        populateYearFilterOptions('createdAtYearFilter');
+    }
+
+    function initializeEventFilterOptions() {
+        populateYearFilterOptions('eventYearFilter');
+    }
+
+    function populateYearFilterOptions(selectId) {
+        const yearSelect = document.getElementById(selectId);
+        if (!yearSelect) {
+            return;
+        }
+
+        const currentYear = new Date().getFullYear();
+        for (let year = currentYear; year >= currentYear - 4; year--) {
+            const option = document.createElement('option');
+            option.value = String(year);
+            option.textContent = `${year}년`;
+            yearSelect.appendChild(option);
+        }
+    }
+
+    function bindCreatedAtFilterControls() {
+        const filterIds = ['createdAtYearFilter', 'createdAtMonthFilter'];
+
+        filterIds.forEach((id) => {
+            const element = document.getElementById(id);
+            if (!element) {
+                return;
+            }
+
+            element.addEventListener('change', () => {
+                dashboardState.createdAtFilters = {
+                    year: document.getElementById('createdAtYearFilter')?.value || '',
+                    month: document.getElementById('createdAtMonthFilter')?.value || ''
+                };
+                reloadCreatedAtStats();
+            });
+        });
+
+        const resetButton = document.getElementById('resetCreatedAtFiltersBtn');
+        if (resetButton) {
+            resetButton.addEventListener('click', resetCreatedAtFilters);
+        }
+    }
+
+    function resetCreatedAtFilters() {
+        const yearFilter = document.getElementById('createdAtYearFilter');
+        const monthFilter = document.getElementById('createdAtMonthFilter');
+
+        if (yearFilter) yearFilter.value = '';
+        if (monthFilter) monthFilter.value = '';
+
+        dashboardState.createdAtFilters = {
+            year: '',
+            month: ''
+        };
+
+        reloadCreatedAtStats();
+    }
+
+    function bindEventFilterControls() {
+        const filterIds = ['eventYearFilter', 'eventMonthFilter', 'eventTypeFilter', 'eventStatusFilter'];
+
+        filterIds.forEach((id) => {
+            const element = document.getElementById(id);
+            if (!element) {
+                return;
+            }
+
+            element.addEventListener('change', () => {
+                dashboardState.eventFilters = {
+                    year: document.getElementById('eventYearFilter')?.value || '',
+                    month: document.getElementById('eventMonthFilter')?.value || '',
+                    eventType: document.getElementById('eventTypeFilter')?.value || '',
+                    status: document.getElementById('eventStatusFilter')?.value || ''
+                };
+                reloadEventStats();
+            });
+        });
+
+        const resetButton = document.getElementById('resetEventFiltersBtn');
+        if (resetButton) {
+            resetButton.addEventListener('click', resetEventFilters);
+        }
+    }
+
+    function resetEventFilters() {
+        const yearFilter = document.getElementById('eventYearFilter');
+        const monthFilter = document.getElementById('eventMonthFilter');
+        const typeFilter = document.getElementById('eventTypeFilter');
+        const statusFilter = document.getElementById('eventStatusFilter');
+
+        if (yearFilter) yearFilter.value = '';
+        if (monthFilter) monthFilter.value = '';
+        if (typeFilter) typeFilter.value = '';
+        if (statusFilter) statusFilter.value = '';
+
+        dashboardState.eventFilters = {
+            year: '',
+            month: '',
+            eventType: '',
+            status: ''
+        };
+
+        reloadEventStats();
+    }
+
+    function buildUserStatsUrl() {
+        return buildCreatedAtStatsUrl('/api/v1/admin/stats/users');
+    }
+
+    function buildResidentStatsUrl() {
+        return buildCreatedAtStatsUrl('/api/v1/admin/stats/residents');
+    }
+
+    function buildCreatedAtStatsUrl(path) {
+        const params = new URLSearchParams();
+        const { year, month } = dashboardState.createdAtFilters;
+
+        if (year) {
+            params.set('year', year);
+        }
+        if (month) {
+            params.set('month', month);
+        }
+
+        const query = params.toString();
+        return query ? `${path}?${query}` : path;
+    }
+
+    function buildEventStatsUrl() {
+        const params = new URLSearchParams();
+        const { year, month, eventType, status } = dashboardState.eventFilters;
+
+        if (year) {
+            params.set('year', year);
+        }
+        if (month) {
+            params.set('month', month);
+        }
+        if (eventType) {
+            params.set('eventType', eventType);
+        }
+        if (status) {
+            params.set('status', status);
+        }
+
+        const query = params.toString();
+        return query ? `/api/v1/admin/stats/events?${query}` : '/api/v1/admin/stats/events';
+    }
+
     async function loadDashboardData() {
         const [userResult, residentResult, eventResult] = await Promise.allSettled([
-            fetchStats('/api/v1/admin/stats/users'),
-            fetchStats('/api/v1/admin/stats/residents'),
-            fetchStats('/api/v1/admin/stats/events')
+            fetchStats(buildUserStatsUrl()),
+            fetchStats(buildResidentStatsUrl()),
+            fetchStats(buildEventStatsUrl())
         ]);
 
         applySectionResult('userData', 'userError', userResult);
@@ -180,6 +527,39 @@
         applySectionResult('eventData', 'eventError', eventResult);
 
         renderDashboard();
+    }
+
+    async function reloadCreatedAtStats() {
+        setCardText('totalUsers', '濡쒕뵫以?..');
+        setCardText('totalResidents', '濡쒕뵫以?..');
+        document.getElementById('avgAge').innerText = '0';
+        showChartMessage('userAgeChart', '?뚯썝 ?곕졊? ?곗씠?곕? 遺덈윭?ㅻ뒗 以묒엯?덈떎.');
+        showChartMessage('userPurposeChart', '?뚯썝 媛??紐⑹쟻 ?곗씠?곕? 遺덈윭?ㅻ뒗 以묒엯?덈떎.');
+        showChartMessage('residentAgeChart', '嫄곗＜???곗씠?곕? 遺덈윭?ㅻ뒗 以묒엯?덈떎.');
+
+        const [userResult, residentResult] = await Promise.allSettled([
+            fetchStats(buildUserStatsUrl()),
+            fetchStats(buildResidentStatsUrl())
+        ]);
+
+        applySectionResult('userData', 'userError', userResult);
+        applySectionResult('residentData', 'residentError', residentResult);
+        renderUserSection();
+        renderResidentSection();
+    }
+
+    async function reloadEventStats() {
+        setCardText('totalEvents', '로딩중...');
+        setCardText('falseAlarmRate', '로딩중...');
+        showChartMessage('eventStatusChart', '이벤트 상태 데이터를 불러오는 중입니다.');
+        showChartMessage('monthlyTrendChart', '월별 이벤트 추이를 불러오는 중입니다.');
+
+        const [eventResult] = await Promise.allSettled([
+            fetchStats(buildEventStatsUrl())
+        ]);
+
+        applySectionResult('eventData', 'eventError', eventResult);
+        renderEventSection();
     }
 
     function applySectionResult(dataKey, errorKey, result) {
@@ -318,6 +698,9 @@
     function normalizeEventStats(data) {
         return {
             totalEvents: asNumber(data?.totalEvents),
+            byType: normalizeChartData(data?.byType, [
+                ['유형', '건수']
+            ]),
             byStatus: normalizeChartData(data?.byStatus, [
                 ['상태', '건수']
             ]),
@@ -512,7 +895,7 @@
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
             renderDashboard();
-        }, 250);   // 250ms 디바운스
+        }, 250);
     });
 </script>
 </body>

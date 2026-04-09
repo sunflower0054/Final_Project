@@ -1,5 +1,8 @@
 package com.office.monitoring.admin;
 
+import com.office.monitoring.admin.dto.AdminCreatedAtStatsFilter;
+import com.office.monitoring.admin.dto.AdminEventStatsFilter;
+import com.office.monitoring.admin.dto.AdminStatsDTO;
 import com.office.monitoring.event.EventRepository;
 import com.office.monitoring.member.MemberRepository;
 import com.office.monitoring.resident.ResidentRepository;
@@ -14,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -122,7 +127,7 @@ class AdminStatsServiceTest {
 
     @Test
     void getEventStats_타입별상태별집계를_실데이터로_구성하고_PENDING은_byStatus에서_제외한다() {
-        when(eventRepository.findAllForAdminStats()).thenReturn(List.of(
+        when(eventRepository.findAllForAdminStatsByFilter(null, null)).thenReturn(List.of(
                 eventStats("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 1, 5, 10, 0)),
                 eventStats("NO_MOTION_DETECTED", "AUTO_REPORTED", LocalDateTime.of(2026, 1, 6, 10, 0)),
                 eventStats("VIOLENT_MOTION_DETECTED", "CLOSED", LocalDateTime.of(2026, 2, 1, 9, 0)),
@@ -130,7 +135,7 @@ class AdminStatsServiceTest {
                 eventStats("UNKNOWN_TYPE", "CONFIRMED", LocalDateTime.of(2026, 2, 3, 9, 0))
         ));
 
-        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(null, null);
+        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(filter(null, null, null, null));
 
         assertThat(response.totalEvents()).isEqualTo(5);
         assertThat(response.byType()).containsExactly(
@@ -154,16 +159,18 @@ class AdminStatsServiceTest {
 
     @Test
     void getEventStats_year만_있으면_해당연도_12개월기준으로_집계한다() {
-        when(eventRepository.findAllForAdminStatsBetween(
+        when(eventRepository.findAllForAdminStatsBetweenByFilter(
                 LocalDateTime.of(2026, 1, 1, 0, 0),
-                LocalDateTime.of(2027, 1, 1, 0, 0)
+                LocalDateTime.of(2027, 1, 1, 0, 0),
+                null,
+                null
         )).thenReturn(List.of(
                 eventStats("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 1, 10, 8, 0)),
                 eventStats("NO_MOTION_DETECTED", "AUTO_REPORTED", LocalDateTime.of(2026, 3, 10, 8, 0)),
                 eventStats("VIOLENT_MOTION_DETECTED", "CLOSED", LocalDateTime.of(2026, 12, 10, 8, 0))
         ));
 
-        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(2026, null);
+        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(filter(2026, null, null, null));
 
         assertThat(response.totalEvents()).isEqualTo(3);
         assertThat(response.monthlyTrend()).containsExactly(
@@ -185,15 +192,17 @@ class AdminStatsServiceTest {
 
     @Test
     void getEventStats_year와_month가_있으면_해당월만_집계한다() {
-        when(eventRepository.findAllForAdminStatsBetween(
+        when(eventRepository.findAllForAdminStatsBetweenByFilter(
                 LocalDateTime.of(2026, 4, 1, 0, 0),
-                LocalDateTime.of(2026, 5, 1, 0, 0)
+                LocalDateTime.of(2026, 5, 1, 0, 0),
+                null,
+                null
         )).thenReturn(List.of(
                 eventStats("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 4, 8, 9, 0)),
                 eventStats("NO_MOTION_DETECTED", "PENDING", LocalDateTime.of(2026, 4, 9, 9, 0))
         ));
 
-        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(2026, 4);
+        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(filter(2026, 4, null, null));
 
         assertThat(response.totalEvents()).isEqualTo(2);
         assertThat(response.byStatus()).containsExactly(
@@ -210,12 +219,12 @@ class AdminStatsServiceTest {
 
     @Test
     void getEventStats_month만_있으면_안전하게_전체기준으로_처리한다() {
-        when(eventRepository.findAllForAdminStats()).thenReturn(List.of(
+        when(eventRepository.findAllForAdminStatsByFilter(null, null)).thenReturn(List.of(
                 eventStats("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2025, 12, 1, 8, 0)),
                 eventStats("VIOLENT_MOTION_DETECTED", "AUTO_REPORTED", LocalDateTime.of(2026, 1, 1, 8, 0))
         ));
 
-        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(null, 4);
+        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(filter(null, 4, null, null));
 
         assertThat(response.totalEvents()).isEqualTo(2);
         assertThat(response.monthlyTrend()).containsExactly(
@@ -225,7 +234,249 @@ class AdminStatsServiceTest {
         );
     }
 
+    @Test
+    void getEventStats_eventType만_있으면_해당유형만_집계한다() {
+        when(eventRepository.findAllForAdminStatsByFilter("FALL_DETECTED", null)).thenReturn(List.of(
+                eventStats("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 4, 8, 9, 0)),
+                eventStats("FALL_DETECTED", "PENDING", LocalDateTime.of(2026, 4, 9, 9, 0))
+        ));
+
+        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(filter(null, null, "FALL_DETECTED", null));
+
+        assertThat(response.totalEvents()).isEqualTo(2);
+        assertThat(response.byType()).containsExactly(
+                List.of("유형", "건수"),
+                List.of("낙상", 2L),
+                List.of("움직임 없음", 0L),
+                List.of("폭행", 0L)
+        );
+        assertThat(response.byStatus()).containsExactly(
+                List.of("상태", "건수"),
+                List.of("수동신고", 1L),
+                List.of("자동신고", 0L),
+                List.of("오탐지", 0L)
+        );
+    }
+
+    @Test
+    void getEventStats_status만_있으면_해당상태만_집계한다() {
+        when(eventRepository.findAllForAdminStatsByFilter(null, "CLOSED")).thenReturn(List.of(
+                eventStats("FALL_DETECTED", "CLOSED", LocalDateTime.of(2026, 4, 8, 9, 0)),
+                eventStats("VIOLENT_MOTION_DETECTED", "CLOSED", LocalDateTime.of(2026, 4, 9, 9, 0))
+        ));
+
+        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(filter(null, null, null, "CLOSED"));
+
+        assertThat(response.totalEvents()).isEqualTo(2);
+        assertThat(response.byType()).containsExactly(
+                List.of("유형", "건수"),
+                List.of("낙상", 1L),
+                List.of("움직임 없음", 0L),
+                List.of("폭행", 1L)
+        );
+        assertThat(response.byStatus()).containsExactly(
+                List.of("상태", "건수"),
+                List.of("수동신고", 0L),
+                List.of("자동신고", 0L),
+                List.of("오탐지", 2L)
+        );
+    }
+
+    @Test
+    void getEventStats_year_month_eventType_status를_조합해_집계한다() {
+        when(eventRepository.findAllForAdminStatsBetweenByFilter(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0),
+                "FALL_DETECTED",
+                "CONFIRMED"
+        )).thenReturn(List.of(
+                eventStats("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 4, 8, 9, 0))
+        ));
+
+        AdminStatsDTO.EventStatsResponse response =
+                adminStatsService.getEventStats(filter(2026, 4, "FALL_DETECTED", "CONFIRMED"));
+
+        assertThat(response.totalEvents()).isEqualTo(1);
+        assertThat(response.byType()).containsExactly(
+                List.of("유형", "건수"),
+                List.of("낙상", 1L),
+                List.of("움직임 없음", 0L),
+                List.of("폭행", 0L)
+        );
+        assertThat(response.byStatus()).containsExactly(
+                List.of("상태", "건수"),
+                List.of("수동신고", 1L),
+                List.of("자동신고", 0L),
+                List.of("오탐지", 0L)
+        );
+        assertThat(response.monthlyTrend()).containsExactly(
+                List.of("월", "낙상", "움직임 없음", "폭행"),
+                List.of("4월", 1L, 0L, 0L)
+        );
+    }
+
+    @Test
+    void getEventStats_알수없는_eventType은_전체기준으로_안전처리한다() {
+        when(eventRepository.findAllForAdminStatsByFilter(null, null)).thenReturn(List.of(
+                eventStats("FALL_DETECTED", "CONFIRMED", LocalDateTime.of(2026, 4, 8, 9, 0))
+        ));
+
+        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(filter(null, null, "UNKNOWN", null));
+
+        assertThat(response.totalEvents()).isEqualTo(1);
+        assertThat(response.byType()).containsExactly(
+                List.of("유형", "건수"),
+                List.of("낙상", 1L),
+                List.of("움직임 없음", 0L),
+                List.of("폭행", 0L)
+        );
+    }
+
+    @Test
+    void getEventStats_알수없는_status는_전체기준으로_안전처리한다() {
+        when(eventRepository.findAllForAdminStatsByFilter(null, null)).thenReturn(List.of(
+                eventStats("VIOLENT_MOTION_DETECTED", "AUTO_REPORTED", LocalDateTime.of(2026, 4, 8, 9, 0))
+        ));
+
+        AdminStatsDTO.EventStatsResponse response = adminStatsService.getEventStats(filter(null, null, null, "UNKNOWN"));
+
+        assertThat(response.totalEvents()).isEqualTo(1);
+        assertThat(response.byStatus()).containsExactly(
+                List.of("상태", "건수"),
+                List.of("수동신고", 0L),
+                List.of("자동신고", 1L),
+                List.of("오탐지", 0L)
+        );
+    }
+
+    @Test
+    void getUserStats_year만_있으면_createdAt_해당연도_기준으로_집계한다() {
+        when(memberRepository.findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2027, 1, 1, 0, 0)
+        )).thenReturn(List.of(
+                memberStats(1990, "보호자", LocalDateTime.of(2026, 1, 5, 9, 0)),
+                memberStats(1988, "초기 목적", LocalDateTime.of(2026, 12, 31, 23, 59))
+        ));
+
+        AdminStatsDTO.UserStatsResponse response =
+                adminStatsService.getUserStats(new AdminCreatedAtStatsFilter(2026, null));
+
+        assertThat(response.totalUsers()).isEqualTo(2);
+        verify(memberRepository).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2027, 1, 1, 0, 0)
+        );
+    }
+
+    @Test
+    void getUserStats_month만_있으면_createdAt_전체기준으로_안전처리한다() {
+        when(memberRepository.findAllForAdminStats()).thenReturn(List.of(
+                memberStats(1990, "보호자", LocalDateTime.of(2025, 12, 1, 8, 0)),
+                memberStats(1988, "초기 목적", LocalDateTime.of(2026, 1, 1, 8, 0))
+        ));
+
+        AdminStatsDTO.UserStatsResponse response =
+                adminStatsService.getUserStats(new AdminCreatedAtStatsFilter(null, 4));
+
+        assertThat(response.totalUsers()).isEqualTo(2);
+        verify(memberRepository).findAllForAdminStats();
+        verify(memberRepository, never()).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        );
+    }
+
+    @Test
+    void getResidentStats_year와_month가_있으면_createdAt_해당월_기준으로_집계한다() {
+        LocalDate today = LocalDate.now();
+        when(residentRepository.findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        )).thenReturn(List.of(
+                residentStats(today.minusYears(84), LocalDateTime.of(2026, 4, 2, 9, 0)),
+                residentStats(today.minusYears(74), LocalDateTime.of(2026, 4, 20, 9, 0))
+        ));
+
+        AdminStatsDTO.ResidentStatsResponse response =
+                adminStatsService.getResidentStats(new AdminCreatedAtStatsFilter(2026, 4));
+
+        assertThat(response.totalResidents()).isEqualTo(2);
+        verify(residentRepository).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        );
+    }
+
+    @Test
+    void getUserStats_yearAndMonth_filtersMembersByCreatedAtMonth() {
+        when(memberRepository.findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        )).thenReturn(List.of(
+                memberStats(1991, "PURPOSE_A", LocalDateTime.of(2026, 4, 3, 9, 0)),
+                memberStats(1987, "PURPOSE_B", LocalDateTime.of(2026, 4, 27, 9, 0))
+        ));
+
+        AdminStatsDTO.UserStatsResponse response =
+                adminStatsService.getUserStats(new AdminCreatedAtStatsFilter(2026, 4));
+
+        assertThat(response.totalUsers()).isEqualTo(2);
+        verify(memberRepository).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        );
+    }
+
+    @Test
+    void getResidentStats_year_filtersResidentsByCreatedAtYear() {
+        LocalDate today = LocalDate.now();
+        when(residentRepository.findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2027, 1, 1, 0, 0)
+        )).thenReturn(List.of(
+                residentStats(today.minusYears(84), LocalDateTime.of(2026, 1, 8, 9, 0)),
+                residentStats(today.minusYears(74), LocalDateTime.of(2026, 11, 1, 9, 0))
+        ));
+
+        AdminStatsDTO.ResidentStatsResponse response =
+                adminStatsService.getResidentStats(new AdminCreatedAtStatsFilter(2026, null));
+
+        assertThat(response.totalResidents()).isEqualTo(2);
+        verify(residentRepository).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 1, 1, 0, 0),
+                LocalDateTime.of(2027, 1, 1, 0, 0)
+        );
+    }
+
+    @Test
+    void getResidentStats_monthOnly_fallsBackToAllResidents() {
+        LocalDate today = LocalDate.now();
+        when(residentRepository.findAllForAdminStats()).thenReturn(List.of(
+                residentStats(today.minusYears(84), LocalDateTime.of(2025, 12, 15, 9, 0)),
+                residentStats(today.minusYears(74), LocalDateTime.of(2026, 1, 10, 9, 0))
+        ));
+
+        AdminStatsDTO.ResidentStatsResponse response =
+                adminStatsService.getResidentStats(new AdminCreatedAtStatsFilter(null, 4));
+
+        assertThat(response.totalResidents()).isEqualTo(2);
+        verify(residentRepository).findAllForAdminStats();
+        verify(residentRepository, never()).findAllForAdminStatsByCreatedAtBetween(
+                LocalDateTime.of(2026, 4, 1, 0, 0),
+                LocalDateTime.of(2026, 5, 1, 0, 0)
+        );
+    }
+
+    private AdminEventStatsFilter filter(Integer year, Integer month, String eventType, String status) {
+        return new AdminEventStatsFilter(year, month, eventType, status);
+    }
+
     private MemberRepository.AdminStatsView memberStats(Integer birthYear, String purpose) {
+        return memberStats(birthYear, purpose, null);
+    }
+
+    private MemberRepository.AdminStatsView memberStats(Integer birthYear, String purpose, LocalDateTime createdAt) {
         return new MemberRepository.AdminStatsView() {
             @Override
             public Integer getBirthYear() {
@@ -236,14 +487,28 @@ class AdminStatsServiceTest {
             public String getPurpose() {
                 return purpose;
             }
+
+            @Override
+            public LocalDateTime getCreatedAt() {
+                return createdAt;
+            }
         };
     }
 
     private ResidentRepository.AdminStatsView residentStats(LocalDate birthDate) {
+        return residentStats(birthDate, null);
+    }
+
+    private ResidentRepository.AdminStatsView residentStats(LocalDate birthDate, LocalDateTime createdAt) {
         return new ResidentRepository.AdminStatsView() {
             @Override
             public LocalDate getBirthDate() {
                 return birthDate;
+            }
+
+            @Override
+            public LocalDateTime getCreatedAt() {
+                return createdAt;
             }
         };
     }

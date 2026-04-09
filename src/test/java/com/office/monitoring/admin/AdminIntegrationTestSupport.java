@@ -94,4 +94,35 @@ abstract class AdminIntegrationTestSupport {
                 .status(status)
                 .build());
     }
+
+    protected Member saveMemberForStats(String username,
+                                        Integer birthYear,
+                                        String purpose,
+                                        LocalDateTime createdAt) {
+        return memberRepository.save(Member.builder()
+                .username(username)
+                .password(passwordEncoder.encode("user1234!"))
+                .name(username)
+                .phone("010-9999-9999")
+                .birthYear(birthYear)
+                .purpose(purpose)
+                .role(Role.FAMILY)
+                .createdAt(createdAt)
+                .build());
+    }
+
+    protected Resident saveResidentForStats(String name,
+                                            LocalDate birthDate,
+                                            LocalDateTime createdAt) {
+        return residentRepository.save(Resident.builder()
+                .name(name)
+                .birthDate(birthDate)
+                .address("Seoul")
+                .phone("010-8888-8888")
+                .disease("DISEASE")
+                .latitude(37.57)
+                .longitude(126.98)
+                .createdAt(createdAt)
+                .build());
+    }
 }
