@@ -49,7 +49,7 @@
                  th:style="${event == null} ? 'display: none;' : 'display: block;'">
 
                 <!-- event가 존재할 때만 아래 Thymeleaf 구문들을 실행하도록 감쌉니다. -->
-                <th:block th:if="${event != null}">
+                <!--<th:block th:if="${event != null}">
                     <th:block th:switch="${event.eventType}">
                         <h3 th:case="'FALL_DETECTED'">🚨 낙상 발생</h3>
                         <h3 th:case="'NO_MOTION_DETECTED'">🚨 무응답 감지</h3>
@@ -65,12 +65,12 @@
                         <span th:text="${#temporals.format(event.timestamp, 'HH:mm:ss')}"></span>
                     </p>
 
-                    <p style="font-size:12px; margin-top:5px; color: var(--gray-600);"
+                    <p style="font-size:12px; margin-top:5px; color: var(&#45;&#45;gray-600);"
                        th:if="${event.eventType == 'VIOLENT_MOTION_DETECTED' and event.maxVelocity != null}">
                         <span th:text="'최대 속도: ' + ${event.maxVelocity} + 'm/s'"></span>
                         <span th:if="${event.personCount != null}" th:text="' | 인원: ' + ${event.personCount} + '명'"></span>
                     </p>
-                </th:block>
+                </th:block>-->
             </div>
 
             <!-- 버튼 그룹은 기존과 동일하게 유지 -->
@@ -175,6 +175,8 @@
     }
 
     function initialize() {
+        const residentName = window.currentResidentName ||
+                     /*[[${resident != null ? resident.name + ' 어르신' : '어르신'}]]*/ '어르신';
         updateClock();
         setInterval(updateClock, 1000);
 
@@ -240,26 +242,24 @@
         }
     }
 
-    // 3. UI 동적 갱신 함수 (최적화 버전)
+    // 3. UI 동적 갱신 함수 (Thymeleaf와 완전 통일 버전)
     function updateUrgentAlertUI(event) {
-        console.log('✅ updateUrgentAlertUI 호출됨! event:', event);   // ← 추가
+        console.log('✅ updateUrgentAlertUI 호출됨! event:', event);
 
         const alertBox = document.getElementById('urgentAlertBox');
         const container = document.getElementById('monitoringContainer');
         const liveDot = document.getElementById('liveDot');
-        const reportBtn = document.getElementById('manualReportBtn');
-        const closeBtn = document.getElementById('closeSituationBtn');
 
         if (!alertBox || !event) return;
 
-        // 1. 시각적 상태 변경 (테두리 및 점 색상 빨간색으로)
+        // 모니터링 박스 + 라이브 도트 빨간색으로 변경
         if (container) {
             container.classList.remove('green-border');
             container.classList.add('red-border');
         }
         if (liveDot) liveDot.style.background = '#e74c3c';
 
-        // 2. 이벤트 제목 결정
+        // 이벤트 제목
         const titles = {
             'FALL_DETECTED': '🚨 낙상 발생',
             'NO_MOTION_DETECTED': '🚨 무응답 감지',
@@ -267,38 +267,51 @@
         };
         const eventTitle = titles[event.eventType] || '🚨 이상 상황 발생';
 
-        // 3. 시간 및 신뢰도 데이터 포맷팅
+        // 시간 포맷
         const eventTime = new Date(event.timestamp).toLocaleTimeString('ko-KR', {
-            hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
         });
+
+        // 신뢰도
         const confidence = event.confidence ? Math.round(event.confidence * 100) : 0;
 
-        // 4. HTML 구조 동적 생성 (기존 소스 유지)
+        // 어르신 이름 (전역 변수로 저장한 것을 사용)
+        const residentName = window.currentResidentName || '어르신';
+
+        // 통일된 HTML 구조
         alertBox.innerHTML = `
             <h3>${eventTitle}</h3>
-            <p><b>어르신 감지됨</b></p>
+            <p><b>${residentName} 감지됨</b></p>
+
             <p style="font-size:13px; margin-top:5px;">
                 <span>신뢰도 ${confidence}% | </span>
                 <span>${eventTime}</span>
             </p>
+
             ${event.eventType === 'VIOLENT_MOTION_DETECTED' ? `
                 <p style="font-size:12px; margin-top:5px; color: var(--gray-600);">
-                    <span>최대 속도: ${event.maxVelocity || 0}m/s</span>
-                    <span> | 인원: ${event.personCount || 0}명</span>
+                    ${event.maxVelocity !== null && event.maxVelocity !== undefined ?
+                        `<span>최대 속도: ${event.maxVelocity}m/s</span>` : ''}
+                    ${event.personCount !== null && event.personCount !== undefined ?
+                        `<span> | 인원: ${event.personCount}명</span>` : ''}
                 </p>
             ` : ''}
         `;
 
-        // 5. 알림창 표시
         alertBox.style.display = 'block';
 
-        // 6. [중요] 버튼 클릭 핸들러 업데이트
-        // 기존 함수를 호출하도록 감싸줘야 그 안에 있는 'confirm(멘트)'이 작동합니다.
+        // 버튼 이벤트 연결
+        const reportBtn = document.getElementById('manualReportBtn');
+        const closeBtn = document.getElementById('closeSituationBtn');
+
         if (reportBtn) {
-            reportBtn.onclick = function() { goToManualReport(event.id); };
+            reportBtn.onclick = () => goToManualReport(event.id);
         }
         if (closeBtn) {
-            closeBtn.onclick = function() { closeSituation(event.id); };
+            closeBtn.onclick = () => closeSituation(event.id);
         }
     }
 
