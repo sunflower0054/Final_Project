@@ -23,9 +23,9 @@ public class EventScheduler {
     private long timeoutMs;
 
     // ※ 발표 시연 시 fixedDelay = 5000 (5초) 으로 변경
-    @Scheduled(fixedDelay = 5000)
+//    @Scheduled(fixedDelay = 50000)
     public void checkPendingEvents() {
-        LocalDateTime threshold = LocalDateTime.now()
+/*        LocalDateTime threshold = LocalDateTime.now()
                 .minusNanos(timeoutMs * 1_000_000L);
 
         List<Event> pendingEvents =
@@ -37,7 +37,7 @@ public class EventScheduler {
 
         for (Event event : pendingEvents) {
             processExpiredEvent(event);
-        }
+        }*/
     }
 
     private void processExpiredEvent(Event event) {

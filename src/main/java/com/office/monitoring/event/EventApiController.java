@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -132,5 +133,13 @@ public class EventApiController {
     private Double parseDoubleSafe(String val) {
         try { return Double.parseDouble(val); }
         catch (Exception e) { return null; }
+    }
+
+    @GetMapping("/latest-pending")
+    public ResponseEntity<Event> getLatestPendingEvent(@RequestParam Long residentId) {
+        return eventRepository.findTopByResidentIdAndStatusInOrderByCreatedAtDesc(
+                        residentId, List.of("PENDING", "CONFIRMED"))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 }

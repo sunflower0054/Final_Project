@@ -5,6 +5,7 @@ import com.office.monitoring.event.EventRepository;
 import com.office.monitoring.member.Member;
 import com.office.monitoring.resident.Resident;
 import com.office.monitoring.resident.ResidentRepository;
+import com.office.monitoring.security.CurrentUserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,35 +24,28 @@ public class SmsController {
     private final EventRepository eventRepository;
     private final SmsService smsService;
     private final ResidentRepository residentRepository;
+    private final CurrentUserService currentUserService;
+
 
     // 119 신고 버튼 클릭
     @GetMapping("/confirm")
-    public String confirm(@RequestParam Long eventId,
-                          HttpSession session,
-                          Model model) {
+    public String confirm(@RequestParam Long eventId, Model model) {
 
-        // 1) 이벤트 조회
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("이벤트 없음"));
 
-        // 2) 거주자 조회 (이벤트 → residentId → 거주자 한 줄)
         Resident resident = residentRepository.findById(event.getResidentId())
                 .orElseThrow(() -> new IllegalArgumentException("거주자 없음"));
 
-        // 3) 신고자 연락처 (세션에서 꺼내기)
-        Member loginMember = (Member) session.getAttribute("loginMember");
+        Member loginMember = currentUserService.getCurrentMember();
         String reporterPhone = loginMember.getPhone();
 
-        // 스케줄러 만료 처리
         event.setStatus("CONFIRMED");
         eventRepository.save(event);
 
-        // 119 수동 문자 전송 (신고자 연락처는 추후 로그인 유저에서 가져오기)
-        boolean sent = smsService.sendManualReport(event, "01083763942");
-
+        boolean sent = smsService.sendManualReport(event, reporterPhone);
 
         if (sent) {
-            // 6) 발송된 문자 내용 조립 (화면에 보여줄 내용)
             int age = Period.between(resident.getBirthDate(), LocalDate.now()).getYears();
             String messageContent = String.format(
                     "[긴급신고] %s 감지\n"
@@ -70,10 +64,12 @@ public class SmsController {
 
             model.addAttribute("messageContent", messageContent);
             model.addAttribute("resident", resident);
-            return "manuReport";    // templates/manuReport.html
+
+            // 여기 수정!! (manuReport → manualReport)
+            return "report/manualReport";     // ←←← 이 부분을 manualReport로 변경
 
         } else {
-            return "failReport";    // templates/failReport.html
+            return "report/failReport";       // failReport도 실제 파일명과 맞춰주세요
         }
     }
 

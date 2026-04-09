@@ -1,14 +1,17 @@
 package com.office.monitoring.security;
 
 import com.office.monitoring.member.CustomUserDetailsService;
+import com.office.monitoring.member.Member;
+import com.office.monitoring.member.MemberRepository;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final MemberRepository memberRepository;
 
     @Bean
     /** 요청된 인증/인가 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
@@ -44,12 +48,6 @@ public class SecurityConfig {
                                 PathPatternRequestMatcher.withDefaults()
                                         .matcher(HttpMethod.POST, "/api/v1/daily-activity")
                         )
-                )
-                // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                // 세션 설정 추가 — 로그인 성공 시 세션 생성 보장
-                // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         // 정적 리소스 + 공개 페이지
@@ -101,15 +99,44 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/member/login")
                         .loginProcessingUrl("/api/v1/auth/login")
-                        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                        // 리다이렉트 방식으로 변경
-                        // 브라우저가 세션 쿠키를 자동으로 완벽하게 처리
-                        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                         .successHandler((request, response, authentication) -> {
-                            response.sendRedirect("/");
+                            response.setStatus(HttpStatus.OK.value());
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
+                            String username = authentication.getName();
+                            Member member = memberRepository.findByUsername(username).orElse(null);
+                            String name = member != null ? member.getName() : username;
+                            String role = member != null ? member.getRole().name() : "";
+
+                            if (request.getSession(false) != null) {
+                                boolean jsessionAlreadySet = response.getHeaders(HttpHeaders.SET_COOKIE).stream()
+                                        .anyMatch(header -> header.startsWith("JSESSIONID="));
+
+                                if (!jsessionAlreadySet) {
+                                    Cookie sessionCookie = new Cookie("JSESSIONID", request.getSession(false).getId());
+                                    sessionCookie.setHttpOnly(true);
+                                    sessionCookie.setPath("/");
+                                    sessionCookie.setSecure(request.isSecure());
+                                    response.addCookie(sessionCookie);
+                                }
+                            }
+
+                            response.getWriter().write("""
+                                {"success":true,"username":"%s","name":"%s","role":"%s","token":null,"message":"로그인 성공"}
+                                """.formatted(
+                                    escapeJson(username),
+                                    escapeJson(name),
+                                    escapeJson(role)
+                            ).trim());
                         })
                         .failureHandler((request, response, exception) -> {
-                            response.sendRedirect("/member/login?error");
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                            response.getWriter().write("""
+                                {"success":false,"message":"아이디 또는 비밀번호가 올바르지 않습니다."}
+                                """.trim());
                         })
                         .permitAll()
                 )

@@ -107,8 +107,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                                              @Param("end") LocalDateTime end,
                                                              @Param("eventType") String eventType,
                                                              @Param("status") String status);
-}
 
-    // 거주자 ID와 상태(PENDING)를 기준으로 가장 최근 이벤트를 하나 가져오는 쿼리입니다.
-    Optional<Event> findTopByResidentIdAndStatusOrderByCreatedAtDesc(Long residentId, String status);
+
+// 거주자 ID와 상태(PENDING)를 기준으로 가장 최근 이벤트를 하나 가져오는 쿼리입니다.
+Optional<Event> findTopByResidentIdAndStatusInOrderByCreatedAtDesc(
+        Long residentId, List<String> status);
 }
