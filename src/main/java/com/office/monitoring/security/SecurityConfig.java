@@ -23,11 +23,13 @@ import java.nio.charset.StandardCharsets;
 
 @Configuration
 @RequiredArgsConstructor
+/** 로그인 사용자 식별과 접근 제어 규칙을 구성하는 보안 구성 요소. */
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
+    /** 요청된 인증/인가 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .userDetailsService(customUserDetailsService)
@@ -73,7 +75,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/daily-activity").permitAll()
 
                         // 관리자 전용
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**", "/admin/**").hasRole("ADMIN")
 
                         // 로그인 필수 회원 API
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/auth/withdraw").authenticated()
@@ -139,7 +141,16 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /** 요청된 인증/인가 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
+    private String escapeJson(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
     @Bean
+    /** 요청된 인증/인가 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }

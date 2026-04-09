@@ -13,9 +13,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** 거주자 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class ResidentRegisterIntegrationTest extends ResidentIntegrationTestSupport {
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 거주자등록_성공시_거주자저장_회원연결_AI기본설정생성() throws Exception {
         mockMvc.perform(post("/api/v1/residents")
                         .with(user("new-user").roles("FAMILY"))
@@ -39,7 +41,6 @@ class ResidentRegisterIntegrationTest extends ResidentIntegrationTestSupport {
 
         Member member = memberRepository.findByUsername("new-user").orElseThrow();
         Resident resident = residentRepository.findById(member.getResidentId()).orElseThrow();
-        AiSettings aiSettings = aiSettingsRepository.findByResidentId(resident.getId());
 
         assertThat(member.getResidentId()).isNotNull();
         assertThat(resident.getName()).isEqualTo("김영희");
@@ -47,10 +48,11 @@ class ResidentRegisterIntegrationTest extends ResidentIntegrationTestSupport {
         assertThat(resident.getAddress()).isEqualTo("서울시 강남구 테스트로 101");
         assertThat(resident.getPhone()).isNull();
         assertThat(resident.getDisease()).isEqualTo("고혈압");
-        assertThat(aiSettings).isNotNull();
+        assertThat(aiSettingsRepository.findByResidentId(resident.getId())).isPresent();
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 이미_연결된_거주자가_있으면_거주자등록_실패() throws Exception {
         mockMvc.perform(post("/api/v1/residents")
                         .with(user("user").roles("FAMILY"))
@@ -73,6 +75,7 @@ class ResidentRegisterIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 거주자등록_validation_실패시_400() throws Exception {
         mockMvc.perform(post("/api/v1/residents")
                         .with(user("new-user").roles("FAMILY"))

@@ -12,9 +12,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** 거주자 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class ResidentUpdateIntegrationTest extends ResidentIntegrationTestSupport {
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 연결된_거주자수정_성공시_DB반영() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("수정 전")
@@ -56,6 +58,7 @@ class ResidentUpdateIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 연결되지않은_거주자수정시_403() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("남의 거주자")
@@ -88,6 +91,7 @@ class ResidentUpdateIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 거주자수정_validation_실패시_400() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("원본")

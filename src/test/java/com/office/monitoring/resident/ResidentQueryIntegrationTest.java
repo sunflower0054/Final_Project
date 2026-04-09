@@ -10,9 +10,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/** 거주자 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class ResidentQueryIntegrationTest extends ResidentIntegrationTestSupport {
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 본인에게_연결된_거주자조회_성공() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("박순자")
@@ -36,6 +38,7 @@ class ResidentQueryIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void ADMIN은_임의의_거주자조회_성공() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("관리대상자")
@@ -55,6 +58,7 @@ class ResidentQueryIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 연결되지않은_거주자조회시_403() throws Exception {
         Resident resident = residentRepository.save(Resident.builder()
                 .name("남의 거주자")
@@ -74,6 +78,7 @@ class ResidentQueryIntegrationTest extends ResidentIntegrationTestSupport {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 존재하지않는_거주자조회시_400() throws Exception {
         mockMvc.perform(get("/api/v1/residents/999999")
                         .with(user("admin").roles("ADMIN")))

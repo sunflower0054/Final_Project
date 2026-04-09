@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Profile({"local", "dev"})
 @RequiredArgsConstructor
+/** 회원 정보 조회, 가입, 수정, 탈퇴와 관련된 도메인 동작을 담당하는 구성 요소. */
 public class DefaultMemberInitializer implements CommandLineRunner {
 
     private final MemberRepository memberRepository;
@@ -19,6 +20,7 @@ public class DefaultMemberInitializer implements CommandLineRunner {
 
     @Override
     @Transactional
+    /** 요청된 회원 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     public void run(String... args) {
         if (memberRepository.count() > 0) {
             return;

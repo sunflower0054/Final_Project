@@ -50,5 +50,27 @@
 </div>
 
 
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(loginForm);
+        const urlEncodedData = new URLSearchParams(formData).toString();
+
+        try {
+            const result = await AppApi.post('/api/v1/auth/login', urlEncodedData, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                redirectOn401: false
+            });
+
+            window.location.href = result?.role === 'ADMIN'
+                ? '/admin/stats'
+                : '/';
+        } catch (error) {
+            window.location.href = '/member/login?error';
+        }
+    });
+</script>
 </body>
 </html>
