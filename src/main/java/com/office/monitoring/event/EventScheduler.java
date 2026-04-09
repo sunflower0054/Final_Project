@@ -56,9 +56,9 @@ public class EventScheduler {
             smsService.sendAutoReportAlert(event);
 
         } else {
-            // 실패 → 지수백오프 x6 재시도
+            // 실패 → 지수백오프 x5 재시도
             log.warn("[스케줄러] eventId={} 119 자동신고 실패 → 재시도 시작", event.getId());
-            boolean retrySent = smsService.sendAutoReportWithRetry(event, 6);
+            boolean retrySent = smsService.sendAutoReportWithRetry(event, 5);
 
             if (retrySent) {
                 log.info("[스케줄러] eventId={} 재시도 성공", event.getId());

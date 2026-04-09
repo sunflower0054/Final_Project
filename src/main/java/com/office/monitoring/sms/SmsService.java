@@ -180,7 +180,7 @@ public class SmsService {
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
-    // 119 자동신고 재시도 (지수백오프 x6)
+    // 119 재시도
     public boolean sendAutoReportWithRetry(Event event, int maxRetry) {
         Resident resident = findResident(event.getResidentId());
         List<Member> families = memberRepository.findAllByResidentId(event.getResidentId());
@@ -193,6 +193,7 @@ public class SmsService {
                 log.info("[SMS] 119 재시도 성공 ({}회차)", attempt);
                 return true;
             } catch (Exception e) {
+                if (attempt == maxRetry) break;  // 마지막 시도면 바로 종료
                 long waitMs = (long) Math.pow(2, attempt) * 1000;
                 log.warn("[SMS] 119 재시도 실패 ({}회차), {}ms 대기", attempt, waitMs);
                 sleep(waitMs);
