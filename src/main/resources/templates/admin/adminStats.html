@@ -51,12 +51,30 @@
             text-align: center;
         }
 
+        .event-chart-header {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .event-chart-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .event-chart-helper {
+            font-size: 13px;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
         .event-filter-row {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
             align-items: center;
-            margin-top: 14px;
         }
 
         .event-filter-row select {
@@ -72,14 +90,8 @@
             outline: none;
         }
 
-        .event-filter-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 16px;
-        }
-
         .filter-reset-btn {
-            height: 38px;
+            height: 40px;
             padding: 0 16px;
             border: none;
             border-radius: 10px;
@@ -111,7 +123,8 @@
                 grid-column: auto;
             }
 
-            .event-filter-row select {
+            .event-filter-row select,
+            .filter-reset-btn {
                 width: 100%;
             }
         }
@@ -172,56 +185,56 @@
         </div>
 
         <div class="content-card chart-card">
-            <div class="section-title">
-                [ 이벤트 필터 ]
+            <div class="event-chart-header">
+                <div class="event-chart-title-group">
+                    <div class="section-title">
+                        [ 이벤트 처리 상태 ]
+                    </div>
+                    <div class="event-chart-helper">
+                        아래 이벤트 차트 전체에 적용
+                    </div>
+                </div>
+
+                <div class="event-filter-row">
+                    <select id="eventYearFilter" aria-label="이벤트 연도 필터">
+                        <option value="">전체 연도</option>
+                    </select>
+
+                    <select id="eventMonthFilter" aria-label="이벤트 월 필터">
+                        <option value="">전체 월</option>
+                        <option value="1">1월</option>
+                        <option value="2">2월</option>
+                        <option value="3">3월</option>
+                        <option value="4">4월</option>
+                        <option value="5">5월</option>
+                        <option value="6">6월</option>
+                        <option value="7">7월</option>
+                        <option value="8">8월</option>
+                        <option value="9">9월</option>
+                        <option value="10">10월</option>
+                        <option value="11">11월</option>
+                        <option value="12">12월</option>
+                    </select>
+
+                    <select id="eventTypeFilter" aria-label="이벤트 유형 필터">
+                        <option value="">전체 유형</option>
+                        <option value="FALL_DETECTED">낙상</option>
+                        <option value="NO_MOTION_DETECTED">움직임 없음</option>
+                        <option value="VIOLENT_MOTION_DETECTED">폭행</option>
+                    </select>
+
+                    <select id="eventStatusFilter" aria-label="이벤트 상태 필터">
+                        <option value="">전체 상태</option>
+                        <option value="PENDING">대기중</option>
+                        <option value="CONFIRMED">수동신고</option>
+                        <option value="AUTO_REPORTED">자동신고</option>
+                        <option value="CLOSED">오탐지</option>
+                    </select>
+
+                    <button type="button" id="resetEventFiltersBtn" class="filter-reset-btn">초기화</button>
+                </div>
             </div>
 
-            <div class="event-filter-row">
-                <select id="eventYearFilter" aria-label="이벤트 연도 필터">
-                    <option value="">전체 연도</option>
-                </select>
-
-                <select id="eventMonthFilter" aria-label="이벤트 월 필터">
-                    <option value="">전체 월</option>
-                    <option value="1">1월</option>
-                    <option value="2">2월</option>
-                    <option value="3">3월</option>
-                    <option value="4">4월</option>
-                    <option value="5">5월</option>
-                    <option value="6">6월</option>
-                    <option value="7">7월</option>
-                    <option value="8">8월</option>
-                    <option value="9">9월</option>
-                    <option value="10">10월</option>
-                    <option value="11">11월</option>
-                    <option value="12">12월</option>
-                </select>
-
-                <select id="eventTypeFilter" aria-label="이벤트 유형 필터">
-                    <option value="">전체 유형</option>
-                    <option value="FALL_DETECTED">낙상</option>
-                    <option value="NO_MOTION_DETECTED">움직임 없음</option>
-                    <option value="VIOLENT_MOTION_DETECTED">폭행</option>
-                </select>
-
-                <select id="eventStatusFilter" aria-label="이벤트 상태 필터">
-                    <option value="">전체 상태</option>
-                    <option value="PENDING">대기중</option>
-                    <option value="CONFIRMED">수동신고</option>
-                    <option value="AUTO_REPORTED">자동신고</option>
-                    <option value="CLOSED">오탐지</option>
-                </select>
-            </div>
-
-            <div class="event-filter-actions">
-                <button type="button" id="resetEventFiltersBtn" class="filter-reset-btn">초기화</button>
-            </div>
-        </div>
-
-        <div class="content-card chart-card">
-            <div class="section-title">
-                [ 이벤트 처리 상태 ]
-            </div>
             <div id="eventStatusChart" class="chart-container"></div>
         </div>
 
