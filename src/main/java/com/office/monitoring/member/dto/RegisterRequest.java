@@ -18,5 +18,7 @@ public record RegisterRequest(
         String phone,
 
         @NotBlank(message = "사용 목적은 필수입니다.")
-        String purpose
+        String purpose,
+
+        Integer birthYear
 ) {}

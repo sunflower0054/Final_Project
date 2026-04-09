@@ -138,6 +138,25 @@ public class SmsService {
     /** 119 신고 문자 내용 조립 */
     private String build119Message(Event event, Resident resident, String reporterPhone) {
         int age = Period.between(resident.getBirthDate(), LocalDate.now()).getYears();
+
+        // 1. 이벤트 타입을 한글로 변환
+        String eventTypeKorean;
+        switch (event.getEventType().toString()) {
+            case "VIOLENT_MOTION_DETECTED":
+                eventTypeKorean = "폭행 의심";
+                break;
+            case "NO_MOTION_DETECTED":
+                eventTypeKorean = "무응답";
+                break;
+            case "FALL_DETECTED":
+                eventTypeKorean = "낙상";
+                break;
+            default:
+                eventTypeKorean = "이상 상황";
+                break;
+        }
+
+        // 2. 문자 내용 조립 (event.getEventType() 대신 eventTypeKorean 사용)
         return String.format(
                 "[긴급신고] %s 감지\n"
                         + "이름: %s / %d세\n"
@@ -145,7 +164,7 @@ public class SmsService {
                         + "주소: %s\n"
                         + "거주자 연락처: %s\n"
                         + "보호자 연락처: %s",
-                event.getEventType(),
+                eventTypeKorean, // <-- 이 부분 수정됨
                 resident.getName(), age,
                 resident.getDisease() != null ? resident.getDisease() : "없음",
                 resident.getAddress(),
