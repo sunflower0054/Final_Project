@@ -809,3 +809,95 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 
 /* 상황 종료 및 복구 (노란빛 도는 올리브) */
 .btn-success { background-color: var(--accent) !important; color: #fff !important; border: none !important; }
+
+/* =========================================================
+   [추가] setting.html 하단 버튼 크기 대폭 축소 (기존 CSS 위에 덮어쓰기)
+   ========================================================= */
+
+.reset-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #ffffff;
+    color: var(--gray-700);
+    border: 2px solid var(--gray-300);
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.reset-btn:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+    color: var(--gray-800);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+.apply-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 22px;
+    background: linear-gradient(90deg, var(--primary-mid), var(--primary));
+    color: #ffffff;
+    border: none;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(107, 142, 35, 0.35);
+    position: relative;
+    overflow: hidden;
+}
+
+.apply-btn:hover {
+    background: linear-gradient(90deg, var(--primary), #4a5f28);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(107, 142, 35, 0.45);
+}
+
+/* 아이콘 크기 축소 + 애니메이션 */
+.reset-btn svg,
+.apply-btn svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.25s ease;
+}
+
+.reset-btn:hover svg {
+    transform: rotate(180deg);
+}
+
+.apply-btn:hover svg {
+    transform: translateX(2px);
+}
+
+/* 버튼이 작아졌으니 카드 푸터 여백도 살짝 조정 (추가) */
+.card-footer {
+    padding: 18px 28px;
+    gap: 16px;
+}
+
+.section .content-card {
+    max-width: 1080px !important;
+    margin: 0 auto !important;
+}
+
+.section .sensitivity-item .si-value-box {
+    width: 82px !important;           /* 가장 긴 값(60, 1.00, 0.03 등)도 여유 있게 수용 */
+    min-width: 82px !important;
+    flex-shrink: 0 !important;        /* 크기 고정 강제 */
+    text-align: center;
+}
+
+.section .sensitivity-item .si-value {
+    width: 100% !important;
+    text-align: center !important;
+    font-size: 24px !important;
+}
