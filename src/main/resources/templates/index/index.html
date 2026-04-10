@@ -129,7 +129,16 @@
     window.currentResidentName = /*[[${resident != null ? resident.name + ' 어르신' : '어르신'}]]*/ '어르신';
     window.addEventListener('load', initialize);
 
-    const initialEvent = /*[[${event}]]*/ null;
+    const initialEvent = /*[[${event != null ?
+    {id: event.id,
+     eventType: event.eventType,
+     timestamp: event.timestamp,
+     confidence: event.confidence,
+     status: event.status,
+     maxVelocity: event.maxVelocity,
+     personCount: event.personCount}
+    : null}]]*/ null;
+
     const currentResidentId = /*[[
         ${resident != null ? resident.id :
           (currentUser != null && currentUser.residentId != null ? currentUser.residentId : null)}
