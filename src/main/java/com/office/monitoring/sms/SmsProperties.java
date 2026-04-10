@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "coolsms")
-public class SmsProperties {
+public class SmsProperties { // 빈으로 등록됨
     private String apiKey;
     private String apiSecret;
     private String fromNumber;

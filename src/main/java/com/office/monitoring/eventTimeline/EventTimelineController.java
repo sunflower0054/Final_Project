@@ -19,17 +19,19 @@ public class EventTimelineController {
     @GetMapping()
     public ResponseEntity<EventTimelineDto> getTimeline(
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) Long residentId) {
 
         if (date == null) date = LocalDate.now();
-        return ResponseEntity.ok(timelineService.getTimeline(date));
+        return ResponseEntity.ok(timelineService.getTimeline(date, residentId));
     }
 
     // 이벤트 타입별 전체 조회
     @GetMapping("/all")
     public ResponseEntity<List<EventTimelineDto.EventItem>> getAllByType(
             @RequestParam String type,
-            @RequestParam(defaultValue = "desc") String sort) {
-        return ResponseEntity.ok(timelineService.getAllByType(type, sort));
+            @RequestParam(defaultValue = "desc") String sort,
+            @RequestParam(required = false) Long residentId) {
+        return ResponseEntity.ok(timelineService.getAllByType(type, sort, residentId));
     }
 }

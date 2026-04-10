@@ -65,11 +65,10 @@ public class SmsController {
             model.addAttribute("messageContent", messageContent);
             model.addAttribute("resident", resident);
 
-            // 여기 수정!! (manuReport → manualReport)
-            return "report/manuReport";     // ←←← 이 부분을 manualReport로 변경
+            return "report/manuReport";
 
         } else {
-            return "report/failReport";       // failReport도 실제 파일명과 맞춰주세요
+            return "report/failReport";
         }
     }
 

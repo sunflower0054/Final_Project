@@ -28,7 +28,7 @@
                     <p>실시간 화면을 불러오는 중입니다...</p>
                 </div>
 
-                <img id="videoFeed" src="http://192.168.0.5:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">
+                <img id="videoFeed" src="http://192.168.0.23:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">
 
                 <!-- 라이브 인디케이터 점 색상도 eventId 기준으로 변경 -->
                 <div class="live-indicator">
@@ -41,41 +41,14 @@
         <aside class="content-card control-panel">
             <h2 style="font-size: 14px; color: var(--gray-500); margin-bottom: 15px;">실시간 감지 정보</h2>
 
-            <!--
-              수정 완료:
-              event 객체의 데이터를 활용하여 상황에 맞는 동적 알림창을 띄웁니다.
-            -->
             <div class="urgent-alert" id="urgentAlertBox"
                  th:style="${event == null} ? 'display: none;' : 'display: block;'">
-
-                <!-- event가 존재할 때만 아래 Thymeleaf 구문들을 실행하도록 감쌉니다. -->
-                <!--<th:block th:if="${event != null}">
-                    <th:block th:switch="${event.eventType}">
-                        <h3 th:case="'FALL_DETECTED'">🚨 낙상 발생</h3>
-                        <h3 th:case="'NO_MOTION_DETECTED'">🚨 무응답 감지</h3>
-                        <h3 th:case="'VIOLENT_MOTION_DETECTED'">🚨 폭행 의심 감지</h3>
-                        <h3 th:case="*">🚨 이상 상황 발생</h3>
-                    </th:block>
-
-                    <p><b th:text="${resident?.name} + ' 어르신'">어르신</b></p>
-
-                    <p style="font-size:13px; margin-top:5px;">
-            <span th:if="${event.confidence != null}"
-                  th:text="'신뢰도 ' + ${#numbers.formatDecimal(event.confidence * 100, 1, 0)} + '% | '"></span>
-                        <span th:text="${#temporals.format(event.timestamp, 'HH:mm:ss')}"></span>
-                    </p>
-
-                    <p style="font-size:12px; margin-top:5px; color: var(&#45;&#45;gray-600);"
-                       th:if="${event.eventType == 'VIOLENT_MOTION_DETECTED' and event.maxVelocity != null}">
-                        <span th:text="'최대 속도: ' + ${event.maxVelocity} + 'm/s'"></span>
-                        <span th:if="${event.personCount != null}" th:text="' | 인원: ' + ${event.personCount} + '명'"></span>
-                    </p>
-                </th:block>-->
             </div>
 
             <!-- 버튼 그룹은 기존과 동일하게 유지 -->
             <div class="btn-group">
-                <button class="btn btn-red" id="manualReportBtn">
+                <button class="btn btn-red" id="manualReportBtn"
+                        onclick="alert('현재 감지된 이벤트가 없습니다.')">
                     🚨 119 수동 신고
                 </button>
 
@@ -92,7 +65,8 @@
                     📍 주변 안심 시설 찾기
                 </button>
 
-                <button class="btn btn-success" id="closeSituationBtn">
+                <button class="btn btn-success" id="closeSituationBtn"
+                        onclick="alert('현재 감지된 이벤트가 없습니다.')">
                     상황 종료
                 </button>
             </div>
@@ -175,8 +149,7 @@
     }
 
     function initialize() {
-        const residentName = window.currentResidentName ||
-                     /*[[${resident != null ? resident.name + ' 어르신' : '어르신'}]]*/ '어르신';
+        window.currentResidentName = /*[[${resident != null ? resident.name + ' 어르신' : null}]]*/ null;
         updateClock();
         setInterval(updateClock, 1000);
 
@@ -488,9 +461,7 @@
             return;
         }
 
-        // 사용자의 실수를 방지하기 위해 한 번 더 확인창을 띄워주는 것이 좋습니다.
         if (confirm("119 수동 신고를 진행하시겠습니까? 관련 정보가 문자로 전송됩니다.")) {
-            // SmsController의 @GetMapping("/confirm") 경로로 이동하며 eventId 전달
             location.href = `/report/confirm?eventId=${eventId}`;
         }
     }
