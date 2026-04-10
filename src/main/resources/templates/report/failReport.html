@@ -162,11 +162,11 @@
                 <div class="sms-bubble" id="sms-content" style="background-color: #FEF2F2; border-left-color: var(--error);">
                     <strong style="color: var(--error);">[발송 실패]</strong>
                     통신사 장애 등의 원인으로 아래 내용의 119 신고 문자 전송에 실패했습니다. 직접 전화 신고가 필요합니다.
-                    이름: <span th:text="${resident?.name}">이름</span> / <span th:text="${resident?.age}">00</span>세
+                    이름: <span th:text="${resident?.name}">이름</span> / <span th:text="${age}">00</span>세
                     기저질환: <span th:text="${resident?.disease}">없음</span>
                     주소: <span th:text="${resident?.address}">주소 정보 없음</span>
                     거주자 연락처: <span th:text="${resident?.phone}">010-0000-0000</span>
-                    보호자 연락처: <span th:text="${resident?.guardianPhone}">010-0000-0000</span>
+                    보호자 연락처: <span th:text="${reporterPhone}">010-0000-0000</span>
                 </div>
             </div>
 

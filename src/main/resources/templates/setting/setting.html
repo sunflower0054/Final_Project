@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관제 시스템 - AI 감지 설정</title>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -118,15 +120,15 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.93"/></svg>
                     기본값으로 초기화
                 </button>
-<!--                <span class="footer-note">마지막 저장: <span id="footer-date" style="font-weight:700; color:var(&#45;&#45;gray-900);">2024-04-24 14:30:25</span></span>-->
                 <button class="apply-btn" onclick="applyToPython()">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                    Python에 즉시 적용
+                    즉시 적용
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- 나머지 섹션은 그대로 유지 -->
     <div class="section">
         <div class="section-header">
             <div class="section-title">
@@ -191,6 +193,7 @@
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 <script th:src="@{/js/app-api.js}"></script>
+<script th:src="@{/js/app-api.js}"></script>
 <script>
     const DEFAULTS = { fall: 0.7, motion: 15, assault: 0.4 };
 
@@ -202,21 +205,17 @@
         if (valEl) valEl.textContent = display;
 
         let pct = 0;
-        if (valId === 'fall-val') {
-            pct = v * 100;
-        } else if (valId === 'motion-val') {
-            pct = ((v - 5) / 55) * 100;
-        } else if (valId === 'assault-val') {
-            pct = v * 100;
-        }
+        if (valId === 'fall-val') pct = v * 100;
+        else if (valId === 'motion-val') pct = ((v - 5) / 55) * 100;
+        else if (valId === 'assault-val') pct = v * 100;
         pct = Math.min(100, Math.max(0, pct));
 
         const bar = document.getElementById(impactId);
         if (bar) {
             bar.style.width = pct + '%';
             const colorMap = {
-                'fall-impact':    'var(--primary-mid)',
-                'motion-impact':  'var(--accent)',
+                'fall-impact': 'var(--primary-mid)',
+                'motion-impact': 'var(--accent)',
                 'assault-impact': 'var(--primary)'
             };
             bar.style.background = colorMap[impactId] || 'var(--navy)';
@@ -242,13 +241,11 @@
         if (impactId === 'fall-impact') {
             hintText = pct > 65 ? '민감도 높음 → 오탐 주의' :
                        pct > 30 ? '민감도 보통 → 균형 유지' : '민감도 낮음 → 오탐 감소';
-        }
-        else if (impactId === 'motion-impact') {
+        } else if (impactId === 'motion-impact') {
             hintText = currentValue <= 15 ? '짧은 대기 → 즉각 알림 발송' :
                        currentValue >= 40 ? '긴 대기 → 여유로운 반응' :
                        Math.round(currentValue) + '초 후 알림 발송';
-        }
-        else if (impactId === 'assault-impact') {
+        } else if (impactId === 'assault-impact') {
             hintText = pct > 65 ? '임계값 높음 → 둔감' :
                        pct > 30 ? '임계값 보통 → 균형' : '임계값 낮음 → 민감';
         }
@@ -286,7 +283,6 @@
                 document.getElementById('assault-slider').value = data.velocityThreshold;
                 updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
             }
-            if (data.updatedAt) document.getElementById('footer-date').textContent = data.updatedAt;
         } catch(e) {
             console.log('서버 미연결 - 기본값 사용');
         }
@@ -297,22 +293,30 @@
         showLoading(true);
 
         try {
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+
             const saveRes = await fetch('/api/v1/settings', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(csrfToken && { [csrfHeader]: csrfToken })
+                },
                 body: JSON.stringify(payload)
             });
 
-            if (!saveRes.ok) throw new Error('DB 저장 실패');
-
-            const data = await saveRes.json();
-            if (data.updatedAt) {
-                document.getElementById('footer-date').textContent = data.updatedAt;
+            if (!saveRes.ok) {
+                const errorText = await saveRes.text();
+                console.error('DB 저장 실패:', saveRes.status, errorText);
+                throw new Error(`DB 저장 실패 (${saveRes.status})`);
             }
 
             await fetch('/api/v1/settings/apply', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(csrfToken && { [csrfHeader]: csrfToken })
+                },
                 body: JSON.stringify(payload)
             });
 
@@ -327,9 +331,9 @@
 
     function getPayload() {
         return {
-            fallSensitivity:    parseFloat(document.getElementById('fall-slider').value),
-            noMotionThreshold:  parseInt(document.getElementById('motion-slider').value),
-            velocityThreshold:  parseFloat(document.getElementById('assault-slider').value)
+            fallSensitivity: parseFloat(document.getElementById('fall-slider').value),
+            noMotionThreshold: parseInt(document.getElementById('motion-slider').value),
+            velocityThreshold: parseFloat(document.getElementById('assault-slider').value)
         };
     }
 

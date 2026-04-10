@@ -8,6 +8,8 @@ import com.office.monitoring.resident.ResidentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.message.model.Message;
+import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
+import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.springframework.stereotype.Service;
 
@@ -113,14 +115,38 @@ public class SmsService {
 
     /** 단건 전송 — sms_log 저장 없음 (119 문자는 log 저장 안 함) */
     private boolean sendOnce(String text, String label) {
-        // 119 전화번호 (실제 번호로 교체)
-        String target119 = "01034200339";
+        String target119 = "01034200339";   // ← 실제 테스트 받을 번호
+
         try {
-            sendMessage(target119, text);
-            log.info("[SMS] {} 전송 성공", label);
-            return true;
+            Message message = new Message();
+            message.setFrom(smsProperties.getFromNumber());
+            message.setTo(target119);
+            message.setText(text);
+            message.setSubject("[늘봄 긴급알림]");
+
+            // ★★★ Nurigo SDK 최신 버전에서 권장하는 단일 메시지 전송 방식 ★★★
+            SingleMessageSentResponse response = messageService.sendOne(
+                    new SingleMessageSendingRequest(message)
+            );
+
+            String statusCode = response.getStatusCode();
+            String statusMsg = response.getStatusMessage() != null
+                    ? response.getStatusMessage()
+                    : "N/A";
+
+            log.info("[SMS] {} 전송 응답 → statusCode: {}, statusMessage: {}",
+                    label, statusCode, statusMsg);
+
+            if ("2000".equals(statusCode)) {
+                log.info("[SMS] {} 전송 성공", label);
+                return true;
+            } else {
+                log.error("[SMS] {} 전송 실패 (CoolSMS): {}", label, statusMsg);
+                return false;
+            }
+
         } catch (Exception e) {
-            log.error("[SMS] {} 전송 실패: {}", label, e.getMessage());
+            log.error("[SMS] {} 전송 중 예외 발생: {}", label, e.getMessage(), e);
             return false;
         }
     }

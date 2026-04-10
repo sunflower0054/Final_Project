@@ -64,6 +64,8 @@ public class SmsController {
 
             model.addAttribute("messageContent", messageContent);
             model.addAttribute("resident", resident);
+            model.addAttribute("age", age);
+            model.addAttribute("reporterPhone", reporterPhone);
 
             return "report/manuReport";
 
@@ -121,6 +123,8 @@ public class SmsController {
 
         model.addAttribute("messageContent", messageContent);
         model.addAttribute("resident", resident);
+        model.addAttribute("age", age);
+        model.addAttribute("reporterPhone", reporterPhone);
         return "autoReport";    // templates/autoReport.html
     }
 }
