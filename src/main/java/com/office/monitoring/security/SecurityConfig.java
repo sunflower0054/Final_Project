@@ -46,7 +46,9 @@ public class SecurityConfig {
                                 PathPatternRequestMatcher.withDefaults()
                                         .matcher(HttpMethod.POST, "/api/v1/events/receive"),
                                 PathPatternRequestMatcher.withDefaults()
-                                        .matcher(HttpMethod.POST, "/api/v1/daily-activity")
+                                        .matcher(HttpMethod.POST, "/api/v1/daily-activity"),
+                                PathPatternRequestMatcher.withDefaults()
+                                        .matcher("/api/v1/settings/**")
                         )
                 )
                 .authorizeHttpRequests(authorize -> authorize
