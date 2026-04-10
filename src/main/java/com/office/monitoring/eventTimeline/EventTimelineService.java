@@ -17,21 +17,19 @@ public class EventTimelineService {
 
     private final EventRepository eventRepository;
 
-    private static final Long TEMP_RESIDENT_ID = 22L;
-
     // 하루치 타임라인 조회
-    public EventTimelineDto getTimeline(LocalDate date) {
+    public EventTimelineDto getTimeline(LocalDate date, Long residentId) {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end   = date.atTime(23, 59, 59);
 
         // 1) 하루치 이벤트 (PENDING 제외, 이미지 fetch join)
         List<Event> events = eventRepository.findTimelineEvents(
-                TEMP_RESIDENT_ID, start, end);
+                residentId, start, end);
 
         // 2) 7일 위험지수 계산
         LocalDateTime weekStart = date.minusDays(6).atStartOfDay();
         List<Event> weekEvents  = eventRepository
-                .findByResidentIdAndCreatedAtBetween(TEMP_RESIDENT_ID, weekStart, end);
+                .findByResidentIdAndCreatedAtBetween(residentId, weekStart, end);
         int riskScore = calcRiskScore(weekEvents);
 
         // 3) 하루 요약
@@ -68,10 +66,10 @@ public class EventTimelineService {
     }
 
     // 이벤트 타입별 전체 조회
-    public List<EventTimelineDto.EventItem> getAllByType(String eventType, String sort) {
+    public List<EventTimelineDto.EventItem> getAllByType(String eventType, String sort, Long residentId) {
         List<Event> events = sort.equals("asc")
-                ? eventRepository.findAllByTypeAsc(TEMP_RESIDENT_ID, eventType)
-                : eventRepository.findAllByTypeDesc(TEMP_RESIDENT_ID, eventType);
+                ? eventRepository.findAllByTypeAsc(residentId, eventType)
+                : eventRepository.findAllByTypeDesc(residentId, eventType);
         return events.stream().map(this::toEventItem).collect(Collectors.toList());
     }
 
