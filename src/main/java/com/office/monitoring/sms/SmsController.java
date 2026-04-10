@@ -64,6 +64,8 @@ public class SmsController {
 
             model.addAttribute("messageContent", messageContent);
             model.addAttribute("resident", resident);
+            model.addAttribute("age", age);
+            model.addAttribute("reporterPhone", reporterPhone);
 
             // 여기 수정!! (manuReport → manualReport)
             return "report/manuReport";     // ←←← 이 부분을 manualReport로 변경
@@ -122,6 +124,8 @@ public class SmsController {
 
         model.addAttribute("messageContent", messageContent);
         model.addAttribute("resident", resident);
+        model.addAttribute("age", age);
+        model.addAttribute("reporterPhone", reporterPhone);
         return "autoReport";    // templates/autoReport.html
     }
 }

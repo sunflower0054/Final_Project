@@ -138,7 +138,7 @@ public class EventApiController {
     @GetMapping("/latest-pending")
     public ResponseEntity<Event> getLatestPendingEvent(@RequestParam Long residentId) {
         return eventRepository.findTopByResidentIdAndStatusInOrderByCreatedAtDesc(
-                        residentId, List.of("PENDING", "CONFIRMED"))
+                        residentId, List.of("PENDING"))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }

@@ -54,7 +54,7 @@ public class IndexController {
         // ★★★ 핵심 수정 ★★★
         // PENDING + CONFIRMED 모두 조회 (실시간 알림이 CONFIRMED 상태에서도 보이게)
         Optional<Event> activeEvent = eventRepository.findTopByResidentIdAndStatusInOrderByCreatedAtDesc(
-                resident.getId(), List.of("PENDING", "CONFIRMED"));
+                resident.getId(), List.of("PENDING"));
 
         if (activeEvent.isPresent()) {
             Event event = activeEvent.get();

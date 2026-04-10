@@ -151,8 +151,11 @@
 
 <script th:src="@{/js/app-api.js}"></script>
 <script th:inline="javascript">
+
     // 1. 초기화 및 이벤트 리스너 설정
+    window.currentResidentName = /*[[${resident != null ? resident.name + ' 어르신' : '어르신'}]]*/ '어르신';
     window.addEventListener('load', initialize);
+
     const initialEvent = /*[[${event}]]*/ null;
     const currentResidentId = /*[[
         ${resident != null ? resident.id :
@@ -160,23 +163,16 @@
     ]]*/ null;
     const residentIdForApi = currentResidentId || 0;
 
-    function showVideo() {
-        // 1. 로딩 UI 숨기기
-        const loader = document.getElementById('videoLoader');
-        if (loader) {
-            loader.style.display = 'none';
-        }
+    let currentEventId = null;   // ← 새로 추가: 현재 활성 이벤트 ID 관리
 
-        // 2. 영상 피드 보여주기
+    function showVideo() {
+        const loader = document.getElementById('videoLoader');
+        if (loader) loader.style.display = 'none';
         const videoFeed = document.getElementById('videoFeed');
-        if (videoFeed) {
-            videoFeed.style.display = 'block'; // 숨겨진 영상을 나타나게 함
-        }
+        if (videoFeed) videoFeed.style.display = 'block';
     }
 
     function initialize() {
-        const residentName = window.currentResidentName ||
-                     /*[[${resident != null ? resident.name + ' 어르신' : '어르신'}]]*/ '어르신';
         updateClock();
         setInterval(updateClock, 1000);
 
@@ -184,7 +180,6 @@
         document.addEventListener('click', closeDropdownsOnOutside);
         preventCloseInsideDropdown();
 
-        // 필터 버튼 이벤트
         setupTimelineFilter();
 
         // 날짜 입력창
@@ -196,123 +191,128 @@
             fetchTimelineData(todayStr);
         }
 
-        // ★★★ 핵심 수정 ★★★
-        // 1. 페이지 로드와 동시에 초기 이벤트 처리
+        // ★★★ 핵심: 항상 기본 버튼 핸들러 등록 (이벤트 없을 때 alert 나오게 함)
+        setupDefaultButtonHandlers();
+
+        // 초기 이벤트 처리
         if (initialEvent) {
             updateUrgentAlertUI(initialEvent);
         }
 
-        // 2. 즉시 한 번 체크 (3초 기다리지 않음)
         checkNewEvent();
-
-        // 3. 이후 3초마다 폴링
         setInterval(checkNewEvent, 3000);
+    }
+
+    // 새로 추가: 기본 버튼 핸들러 (이벤트 없을 때)
+    function setupDefaultButtonHandlers() {
+        const reportBtn = document.getElementById('manualReportBtn');
+        const closeBtn = document.getElementById('closeSituationBtn');
+
+        if (reportBtn) {
+            reportBtn.onclick = () => {
+                alert("현재 진행 중인 상황이 없습니다.");
+            };
+        }
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                alert("현재 진행 중인 상황이 없습니다.");
+            };
+        }
+    }
+
+    // 새로 추가: 이벤트 없을 때 UI 초기화 (빨간 박스 문제 해결)
+    function resetUrgentAlertUI() {
+        const alertBox = document.getElementById('urgentAlertBox');
+        const container = document.getElementById('monitoringContainer');
+        const liveDot = document.getElementById('liveDot');
+
+        if (alertBox) {
+            alertBox.style.display = 'none';
+            alertBox.innerHTML = '';
+        }
+        if (container) {
+            container.classList.remove('red-border');
+            container.classList.add('green-border');
+        }
+        if (liveDot) liveDot.style.background = '#2ecc71';
+
+        currentEventId = null;
+        setupDefaultButtonHandlers();   // 다시 기본 핸들러로 복구
     }
 
     async function checkNewEvent() {
         console.log(`🔍 checkNewEvent 실행 → residentId=${residentIdForApi}`);
 
-        if (residentIdForApi === 0) {
-            console.warn("residentId가 설정되지 않았습니다.");
-            return;
-        }
+        if (residentIdForApi === 0) return;
 
         try {
             const response = await fetch(`/api/v1/events/latest-pending?residentId=${residentIdForApi}`);
 
-            console.log(`📡 API 응답 상태: ${response.status} ${response.statusText}`);
-
             if (response.status === 200) {
-                console.log('✅ PENDING 이벤트 발견! UI 업데이트 시작');
                 const event = await response.json();
-                console.log('📦 받은 이벤트 데이터:', event);
+                console.log('✅ PENDING 이벤트 발견!', event);
                 updateUrgentAlertUI(event);
             }
             else if (response.status === 204) {
                 console.log('ℹ️ 현재 PENDING 이벤트 없음 (204)');
-                // 필요하면 여기서 UI를 녹색으로 원복하는 로직 추가 가능
-            }
-            else {
-                console.error(`⚠️ 예상치 못한 응답 코드: ${response.status}`);
-                const errorText = await response.text();
-                console.error('에러 내용:', errorText);
+                resetUrgentAlertUI();   // ← 여기서 녹색 복구 + 빈 박스 제거
             }
         } catch (e) {
             console.error("🚨 이벤트 체크 fetch 실패:", e);
         }
     }
 
-    // 3. UI 동적 갱신 함수 (Thymeleaf와 완전 통일 버전)
+    // UI 동적 갱신 함수 (기존 로직 + 개선)
     function updateUrgentAlertUI(event) {
-        console.log('✅ updateUrgentAlertUI 호출됨! event:', event);
+        if (!event) return;
+
+        currentEventId = event.id;
 
         const alertBox = document.getElementById('urgentAlertBox');
         const container = document.getElementById('monitoringContainer');
         const liveDot = document.getElementById('liveDot');
 
-        if (!alertBox || !event) return;
-
-        // 모니터링 박스 + 라이브 도트 빨간색으로 변경
+        // 빨간색으로 변경
         if (container) {
             container.classList.remove('green-border');
             container.classList.add('red-border');
         }
         if (liveDot) liveDot.style.background = '#e74c3c';
 
-        // 이벤트 제목
+        // 제목, 시간, 신뢰도 등 기존 로직 그대로 유지 (생략 없이 전체 붙여넣기)
         const titles = {
             'FALL_DETECTED': '🚨 낙상 발생',
             'NO_MOTION_DETECTED': '🚨 무응답 감지',
             'VIOLENT_MOTION_DETECTED': '🚨 폭행 의심 감지'
         };
         const eventTitle = titles[event.eventType] || '🚨 이상 상황 발생';
-
-        // 시간 포맷
-        const eventTime = new Date(event.timestamp).toLocaleTimeString('ko-KR', {
-            hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
-
-        // 신뢰도
+        const eventTime = new Date(event.timestamp).toLocaleTimeString('ko-KR', {hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
         const confidence = event.confidence ? Math.round(event.confidence * 100) : 0;
-
-        // 어르신 이름 (전역 변수로 저장한 것을 사용)
         const residentName = window.currentResidentName || '어르신';
 
-        // 통일된 HTML 구조
         alertBox.innerHTML = `
             <h3>${eventTitle}</h3>
             <p><b>${residentName} 감지됨</b></p>
-
             <p style="font-size:13px; margin-top:5px;">
                 <span>신뢰도 ${confidence}% | </span>
                 <span>${eventTime}</span>
             </p>
-
             ${event.eventType === 'VIOLENT_MOTION_DETECTED' ? `
                 <p style="font-size:12px; margin-top:5px; color: var(--gray-600);">
-                    ${event.maxVelocity !== null && event.maxVelocity !== undefined ?
-                        `<span>최대 속도: ${event.maxVelocity}m/s</span>` : ''}
-                    ${event.personCount !== null && event.personCount !== undefined ?
-                        `<span> | 인원: ${event.personCount}명</span>` : ''}
+                    ${event.maxVelocity !== null && event.maxVelocity !== undefined ? `<span>최대 속도: ${event.maxVelocity}m/s</span>` : ''}
+                    ${event.personCount !== null && event.personCount !== undefined ? `<span> | 인원: ${event.personCount}명</span>` : ''}
                 </p>
             ` : ''}
         `;
 
         alertBox.style.display = 'block';
 
-        // 버튼 이벤트 연결
+        // 버튼 이벤트 연결 (이벤트 있을 때만)
         const reportBtn = document.getElementById('manualReportBtn');
         const closeBtn = document.getElementById('closeSituationBtn');
 
-        if (reportBtn) {
-            reportBtn.onclick = () => goToManualReport(event.id);
-        }
-        if (closeBtn) {
-            closeBtn.onclick = () => closeSituation(event.id);
-        }
+        if (reportBtn) reportBtn.onclick = () => goToManualReport(event.id);
+        if (closeBtn) closeBtn.onclick = () => closeSituation(event.id);
     }
 
     // 2. 서버 API 데이터 연동 (JSON만 주고받음)
@@ -487,10 +487,7 @@
             alert("이벤트 정보가 없어 신고를 진행할 수 없습니다.");
             return;
         }
-
-        // 사용자의 실수를 방지하기 위해 한 번 더 확인창을 띄워주는 것이 좋습니다.
         if (confirm("119 수동 신고를 진행하시겠습니까? 관련 정보가 문자로 전송됩니다.")) {
-            // SmsController의 @GetMapping("/confirm") 경로로 이동하며 eventId 전달
             location.href = `/report/confirm?eventId=${eventId}`;
         }
     }
@@ -514,28 +511,7 @@
                     const message = await response.text();
                     alert(message);
 
-                    // 긴급 알림창 숨기기
-                    const alertBox = document.querySelector('.urgent-alert');
-                    if (alertBox) {
-                        alertBox.style.display = 'none';
-                    }
-
-                    // --- 추가된 부분: 모니터링 테두리를 녹색으로 원상복구 ---
-                    const monitoringContainer = document.getElementById('monitoringContainer');
-                    if (monitoringContainer) {
-                        monitoringContainer.classList.remove('red-border');
-                        monitoringContainer.classList.add('green-border');
-
-                        // 라이브 인디케이터 색상도 녹색으로 변경
-                        const liveDot = monitoringContainer.querySelector('.live-dot');
-                        if(liveDot) {
-                            liveDot.style.background = '#2ecc71';
-                        }
-                    }
-
-                    // (선택) 처리 완료 후 우측의 수동신고 / 상황종료 버튼들도 숨기거나 비활성화 처리할 수 있습니다.
-                    // const actionBtns = document.querySelectorAll('.btn-red, .btn-success');
-                    // actionBtns.forEach(btn => btn.style.display = 'none');
+                    resetUrgentAlertUI();
 
                 } else {
                     alert("상황 종료 처리에 실패했습니다. 서버 상태를 확인해 주세요.");
