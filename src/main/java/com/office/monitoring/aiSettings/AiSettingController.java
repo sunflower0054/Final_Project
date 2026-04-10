@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class AiSettingController {
 
     private final AiSettingsService aiSettingsService;
-    private static final Long TEMP_RESIDENT_ID = 1L;
+    private static final Long TEMP_RESIDENT_ID = 24L;
 
     // 설정값 조회 (슬라이더 초기값 로딩)
     @GetMapping

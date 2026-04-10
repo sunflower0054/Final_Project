@@ -120,6 +120,10 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.93"/></svg>
                     기본값으로 초기화
                 </button>
+
+                <!-- ← 여기 추가 (마지막 저장 날짜 표시) -->
+                <span class="footer-note">마지막 저장: <span id="footer-date" style="font-weight:700; color:var(--gray-900);">-</span></span>
+
                 <button class="apply-btn" onclick="applyToPython()">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                     즉시 적용
@@ -192,7 +196,6 @@
 
 <div th:replace="~{fragments/footer :: footer}"></div>
 
-<script th:src="@{/js/app-api.js}"></script>
 <script th:src="@{/js/app-api.js}"></script>
 <script>
     const DEFAULTS = { fall: 0.7, motion: 15, assault: 0.4 };
@@ -283,6 +286,12 @@
                 document.getElementById('assault-slider').value = data.velocityThreshold;
                 updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
             }
+
+            // 날짜만 표시 (시간 제거)
+            if (data.updatedAt) {
+                const footerDate = document.getElementById('footer-date');
+                if (footerDate) footerDate.textContent = data.updatedAt.split(' ')[0];
+            }
         } catch(e) {
             console.log('서버 미연결 - 기본값 사용');
         }
@@ -309,6 +318,14 @@
                 const errorText = await saveRes.text();
                 console.error('DB 저장 실패:', saveRes.status, errorText);
                 throw new Error(`DB 저장 실패 (${saveRes.status})`);
+            }
+
+            const data = await saveRes.json();
+
+            // 저장 후 날짜만 표시 (시간 제거)
+            if (data.updatedAt) {
+                const footerDate = document.getElementById('footer-date');
+                if (footerDate) footerDate.textContent = data.updatedAt.split(' ')[0];
             }
 
             await fetch('/api/v1/settings/apply', {

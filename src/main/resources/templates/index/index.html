@@ -41,36 +41,9 @@
         <aside class="content-card control-panel">
             <h2 style="font-size: 14px; color: var(--gray-500); margin-bottom: 15px;">실시간 감지 정보</h2>
 
-            <!--
-              수정 완료:
-              event 객체의 데이터를 활용하여 상황에 맞는 동적 알림창을 띄웁니다.
-            -->
             <div class="urgent-alert" id="urgentAlertBox"
                  th:style="${event == null} ? 'display: none;' : 'display: block;'">
 
-                <!-- event가 존재할 때만 아래 Thymeleaf 구문들을 실행하도록 감쌉니다. -->
-                <!--<th:block th:if="${event != null}">
-                    <th:block th:switch="${event.eventType}">
-                        <h3 th:case="'FALL_DETECTED'">🚨 낙상 발생</h3>
-                        <h3 th:case="'NO_MOTION_DETECTED'">🚨 무응답 감지</h3>
-                        <h3 th:case="'VIOLENT_MOTION_DETECTED'">🚨 폭행 의심 감지</h3>
-                        <h3 th:case="*">🚨 이상 상황 발생</h3>
-                    </th:block>
-
-                    <p><b th:text="${resident?.name} + ' 어르신'">어르신</b></p>
-
-                    <p style="font-size:13px; margin-top:5px;">
-            <span th:if="${event.confidence != null}"
-                  th:text="'신뢰도 ' + ${#numbers.formatDecimal(event.confidence * 100, 1, 0)} + '% | '"></span>
-                        <span th:text="${#temporals.format(event.timestamp, 'HH:mm:ss')}"></span>
-                    </p>
-
-                    <p style="font-size:12px; margin-top:5px; color: var(&#45;&#45;gray-600);"
-                       th:if="${event.eventType == 'VIOLENT_MOTION_DETECTED' and event.maxVelocity != null}">
-                        <span th:text="'최대 속도: ' + ${event.maxVelocity} + 'm/s'"></span>
-                        <span th:if="${event.personCount != null}" th:text="' | 인원: ' + ${event.personCount} + '명'"></span>
-                    </p>
-                </th:block>-->
             </div>
 
             <!-- 버튼 그룹은 기존과 동일하게 유지 -->
@@ -102,7 +75,7 @@
     <section class="content-card">
         <div class="wrap">
             <!-- resident 객체가 존재할 경우 이름을 출력하고, 없을 경우 '거주자 미등록'을 출력합니다 -->
-            <div class="resident-name" th:text="${resident != null ? resident.name + ' 어르신' : '거주자 미등록'}">김순자 어르신</div>
+            <div class="resident-name" th:text="${resident != null ? resident.name + ' 어르신' : '거주자 미등록'}"></div>
             <div class="section-title">
                 이벤트 타임라인
                 <input type="date" class="date-input" id="timelineDateInput">
@@ -342,26 +315,76 @@
         }
     }
 
-    // 3. 위험 지수 카드 업데이트 (RiskSummary 연동)
+
+    // 3. 위험 지수 카드 업데이트 (3단계 색상 그대로 + 점진적 그라데이션)
     function updateRiskCard(risk) {
         if (!risk) return;
+
+        const score = risk.totalScore || 0;
+
+        // 기존 데이터 업데이트 (변경 없음)
         document.getElementById('riskDateRange').innerText = risk.dateRange || '-';
         document.getElementById('riskLevelBadge').innerText = risk.riskLevel || '확인중';
-        document.getElementById('riskScoreNum').innerText = (risk.totalScore || 0) + '점';
+        document.getElementById('riskScoreNum').innerText = score + '점';
 
-        // 200점 만점 기준 게이지 바 너비 계산
-        const percent = Math.min(((risk.totalScore || 0) / 200) * 100, 100);
-        document.getElementById('riskGaugeFill').style.width = percent + '%';
+        // 게이지 너비 계산 (기존 그대로)
+        const percent = Math.min((score / 200) * 100, 100);
+        const gaugeFill = document.getElementById('riskGaugeFill');
+        gaugeFill.style.width = percent + '%';
 
-        // 위험 수준별 색상 변경
+        // ===== 3단계 색상 그대로 사용하면서 점진적으로 변하게 =====
+        // 안전(초록) → 주의(주황) → 위험(빨강) 부드럽게 연결
+        let dynamicColor;
+
+        if (score <= 100) {
+            // 0~100점 : 초록 → 주황 (부드러운 전환)
+            dynamicColor = interpolateColor('#2ecc71', '#ff9800', score / 100);
+        } else {
+            // 100~200점 : 주황 → 빨강 (부드러운 전환)
+            dynamicColor = interpolateColor('#ff9800', '#e74c3c', (score - 100) / 100);
+        }
+
+        // 게이지바 색상 적용
+        gaugeFill.style.background = dynamicColor;
+
+        // 점수 숫자도 같은 색상으로 (모던하게 통일)
+        const scoreNum = document.getElementById('riskScoreNum');
+        scoreNum.style.color = dynamicColor;
+
+        // 위험 배지는 기존 3단계 색상 그대로 유지 (riskLevel 기준)
         const badge = document.getElementById('riskLevelBadge');
         if (risk.riskLevel === '안전') {
-            badge.style.background = '#e7f7ed'; badge.style.color = '#2ecc71';
+            badge.style.background = '#e7f7ed';
+            badge.style.color = '#2ecc71';
         } else if (risk.riskLevel === '주의') {
-            badge.style.background = '#fff4e5'; badge.style.color = '#ff9800';
+            badge.style.background = '#fff4e5';
+            badge.style.color = '#ff9800';
         } else {
-            badge.style.background = '#ffebee'; badge.style.color = '#e74c3c';
+            badge.style.background = '#ffebee';
+            badge.style.color = '#e74c3c';
         }
+    }
+
+    // 색상 보간(Interpolation) 헬퍼 함수 (부드러운 그라데이션 핵심)
+    function interpolateColor(color1, color2, factor) {
+        // HEX → RGB 변환
+        const rgb1 = hexToRgb(color1);
+        const rgb2 = hexToRgb(color2);
+
+        // 선형 보간 (lerp)
+        const r = Math.round(rgb1[0] + (rgb2[0] - rgb1[0]) * factor);
+        const g = Math.round(rgb1[1] + (rgb2[1] - rgb1[1]) * factor);
+        const b = Math.round(rgb1[2] + (rgb2[2] - rgb1[2]) * factor);
+
+        // RGB → HEX 변환
+        return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+
+    function hexToRgb(hex) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return [r, g, b];
     }
 
     // 4. 요약 칩 숫자 업데이트 (DaySummary 연동)
