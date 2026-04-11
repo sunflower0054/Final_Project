@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+
+<header class="header-area" th:fragment="header">
+    <a href="/" class="brand-logo" style="display: flex; align-items: center; gap: 5px; text-decoration: none;">
+        <img src="/images/nelbom.png" alt="NEULBOM 로고" height="60">
+        <span class="brand-name">늘 봄</span>
+    </a>
+
+    <div class="topbar-right">
+        <div class="system-time" id="currentTime">2026. 03. 29 15:30:12</div>
+
+        <!-- [알림 영역] -->
+        <div class="dropdown-wrap">
+            <button class="icon-btn" id="notiBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <div class="noti-dot" id="notiDot" style="display: none;"></div>
+            </button>
+            <div class="dropdown-menu" id="notiDropdown">
+                <div class="dropdown-header">
+                    <span>알림</span>
+                    <span class="noti-count" id="notiCount">0건</span>
+                </div>
+                <div class="noti-list" id="notiList">
+                    <div style="padding: 20px; text-align: center; color: #888; font-size: 13px;">새로운 알림이 없습니다.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- [프로필 영역 - 기존 코드 유지 필수] -->
+        <div class="dropdown-wrap">
+            <button class="icon-btn" id="profileBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+            <div class="dropdown-menu" id="profileDropdown">
+
+                <!-- 1. 로그인 상태 -->
+                <div th:if="${currentUser != null and currentUser['authenticated']}">
+                    <div class="profile-header">
+                        <div class="avatar-container">
+                            <div class="profile-avatar-lg">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="user-name" th:text="${currentUser['name']}">미등록</div>
+                        <div class="user-email" th:text="${currentUser['username']}">미등록</div>
+                    </div>
+
+                    <div class="profile-menu">
+                        <a href="/myinfo/myinfo">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            내 프로필
+                        </a>
+
+                        <!-- 로그인한 사용자가 ADMIN일 때만 '통계' 노출 -->
+                        <a th:if="${currentUser['role'] == 'ADMIN'}" href="/admin/stats">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 20V10M12 20V4M6 20v-6"/>
+                            </svg>
+                            통계
+                        </a>
+
+                        <!-- 로그인한 사용자가 ADMIN이 아닐 때만 '거주자 정보', 'AI 감지 설정' 노출 -->
+                        <th:block th:unless="${currentUser['role'] == 'ADMIN'}">
+                            <a th:href="${currentUser['residentId'] != null} ? @{/resident/detail(id=${currentUser['residentId']})} : @{/resident/detail}"
+                               href="/resident/detail">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                거주자 정보
+                            </a>
+                            <a href="/setting/setting">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                                </svg>
+                                AI 감지 설정
+                            </a>
+                        </th:block>
+                    </div>
+
+                    <div class="dropdown-footer">
+                        <button type="button" class="btn-profile-logout" style="width:100%;" onclick="handleLogout()">
+                            로그아웃
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. 로그아웃 상태 -->
+                <div th:unless="${currentUser != null and currentUser['authenticated']}" class="profile-header profile-logged-out">
+                    <div class="avatar-container">
+                        <div class="profile-avatar-lg anon-avatar">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="logout-msg">
+                        <span class="main-msg">늘 봄 서비스가 처음이신가요?</span>
+                        <span class="sub-msg">로그인하여 서비스를 이용해 보세요.</span>
+                    </div>
+
+                    <div class="profile-action-btns">
+                        <a href="/member/login" class="btn-profile-login">로그인</a>
+                        <a href="/member/register" class="btn-profile-join">회원가입</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // 드롭다운 설정
+            setupDropdown('profileBtn', 'profileDropdown');
+            // [1. 여기에 추가] 알림 버튼(notiBtn)도 클릭 시 열리도록 설정
+            setupDropdown('notiBtn', 'notiDropdown');
+
+            // 알림 데이터 불러오기
+            const currentResidentId = /*[[${currentUser != null ? currentUser['residentId'] : null}]]*/ null;
+            if (currentResidentId) {
+                fetchNotificationStatus(currentResidentId);
+            }
+
+            function setupDropdown(btnId, dropdownId) {
+                const btn = document.getElementById(btnId);
+                const dropdown = document.getElementById(dropdownId);
+                if (!btn || !dropdown) return;
+
+                // 버튼 클릭 → 토글
+                btn.addEventListener('click', (e) => {
+                    e.stopImmediatePropagation();   // ← 더 강력하게 막음
+                    dropdown.classList.toggle('open');
+
+                    // 다른 드롭다운은 닫기
+                    const otherId = btnId === 'notiBtn' ? 'profileDropdown' : 'notiDropdown';
+                    document.getElementById(otherId)?.classList.remove('open');
+                });
+
+                // ★★★ 핵심 수정 ★★★
+                // 드롭다운 내부 클릭 시 닫히지 않게 막음
+                dropdown.addEventListener('click', (e) => {
+                    e.stopImmediatePropagation();
+                });
+            }
+
+            // 외부 클릭 시 모두 닫기
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+            });
+
+            // fetchNotificationStatus 함수 (하루 안보기 로직 추가)
+            async function fetchNotificationStatus(residentId) {
+                try {
+                    const response = await fetch(`/api/v1/notifications/fall-activity-alert?residentId=${residentId}`);
+                    if (!response.ok) throw new Error('불러오기 실패');
+                    const data = await response.json();
+
+                    if (data.triggered === true) {
+                        // 1. 우측 상단 알림 아이콘 업데이트 (이건 팝업과 무관하게 항상 실행)
+                        document.getElementById('notiDot').style.display = 'block';
+                        document.getElementById('notiCount').innerText = '1건';
+                        document.getElementById('notiList').innerHTML = `
+                            <div class="noti-item">
+                                <div class="noti-detail-title">낙상 후 활동량 추적</div>
+                                <div class="noti-detail-row"><span>최근 낙상</span><span class="value">${data.fallDate} ${data.fallTime}</span></div>
+                                <div class="noti-detail-row"><span>활동량 감소</span><span class="value">${data.dropPercent}% ↓</span></div>
+                                <div class="noti-alert-box">${data.message}</div>
+                            </div>`;
+
+                        // 2. 화면 중앙 팝업창 데이터 넣기
+                        document.getElementById('popupFallDate').innerText = `${data.fallDate} ${data.fallTime}`;
+                        document.getElementById('popupDropPercent').innerText = data.dropPercent + '% ↓';
+                        document.getElementById('popupMessage').innerText = data.message;
+
+                        // 3. [추가] 오늘 하루 보지 않기 체크
+                        const hideUntil = localStorage.getItem('hideFallAlertUntil');
+                        const now = new Date().getTime();
+
+                        // 저장된 시간이 없거나, 현재 시간이 저장된 시간을 지났을 때만 팝업 표시
+                        if (!hideUntil || now > parseInt(hideUntil)) {
+                            document.getElementById('fallAlertPopup').style.display = 'flex';
+                        }
+                    }
+                } catch (e) {
+                    console.error('알림 로드 에러:', e);
+                }
+            }
+        });
+    </script>
+
+    <script th:inline="javascript">
+        // 2. 로그아웃 함수를 스크립트 안에 직접 선언
+        async function handleLogout() {
+            console.log("로그아웃 버튼 클릭됨!"); // 작동 확인용
+
+            // CSRF 토큰 가져오기 (Security 설정 때문)
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+                const response = await fetch('/api/v1/auth/logout', {
+                    method: 'POST',
+                    headers: headers
+                });
+
+                if (response.ok) {
+                    // 로그아웃 성공 시 로그인 페이지로 이동
+                    window.location.href = '/member/login?logout';
+                } else {
+                    alert("로그아웃 실패 (서버 에러)");
+                }
+            } catch (error) {
+                console.error("통신 에러:", error);
+            }
+        }
+
+        function closeFallAlertPopup() {
+            const hideToday = document.getElementById('hideTodayChk');
+            if (hideToday && hideToday.checked) {
+                // 체크되었을 경우, 현재 시간 + 24시간을 밀리초로 저장
+                const now = new Date();
+                now.setHours(now.getHours() + 24);
+                localStorage.setItem('hideFallAlertUntil', now.getTime());
+            }
+            document.getElementById('fallAlertPopup').style.display = 'none';
+        }
+    </script>
+
+    <!-- 팝업 HTML 요소 (오늘 하루 보지 않기 추가) -->
+    <div id="fallAlertPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+     background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:16px; padding:30px; width:380px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="font-size:16px; font-weight:700; color:#e74c3c;">🚨 낙상 후 활동량 경고</h3>
+                <button onclick="closeFallAlertPopup()"
+                        style="background:none; border:none; font-size:20px; cursor:pointer; color:#999;">✕</button>
+            </div>
+
+            <div style="background:#fff5f5; border-radius:10px; padding:15px; margin-bottom:15px;">
+                <div style="font-size:12px; color:#999; margin-bottom:4px;">낙상 발생 일시</div>
+                <div style="font-size:15px; font-weight:700; color:#333;" id="popupFallDate">-</div>
+            </div>
+
+            <div style="background:#fff5f5; border-radius:10px; padding:15px; text-align:center; margin-bottom:15px;">
+                <div style="font-size:12px; color:#999; margin-bottom:4px;">활동량 감소율</div>
+                <div style="font-size:28px; font-weight:800; color:#e74c3c;" id="popupDropPercent">-</div>
+            </div>
+
+            <div style="background:#f8f9fa; border-radius:10px; padding:15px; font-size:13px;
+                    color:#555; line-height:1.6; text-align:center;" id="popupMessage">-</div>
+
+            <!-- [여기에 추가됨] 하단 닫기 및 하루안보기 영역 -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
+                <label style="font-size:12px; color:#666; display:flex; align-items:center; cursor:pointer;">
+                    <input type="checkbox" id="hideTodayChk" style="margin-right:6px;"> 오늘 하루 보지 않기
+                </label>
+                <button onclick="closeFallAlertPopup()" style="background:#f1f1f1; border:none; padding:8px 16px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; color:#333;">닫기</button>
+            </div>
+
+        </div>
+    </div>
+
+</header>
+
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>늘 봄 - 내 정보</title>
+    <link rel="stylesheet" th:href="@{/css/myinfo.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="main-container">
+    <main class="content-area">
+        <div class="page-header">
+            <h2 class="page-title">내 계정 설정</h2>
+            <p class="page-subtitle">개인 정보 및 시스템 알림 설정을 관리합니다.</p>
+        </div>
+
+        <div class="myinfo-layout">
+
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar-xl">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <h3 class="profile-name-lg">홍길동</h3>
+                    <span class="badge badge-navy" id="profileRole" style="margin-top: 10px;">가족 회원</span>
+                </div>
+
+                <!--                <div class="profile-actions" style="padding: 20px;">
+                                    <button class="btn-profile-detail">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+                                        </svg>
+                                        프로필 사진 변경
+                                    </button>
+                                </div>-->
+            </div>
+
+            <div class="myinfo-right-column">
+
+                <!-- 기본 정보 카드 -->
+                <div class="content-card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="card-title">기본 정보</h3>
+                        <button type="button" class="userInfoEditBtn" id="editInfoBtn"
+                                style="padding: 4px 12px; background: none; border: 1px dashed var(--gray-400); border-radius: 4px; color: var(--gray-600); font-size: 12px; cursor: pointer;">
+                            정보 수정
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">아이디</label>
+                            <input type="text" class="form-control" id="infoUsername" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">이름</label>
+                            <input type="text" class="form-control" id="infoName" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">휴대폰 번호</label>
+                            <input type="tel" class="form-control userInfoInput" id="infoPhone" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">출생연도</label>
+                            <input type="text" class="form-control" id="infoBirthYear" readonly>
+                        </div>
+
+                        <!-- 역할 (권한) 표시 -->
+                        <div class="form-group">
+                            <label class="form-label">계정 유형</label>
+                            <input type="text" class="form-control" id="infoRole" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card withdraw-section">
+                    <div class="card-body">
+                        <div class="withdraw-content">
+                            <div class="withdraw-text-area">
+                                <h3 class="withdraw-title">서비스 탈퇴</h3>
+                                <p class="withdraw-desc">
+                                    계정을 삭제하면 모든 데이터가 <span class="highlight">즉시 삭제</span>되며 복구할 수 없습니다.<br>
+                                    신중하게 결정해 주세요.
+                                </p>
+                            </div>
+                            <div class="withdraw-action-area">
+                                <button type="button" class="btn btn-withdraw-ghost" onclick="location.href='/member/withdraw'">
+                                    탈퇴 진행하기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>   <!-- myinfo-right-column 끝 -->
+
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:inline="javascript">
+    // 헤더의 시계 기능
+    function updateClock() {
+        const now = new Date();
+        const str = now.getFullYear() + '. ' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '. ' +
+                    String(now.getDate()).padStart(2, '0') + ' ' +
+                    String(now.getHours()).padStart(2, '0') + ':' +
+                    String(now.getMinutes()).padStart(2, '0') + ':' +
+                    String(now.getSeconds()).padStart(2, '0');
+        const timeEl = document.getElementById('currentTime');
+        if(timeEl) timeEl.innerText = str;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 드롭다운 공통 로직
+    function setupDropdown(btnId, dropdownId) {
+        const btn = document.getElementById(btnId);
+        const dropdown = document.getElementById(dropdownId);
+        if (!btn || !dropdown) return;
+
+        btn.addEventListener('click', (e) => {
+            e.stopImmediatePropagation();
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.id !== dropdownId) menu.classList.remove('open');
+            });
+            dropdown.classList.toggle('open');
+        });
+    }
+
+    // 🌟 1. 내 정보 불러오기 (GET API 호출)
+    async function loadMyInfo() {
+        try {
+            const response = await fetch('/api/v1/my-info');
+            if (response.ok) {
+                const data = await response.json();
+
+                // 🌟 역할명 변환 로직
+                let displayRole = data.role;
+                if (data.role === 'FAMILY') {
+                    displayRole = '가족';
+                } else if (data.role === 'ADMIN') {
+                    displayRole = '운영자';
+                }
+
+                // 좌측 프로필 카드 업데이트
+                document.querySelector('.profile-name-lg').innerText = data.name;
+                document.getElementById('profileRole').innerText = displayRole;
+
+                // 우측 기본 정보 카드 업데이트
+                document.getElementById('infoUsername').value = data.username;
+                document.getElementById('infoName').value = data.name;
+                document.getElementById('infoPhone').value = data.phone;
+                document.getElementById('infoBirthYear').value = data.birthYear + '년';
+                document.getElementById('infoRole').value = displayRole;
+            } else {
+                console.error('내 정보를 불러오는데 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('API 호출 중 오류 발생:', error);
+        }
+    }
+
+    // 🌟 2. 정보 수정 버튼 로직 업데이트 (PUT API 호출)
+    function setupInfoEdit() {
+        const editBtn = document.getElementById('editInfoBtn');
+        const editableInputs = document.querySelectorAll('.userInfoInput'); // 현재 휴대폰 번호만
+
+        if(!editBtn) return;
+
+        editBtn.addEventListener('click', async () => {
+            if(editBtn.innerText === '정보 수정') {
+                // 수정 모드 활성화
+                editableInputs.forEach(input => {
+                    input.readOnly = false;
+                    input.style.backgroundColor = '#fff';
+                });
+                editBtn.innerText = '저장';
+                editBtn.style.borderStyle = 'solid';
+                editBtn.style.borderColor = 'var(--navy)';
+                editBtn.style.color = 'var(--navy)';
+                editableInputs[0].focus();
+            } else {
+                // 저장 모드: 실제 수정 AJAX(fetch) 호출
+                const newPhone = document.getElementById('infoPhone').value;
+
+                try {
+                    const response = await fetch('/api/v1/my-info', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        // UpdateMyInfoRequest DTO 구조에 맞게 필드명을 매핑해주세요.
+                        body: JSON.stringify({ phone: newPhone })
+                    });
+
+                    if (response.ok) {
+                        alert('정보가 성공적으로 저장되었습니다.');
+
+                        // 읽기 전용 모드로 복구
+                        editableInputs.forEach(input => {
+                            input.readOnly = true;
+                            input.style.backgroundColor = '';
+                        });
+                        editBtn.innerText = '정보 수정';
+                        editBtn.style.borderStyle = 'dashed';
+                        editBtn.style.borderColor = 'var(--gray-400)';
+                        editBtn.style.color = 'var(--gray-600)';
+                    } else {
+                        alert('정보 수정에 실패했습니다. 다시 시도해주세요.');
+                    }
+                } catch (error) {
+                    console.error('저장 중 오류 발생:', error);
+                    alert('서버와 통신 중 오류가 발생했습니다.');
+                }
+            }
+        });
+    }
+
+    window.addEventListener('load', () => {
+        setupDropdown('notiBtn', 'notiDropdown');
+        setupDropdown('profileBtn', 'profileDropdown');
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown-wrap')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('open'));
+            }
+        });
+
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.addEventListener('click', e => e.stopImmediatePropagation());
+        });
+
+        // 기능 초기화 및 데이터 로드
+        setupInfoEdit();
+        loadMyInfo(); // 페이지 로드 시 정보 불러오기 실행
+    });
+</script>
+
+</body>
+</html>

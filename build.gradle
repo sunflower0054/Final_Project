@@ -24,12 +24,46 @@ repositories {
 }
 
 dependencies {
+    // 웹 서버 (HTTP 요청 받기)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // 스프링이 FastAPI한테 설정값 전달할 때
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // JPA (DB 연동)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Thymeleaf (HTML 화면)
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+
+    // Spring Security (세션 기반 인증/인가)
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // MySQL 드라이버
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // Lombok (getter/setter 자동 생성)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Validation (입력값 검증)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // 개발 편의 도구 (서버 자동 재시작)
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    testImplementation 'org.springframework.boot:spring-boot-starter-thymeleaf-test'
+
+    // 테스트
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testRuntimeOnly 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //스프링에서 다른 서버로 HTTP 요청 보낼 때 쓰는 클라이언트
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // 솔라피 SDK
+    implementation 'net.nurigo:sdk:4.3.0'
 
 }
 

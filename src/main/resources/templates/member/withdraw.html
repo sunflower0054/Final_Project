@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 탈퇴</title>
+
+    <!-- 보안을 위한 CSRF 토큰 (Spring Security 연동용) -->
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/member_style.css}">
+    <style>
+        .radio-group { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+        .radio-label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--gray-700); }
+        .radio-label input[type="radio"] { width: 16px; height: 16px; accent-color: var(--navy); cursor: pointer; }
+        .withdraw-alert { background: #FFF5F5; border: 1px solid #FFE3E3; border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+    </style>
+</head>
+<body>
+
+<div class="global-logo">
+    <span class="global-logo-text">늘 봄</span>
+</div>
+
+<!-- STEP 1: 탈퇴 사유 입력 -->
+<div id="step1" class="step-container" style="display: flex;">
+    <div class="card">
+        <div class="step-bar-card">
+            <div class="step-item active" id="sb1i1"><div class="step-num">1</div><div class="step-label">사유 선택</div></div>
+            <div class="step-item" id="sb1i2"><div class="step-num">2</div><div class="step-label">본인 확인</div></div>
+            <div class="step-item" id="sb1i3"><div class="step-num">3</div><div class="step-label">탈퇴 완료</div></div>
+        </div>
+
+        <div class="section-title">탈퇴 사유를 알려주세요</div>
+        <div class="section-sub">고객님의 소중한 의견을 반영하여 더 나은 모니터링 시스템을 만들겠습니다.</div>
+
+        <div class="form-group" style="margin-top: 24px;">
+            <label class="form-label">이용 목적 및 탈퇴 사유 <span class="req">*</span></label>
+            <div class="radio-group">
+                <label class="radio-label"><input type="radio" name="purpose" value="사용 빈도 낮음"> 시스템 사용 빈도가 낮음</label>
+                <label class="radio-label"><input type="radio" name="purpose" value="기능 부족"> 원하는 기능(AI 분석 등)이 부족함</label>
+                <label class="radio-label"><input type="radio" name="purpose" value="개인정보 우려"> 개인정보 및 영상 데이터 보안 우려</label>
+                <label class="radio-label"><input type="radio" name="purpose" value="기타" id="reasonOther" onchange="toggleOtherInput()"> 기타 사유</label>
+            </div>
+            <input class="form-input" id="purposeEtc" type="text" placeholder="상세 사유를 입력해주세요 (선택)" style="margin-top: 12px; display: none;">
+        </div>
+
+        <button class="btn-primary" id="step1Next" onclick="goStep2()" style="margin-top: 32px;">다음 단계로</button>
+        <button class="btn-outline" onclick="history.back()" style="margin-top: 12px;">취소</button>
+    </div>
+</div>
+
+<!-- STEP 2: 본인 확인 -->
+<div id="step2" class="step-container" style="display: none;">
+    <div class="card">
+        <div class="step-bar-card">
+            <div class="step-item done" id="sb2i1"><div class="step-num"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="step-label">사유 선택</div></div>
+            <div class="step-item active" id="sb2i2"><div class="step-num">2</div><div class="step-label">본인 확인</div></div>
+            <div class="step-item" id="sb2i3"><div class="step-num">3</div><div class="step-label">탈퇴 완료</div></div>
+        </div>
+
+        <div class="section-title">본인 확인</div>
+        <div class="section-sub">안전한 탈퇴 처리를 위해 비밀번호를 다시 한번 입력해 주세요.</div>
+
+        <div class="withdraw-alert">
+            <h3 style="color: var(--error); font-size: 15px; margin-bottom: 8px;">안내사항</h3>
+            <p style="font-size: 13px; color: var(--gray-600); line-height: 1.5;">
+                회원 탈퇴 시 서비스 이용이 즉시 제한됩니다.<br>
+                단, 통계 및 고객 문의 응대를 위해 가입 기록은 <strong>탈퇴 회원 데이터베이스</strong>에 별도로 보관됩니다.
+            </p>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">아이디</label>
+            <input class="form-input" id="withdrawId" type="text" th:value="${currentUser.username}" placeholder="아이디" readonly style="background-color: var(--gray-50); color: var(--gray-500);">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">비밀번호 <span class="req">*</span></label>
+            <div class="pw-wrap">
+                <input class="form-input" id="withdrawPw" type="password" placeholder="현재 비밀번호를 입력해주세요" style="padding-right:40px;">
+                <button class="pw-toggle" type="button" onclick="togglePw('withdrawPw')">👁️</button>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="submitWithdraw()" style="margin-top: 16px; background: var(--error);">탈퇴하기</button>
+        <button class="btn-outline" onclick="goStep1()" style="margin-top: 12px;">이전으로 돌아가기</button>
+    </div>
+</div>
+
+<!-- STEP 3: 탈퇴 완료 -->
+<div id="step3" class="step-container" style="display: none;">
+    <div class="card">
+        <div class="step-bar-card">
+            <div class="step-item done"><div class="step-num"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="step-label">사유 선택</div></div>
+            <div class="step-item done"><div class="step-num"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="step-label">본인 확인</div></div>
+            <div class="step-item active"><div class="step-num">3</div><div class="step-label">탈퇴 완료</div></div>
+        </div>
+
+        <div class="done-wrap">
+            <div class="done-icon" style="border-color: var(--gray-300);">
+                <svg width="40" height="40" fill="none" viewBox="0 0 24 24">
+                    <path d="M20 6L9 17l-5-5" stroke="#64748B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="done-title" style="color: var(--gray-700);">탈퇴가 완료되었습니다.</div>
+            <div class="done-sub">그동안 늘 봄 서비스를 이용해 주셔서 감사합니다.<br>더 나은 서비스로 다시 뵙기를 바라겠습니다.</div>
+            <button class="btn-primary" onclick="location.href='/';">메인 화면으로 가기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 기타 사유 텍스트 입력창 토글
+    function toggleOtherInput() {
+        const isOther = document.getElementById('reasonOther').checked;
+        const etcInput = document.getElementById('purposeEtc');
+        if (isOther) {
+            etcInput.style.display = 'block';
+            etcInput.focus();
+        }
+    }
+
+    // 다른 사유 선택 시 기타 입력창 초기화
+    document.querySelectorAll('input[name="purpose"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if(this.id !== 'reasonOther') {
+                document.getElementById('purposeEtc').style.display = 'none';
+                document.getElementById('purposeEtc').value = '';
+            }
+        });
+    });
+
+    // 단계 이동
+    function goStep2() {
+        if (!document.querySelector('input[name="purpose"]:checked')) {
+            alert('탈퇴 사유를 선택해 주세요.');
+            return;
+        }
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'flex';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function goStep1() {
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step1').style.display = 'flex';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    // 비밀번호 보이기/숨기기 토글
+    function togglePw(id) {
+        const el = document.getElementById(id);
+        el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    // 탈퇴 API 요청
+    async function submitWithdraw() {
+        const pw = document.getElementById('withdrawPw').value;
+        const selectedRadio = document.querySelector('input[name="purpose"]:checked');
+        const purposeEtc = document.getElementById('purposeEtc').value;
+
+        if (!selectedRadio) { alert('탈퇴 사유를 선택해 주세요.'); return; }
+        if (!pw) { alert('비밀번호를 입력해 주세요.'); return; }
+
+        const finalPurpose = selectedRadio.value === '기타' ? purposeEtc : selectedRadio.value;
+
+        // CSRF 토큰 가져오기 (Spring Security 사용 시 필수)
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
+        const headers = { 'Content-Type': 'application/json' };
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
+        }
+
+        try {
+            // URL 파라미터 대신 Body에 JSON 형태로 담아서 전송 (보안 강화)
+            const response = await fetch('/api/v1/auth/withdraw', {
+                method: 'DELETE',
+                headers: headers,
+                body: JSON.stringify({
+                    purpose: finalPurpose,
+                    password: pw
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('step3').style.display = 'flex';
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            } else {
+                alert(data.message || '비밀번호가 일치하지 않거나 오류가 발생했습니다.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('탈퇴 처리 중 오류가 발생했습니다. 네트워크 상태를 확인해주세요.');
+        }
+    }
+</script>
+<script th:src="@{/js/app-api.js}"></script>
+</body>
+</html>

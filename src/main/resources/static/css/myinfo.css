@@ -1,0 +1,905 @@
+/* ===== 1. Modern Design System & Variables ===== */
+:root {
+    /* =========================================
+       1. Main Theme Colors (올리브/카키 베이스)
+       ========================================= */
+    /* 가장 강조되는 핵심 색상 (기본 버튼, 헤더 등) */
+    --primary: #556B2F;
+    --navy: #556B2F;
+
+    /* 중간 톤 (호버 상태, 서브 버튼, 낙상 뱃지 등) */
+    --primary-mid: #6B8E23;
+    --navy-mid: #6B8E23;
+
+    /* 포인트 색상 (경고성 알림, 체크박스 액센트 등) */
+    --accent: #808000;
+    --accent-hover: #556B2F;
+
+    /* 배경 베이스 (아주 연한 올리브 톤으로 눈을 편안하게) */
+    --primary-light: #F5F6F1;
+    --navy-light: #F5F6F1;
+    --accent-light: #F5F6F1;
+    --navy-subtle: #FAFBFA;
+
+    /* =========================================
+       2. Gray Scale (테마에 맞춘 따뜻한 웜 그레이)
+       ========================================= */
+    --gray-50:  #FAFBFA;     /* 가장 밝은 배경 */
+    --gray-100: #F7F1DC;     /* 메인 페이지 배경 (primary-light와 통일) */
+    --gray-200: #E6E8DE;     /* 연한 테두리, 카드 경계선 */
+    --gray-300: #8D8F68;     /* 인풋창 테두리, 비활성 요소 */
+    --gray-400: #A4A999;     /* 플레이스홀더, 부가 설명 텍스트 */
+    --gray-500: #787D6C;     /* 서브 텍스트, 아이콘 */
+    --gray-600: #595E4F;     /* 본문 텍스트 2 */
+    --gray-700: #404536;     /* 강조 텍스트 */
+    --gray-800: #292D21;     /* 진한 제목 */
+    --gray-900: #1B1E15;     /* 가장 어두운 텍스트 (블랙 대체) */
+
+    /* Text & Background Colors */
+    --text-main: var(--gray-900);
+    --text-sub: var(--gray-600);
+    --text-muted: var(--gray-400);
+
+    --bg-page: var(--gray-100);
+    --bg-card: #ffffff;
+    --border-color: var(--gray-200);
+
+    /* =========================================
+       3. Semantic Colors (상태 표시)
+       - 메인 테마를 해치지 않도록 채도를 살짝 낮춤
+       ========================================= */
+    --success: #3E8A42;
+    --success-bg: #E8F5E9;
+    --error: #C92A2A;
+    --error-bg: #FFF5F5;
+    --warning: #D97706;      /* #808000과 겹치지 않도록 주황빛 앰버 톤 유지 */
+    --warning-bg: #FEF3C7;
+    --purple: #6741D9;
+    --purple-bg: #F3F0FF;
+
+    /* =========================================
+       4. Design Elements (그림자, 라운드 등)
+       ========================================= */
+    --shadow-sm: 0 2px 8px rgba(27, 30, 21, 0.04);
+    --shadow-md: 0 8px 30px rgba(27, 30, 21, 0.06);
+    --shadow: 0 4px 12px rgba(27, 30, 21, 0.05);
+
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 16px;
+    --transition: all 0.25s ease;
+
+    /* =========================================
+       5. Charts (차트 전용 색상)
+       ========================================= */
+    --chart-grid-line: var(--gray-200);
+    --chart-pie-green-1: #6B8E23;
+    --chart-pie-green-2: #E6E8DE;
+    --chart-pie-yellow-1: #808000;
+    --chart-pie-yellow-2: #F5F6F1;
+}
+/* ===== 2. Reset & Body ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg-page) !important;
+    padding: 20px; min-height: 100vh;
+    display: flex; flex-direction: column; gap: 20px;
+    overflow-y: auto;
+}
+
+svg {
+    vertical-align: middle;
+}
+
+/* ===== Header & Topbar (style.css와 완벽히 통일) ===== */
+
+/* [style.css] 파일 맨 아래에 추가 */
+
+/* 로그아웃 상태일 때 프로필 카드 컨테이너 */
+#profileDropdown .profile-logged-out {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px 20px 20px; /* 위쪽 여백을 줘서 아이콘을 띄움 */
+}
+
+/* 익명 사용자 아바타 스타일 (색상 연하게) */
+#profileDropdown .anon-avatar {
+    background-color: #f0f0f0;
+    color: #bbb;
+}
+
+/* 안내 문구 스타일 */
+#profileDropdown .logout-msg {
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 25px;
+}
+
+/* 큰 글씨 */
+#profileDropdown .logout-msg .main-msg {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+/* 작은 글씨 */
+#profileDropdown .logout-msg .sub-msg {
+    display: block;
+    font-size: 13px;
+    color: #888;
+    line-height: 1.4;
+}
+
+/* 버튼들을 감싸는 영역 */
+#profileDropdown .profile-action-btns {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* 버튼 사이 간격 */
+}
+
+/* 로그인 버튼: 시스템 기본 검은색 버튼 스타일 (#111) */
+#profileDropdown .btn-profile-login {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #111; /* .btn-profile-logout 참고 */
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+#profileDropdown .btn-profile-login:hover {
+    background-color: #333;
+}
+
+/* 회원가입 버튼: 서브 버튼 스타일 (회색) */
+#profileDropdown .btn-profile-join {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #f1f1f1;
+    color: #555;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    transition: all 0.2s;
+}
+
+#profileDropdown .btn-profile-join:hover {
+    background-color: #e9e9e9;
+    border-color: #ccc;
+    color: #333;
+}
+
+.header-area { display: flex; align-items: center; justify-content: space-between; padding: 0 10px; flex-shrink: 0; }
+.brand-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.logo-box { width: 36px; height: 36px; background: var(--navy); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; padding: 6px;}
+.brand-name { font-size: 24px; font-weight: 800; color: var(--navy); letter-spacing: -1px; }
+
+.logo-image {max-width: 100%; max-height: 100%; object-fit: contain; vertical-align: middle; }
+
+.topbar-right { display: flex; align-items: center; gap: 14px; position: relative; }
+.system-time { font-size: 14px; font-weight: 600; color: var(--gray-500); margin-right: 8px; }
+
+.icon-btn {
+    background: #fff; border: 1px solid var(--gray-300); cursor: pointer; color: var(--gray-600);
+    width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    position: relative; transition: 0.2s;
+}
+.noti-dot { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: var(--error); border: 2px solid #fff; border-radius: 50%; }
+
+/* Dropdown 공통 */
+.dropdown-wrap { position: relative; }
+.dropdown-menu {
+    position: absolute; top: 52px; right: 0; background: #fff;
+    border: 1px solid var(--gray-300); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    display: none; flex-direction: column; z-index: 100; overflow: hidden;
+}
+.dropdown-menu.open { display: flex; }
+
+.dropdown-footer { padding: 12px 24px; border-top: 1px solid var(--gray-100); background: var(--gray-50); }
+
+/* ==================== 알림 드롭다운 ==================== */
+#notiDropdown { width: 340px; }
+#notiDropdown .dropdown-header { justify-content: space-between; padding: 16px 24px; }
+.noti-count { background: #fff; border: 1px solid var(--gray-300); color: var(--gray-700); font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 9999px; }
+.noti-list { max-height: 420px; overflow-y: auto; padding: 0; }
+.noti-item { padding: 20px; border-bottom: 1px solid var(--gray-100); }
+.noti-item:last-child { border-bottom: none; }
+
+.noti-detail-title { font-size: 15px; font-weight: 700; color: var(--gray-900); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.noti-detail-title::before { content: '●'; color: var(--error); font-size: 18px; line-height: 1; }
+.noti-detail-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 6px; }
+.noti-detail-row .value { font-weight: 600; color: var(--gray-900); }
+
+.noti-alert-box { background: #FEE2E2; color: var(--error); padding: 14px 16px; border-radius: 8px; font-size: 13.5px; line-height: 1.4; margin-top: 16px; }
+
+/* ==================== 프로필 드롭다운 ==================== */
+#profileDropdown { width: 320px; }
+.profile-header { padding: 24px 24px 16px; text-align: center; border-bottom: 1px solid var(--gray-100); }
+.avatar-container { position: relative; display: inline-block; margin-bottom: 12px; }
+.profile-avatar-lg { width: 88px; height: 88px; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+.profile-avatar-lg svg { width: 48px; height: 48px; color: #6b7280; }
+
+.user-name { font-size: 20px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
+.user-email { font-size: 13px; color: #64748b; }
+
+.profile-menu { padding: 8px 0; }
+.profile-menu a { display: flex; align-items: center; gap: 10px; padding: 12px 24px; font-size: 14px; font-weight: 600; color: var(--gray-600); text-decoration: none; transition: 0.2s; }
+.profile-menu a svg { color: var(--gray-400); flex-shrink: 0; transition: 0.2s; }
+.profile-menu a:hover { background: var(--navy-light); color: var(--navy); }
+.profile-menu a:hover svg { color: var(--navy); }
+
+/* ===== 4. Content Area Layout & Typography ===== */
+.main-container {
+    display: flex;
+    min-height: calc(100vh - 70px);
+}
+
+.content-area {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.page-header {
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+    font-size: 15px;
+    color: var(--text-sub);
+    margin-top: 5px;
+}
+
+/* ===== 5. Modern Info Grid & Profile Card ===== */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.profile-card {
+    background-color: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.profile-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.profile-header {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.profile-avatar-xl {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    border: 4px solid #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.profile-name-lg {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.profile-email {
+    font-size: 14px;
+    color: var(--text-sub);
+    margin-top: 5px;
+}
+
+.profile-stats {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stat-item {
+    flex: 1;
+    padding: 20px;
+    text-align: center;
+    border-right: 1px solid var(--border-color);
+}
+
+.stat-item:last-child {
+    border-right: none;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-sub);
+    font-weight: 600;
+    margin-top: 3px;
+}
+
+.profile-actions {
+    padding: 20px;
+}
+
+/* ===== 6. Modern Content Card & Form ===== */
+.details-area {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+ .content-card,
+ .profile-card {
+    background-color: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.card-body {
+    padding: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: var(--text-main);
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/*.form-control[readonly] {
+    background-color: var(--primary-light);
+    color: var(--text-sub);
+    cursor: default;
+}*/
+
+.form-control[readonly],
+.form-control:disabled {
+    background-color: var(--gray-50); /* 시선을 끌지 않는 깨끗한 연회색 (#fcfcf9) */
+    color: var(--gray-900); /* 텍스트 데이터는 선명하게 유지 */
+    border-color: var(--gray-200);
+    cursor: default;
+}
+
+/* 생년월일 select 박스(disabled 상태)도 일관성 있게 맞추기 위해 추가 */
+.birth-row select:disabled {
+    background-color: var(--gray-50) !important;
+    color: var(--gray-900);
+    border-color: var(--gray-200);
+    cursor: default;
+    appearance: none; /* 비활성화 시 화살표를 숨기고 싶다면 추가 */
+}
+
+
+/* ===== 7. Setting Row & Modern Toggle ===== */
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.setting-row:last-child {
+    border-bottom: none;
+}
+
+.setting-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.setting-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.setting-desc {
+    font-size: 13px;
+    color: var(--text-sub);
+    margin-top: 2px;
+}
+
+.toggle {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-track {
+    width: 50px;
+    height: 26px;
+    background-color: var(--secondary);
+    border-radius: 13px;
+    transition: var(--transition);
+    position: relative;
+}
+
+.toggle input:checked + .toggle-track {
+    background-color: var(--primary);
+}
+
+.toggle-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: var(--transition);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.toggle input:checked + .toggle-track .toggle-thumb {
+    transform: translateX(24px);
+}
+
+/* ===== 8. Buttons, Badges, & Footer ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    text-decoration: none;
+}
+
+.btn-navy {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+.btn-navy:hover {
+    background-color: var(--primary-mid);
+    transform: translateY(-1px);
+}
+
+.btn-profile-detail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background-color: #ffffff;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+/* 수정됨: 호버 시 var(--primary-mid) 적용 */
+.btn-profile-detail:hover {
+    background-color: var(--gray-50);
+    color: var(--primary);
+    border-color: var(--primary-mid);
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.badge-navy {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.badge-red { background-color: var(--error-bg); color: var(--error); }
+.badge-orange { background-color: var(--warning-bg); color: var(--warning); }
+.badge-purple { background-color: var(--purple-bg); color: var(--purple); }
+
+.card-footer {
+    padding: 15px 25px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-page);
+    text-align: right;
+    border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* 모던 로그아웃 버튼 스타일 */
+.btn-profile-logout {
+    width: 100%; padding: 12px; margin-top: 8px;
+    background-color: #fff; color: #E03131;
+    border: 1px solid #FFE3E3; border-radius: 8px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s ease-in-out;
+}
+.btn-profile-logout:hover { background-color: #FFF5F5; border-color: #FFAFB0; transform: translateY(-1px); }
+.btn-profile-logout:active { background-color: #FFE3E3; transform: translateY(0); }
+.btn-profile-logout svg { transition: transform 0.2s ease; }
+.btn-profile-logout:hover svg { transform: translateX(2px); }
+
+/* 3단 레이아웃 그리드 설정 */
+.info-grid-3col {
+    display: grid;
+    grid-template-columns: 280px 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+    margin-top: 30px;
+}
+
+@media (max-width: 1200px) {
+    .info-grid-3col {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+.myinfo-layout {
+    display: grid !important;
+    grid-template-columns: 280px 1fr !important;
+    gap: 24px !important;
+    align-items: start !important;
+    margin-top: 30px !important;
+}
+
+.myinfo-right-column {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 24px !important;
+}
+
+@media (max-width: 1200px) {
+    .myinfo-layout {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* =============================================
+   Resident Detail & Edit 전용 스타일
+   (기존 스타일 최대한 유지하면서 추가)
+   ============================================= */
+
+.birth-row {
+    display: grid;
+    grid-template-columns: 1fr 0.75fr 0.75fr;
+    gap: 8px;
+    max-width: 260px;
+}
+
+.birth-row select {
+    font-size: 14.5px !important;
+    padding: 7px 8px !important;
+    height: 38px !important;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: #ffffff;
+}
+
+.birth-row select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* 기저질환 Badge 스타일 개선 */
+.underlying-diseases .badge {
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    color: var(--text-sub);
+    transition: all 0.2s ease;
+}
+
+.underlying-diseases .badge:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.underlying-diseases input[type="checkbox"] {
+    margin-right: 6px;
+}
+
+/* 주소 입력 필드 간격 조정 */
+.address-group .form-control {
+    margin-top: 8px;
+}
+
+.address-group .form-control:first-of-type {
+    margin-top: 0;
+}
+
+/* 상세 주소 입력란 스타일 */
+#detailAddress {
+    margin-top: 8px;
+}
+
+/* 폼 라벨 강조 */
+.form-label {
+    font-weight: 600;
+}
+
+/* 회원 탈퇴 전용 스타일 */
+.withdraw-card {
+    border: 2px solid var(--border-color);
+}
+
+.withdraw-alert {
+    background: #FFF5F5;
+    border: 1px solid #FFE3E3;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.radio-label:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+}
+
+.radio-label input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary); /* 늘 봄 메인 컬러 적용 */
+}
+
+
+/* ==========================================================
+   [추가] 모던 탈퇴 섹션 스타일
+========================================================== */
+
+/* 탈퇴 섹션 전체 카드 */
+.content-card.withdraw-section {
+    border: 1px solid var(--gray-200); /* 위협적인 빨강 대신 차분한 그레이 */
+    margin-top: 32px; /* 위 카드와의 간격 */
+    background-color: #fff;
+    transition: var(--transition);
+}
+
+/* 카드 내부 레이아웃 */
+.withdraw-content {
+    display: flex;
+    justify-content: space-between; /* 텍스트와 버튼을 양끝으로 배치 */
+    align-items: center; /* 세로 중앙 정렬 */
+    padding: 10px 10px; /* 내부 여백 조정 */
+}
+
+/* 텍스트 영역 */
+.withdraw-text-area {
+    flex: 1;
+}
+
+/* 제목 styling */
+.withdraw-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy); /* 메인 네이비 컬러 사용 */
+    margin: 0 0 8px 0;
+}
+
+/* 설명 styling */
+.withdraw-desc {
+    font-size: 14px;
+    color: var(--gray-600);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* 강조 텍스트 (즉시 삭제) */
+.withdraw-desc .highlight {
+    color: var(--error); /* 경고 의미로 빨간색 유지하되 부분적으로만 */
+    font-weight: 600;
+}
+
+/* 버튼 영역 */
+.withdraw-action-area {
+    margin-left: 20px;
+}
+
+/* [모던 고스트 버튼] 탈퇴 진행하기 버튼 */
+.btn.btn-withdraw-ghost {
+    background-color: transparent; /* 배경 투명 */
+    color: var(--gray-600); /* 차분한 그레이 텍스트 */
+    border: 1px solid var(--gray-300); /* 옅은 테두리 */
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+/* 버튼 호버 효과 */
+.btn.btn-withdraw-ghost:hover {
+    background-color: #FFF5F5; /* 아주 옅은 핑크빛 배경 */
+    color: var(--error); /* 호버 시에만 빨간색으로 변경 */
+    border-color: var(--error);
+    transform: translateY(-1px); /* 살짝 떠오르는 효과 */
+    box-shadow: 0 2px 5px rgba(224, 49, 49, 0.1); /* 은은한 그림자 */
+}
+
+/* 부드러운 삭제 버튼 스타일 (고스트 버튼) */
+.btn-profile-delete {
+    background-color: #ffffff !important;
+    color: var(--error) !important;       /* 차분한 톤다운 레드 */
+    border: 1px solid #FFE3E3 !important; /* 아주 연한 빨간색 테두리 */
+}
+
+/* 마우스를 올렸을 때 살짝 경고 느낌만 주기 */
+.btn-profile-delete:hover {
+    background-color: #FFF5F5 !important; /* 연한 핑크빛 배경 */
+    border-color: #FFAFB0 !important;
+}
+
+
+.footer-bar {
+    background: #fff;
+    border: 2px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    z-index: 10;
+    margin-top: auto;
+}
+
+.footer-note {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-500);
+}
+
+.footer-btns {
+    display: flex;
+    gap: 12px;
+}
+
+
+.service-footer {
+    margin-top: 40px;
+    padding: 40px 20px;
+    background: #F7F1DC;
+    border-top: 1px solid var(--gray-200);
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-tagline {
+    font-size: 14px;
+    color: var(--gray-500);
+    margin-left: 10px;
+    font-weight: 500;
+}
+
+.footer-info {
+    text-align: right;
+    font-size: 13px;
+    color: var(--gray-400);
+    line-height: 1.6;
+}
