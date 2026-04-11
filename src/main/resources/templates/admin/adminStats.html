@@ -357,8 +357,10 @@
             gray: rootStyle.getPropertyValue('--gray-400').trim() || '#9CA3AF',
             dark: rootStyle.getPropertyValue('--gray-900').trim() || '#1C2919',
             gridLine: rootStyle.getPropertyValue('--chart-grid-line').trim() || '#F1F5F9',
-            pieGreen1: rootStyle.getPropertyValue('--chart-pie-green-1').trim() || '#C5E1A5',
-            pieGreen2: rootStyle.getPropertyValue('--chart-pie-green-2').trim() || '#DCEDC8',
+            pieGreen1: rootStyle.getPropertyValue('--chart-pie-green-1').trim() || '#98cc67',
+            pieGreen2: rootStyle.getPropertyValue('--chart-pie-green-2').trim() || '#aed685',
+            pieGreen3: rootStyle.getPropertyValue('--chart-pie-green-3').trim() || '#c3e0a3',
+            pieGreen4: rootStyle.getPropertyValue('--chart-pie-green-4').trim() || '#6b9e3c',
             pieYellow1: rootStyle.getPropertyValue('--chart-pie-yellow-1').trim() || '#FBBF24',
             pieYellow2: rootStyle.getPropertyValue('--chart-pie-yellow-2').trim() || '#FDE68A'
         };
@@ -825,24 +827,36 @@
     }
 
     function drawUserAgeChart(dataArray) {
-        var data = google.visualization.arrayToDataTable(dataArray);
+        var barColors = ['#b54f30', '#dd7b55', '#8a4d33', '#a92014', '#e69579'];
+
+        // 스타일 컬럼 추가: 각 막대에 개별 색상 적용
+        var styledData = new google.visualization.DataTable();
+        styledData.addColumn('string', '연령대');
+        styledData.addColumn('number', '인원 수');
+        styledData.addColumn({ type: 'string', role: 'style' });
+
+        // dataArray[0]은 헤더이므로 1번째 행부터 순서대로 색상 매핑
+        dataArray.slice(1).forEach(function(row, index) {
+            var color = barColors[index % barColors.length];
+            styledData.addRow([row[0], row[1], 'color: ' + color]);
+        });
+
         var options = {
             legend: { position: 'none' },
-            colors: [colors.primaryMid],
             chartArea: { width: '80%', height: '70%' },
             vAxis: { gridlines: { color: colors.gridLine }, textStyle: { color: colors.gray } },
             hAxis: { textStyle: { color: colors.gray } },
             animation: { startup: true, duration: 800, easing: 'out' }
         };
         var chart = new google.visualization.ColumnChart(document.getElementById('userAgeChart'));
-        chart.draw(data, options);
+        chart.draw(styledData, options);
     }
 
     function drawUserPurposeChart(dataArray) {
         var data = google.visualization.arrayToDataTable(dataArray);
         var options = {
             pieHole: 0.5,
-            colors: [colors.primary, colors.primaryMid, colors.pieGreen1, colors.pieGreen2],
+            colors: [colors.primary, colors.pieGreen4, colors.pieGreen1, colors.pieGreen3],
             chartArea: { width: '90%', height: '90%' },
             legend: { position: 'right', textStyle: { color: colors.dark, fontSize: 12 } },
             pieSliceBorderColor: "none"
@@ -855,7 +869,7 @@
         var data = google.visualization.arrayToDataTable(dataArray);
         var options = {
             pieHole: 0.5,
-            colors: [colors.warning, colors.pieYellow1, colors.pieYellow2],
+            colors: ['#f7e600', '#c9b800', '#f9ef66', '#a89900'],
             chartArea: { width: '90%', height: '90%' },
             legend: { position: 'right' },
             pieSliceBorderColor: "none"
@@ -868,10 +882,10 @@
         var data = google.visualization.arrayToDataTable(dataArray);
         var options = {
             pieHole: 0.6,
-            colors: [colors.gray, colors.success, colors.error],
+            colors: ['#223977', '#555fd3', '#b3bbdf'],
             chartArea: { width: '90%', height: '90%' },
             legend: { position: 'right' },
-            pieSliceText: 'none'
+            pieSliceText: 'percentage'
         };
         var chart = new google.visualization.PieChart(document.getElementById('eventStatusChart'));
         chart.draw(data, options);

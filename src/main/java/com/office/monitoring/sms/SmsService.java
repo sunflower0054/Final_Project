@@ -11,6 +11,7 @@ import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ public class SmsService {
     private final DefaultMessageService messageService;
 
     // ── 1차 알림: 가족에게 이벤트 감지 알림 ──────────────────────────
+    @Async
     public void sendFirstAlert(Event event) {
         List<Member> families = memberRepository.findAllByResidentId(event.getResidentId());
         if (families.isEmpty()) {
