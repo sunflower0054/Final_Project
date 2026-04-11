@@ -20,9 +20,9 @@
        2. Gray Scale (테마에 맞춘 따뜻한 웜 그레이)
        ========================================= */
     --gray-50:  #FAFBFA;
-    --gray-100: #F5F6F1;
+    --gray-100: #F7F1DC;
     --gray-200: #E6E8DE;
-    --gray-300: #D0D4C5;
+    --gray-300: #8D8F68;
     --gray-400: #A4A999;
     --gray-500: #787D6C;
     --gray-600: #595E4F;
@@ -269,8 +269,8 @@ body {
 .top-row { display: grid; grid-template-columns: 1fr 360px; gap: 20px; min-height: 700px; }
 
 .content-card {
-    background: #fff; border: 1px solid var(--gray-300); border-radius: var(--radius);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden;
+    background: var(--gray-100); border: 2px solid var(--gray-300); border-radius: var(--radius);
+    display: flex; flex-direction: column; overflow: hidden;
 }
 
 .monitoring-box { position: relative; background: #000; flex: 1; display: flex; align-items: center; justify-content: center; min-height: 600px; }
@@ -572,7 +572,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 .service-footer {
     margin-top: 40px;
     padding: 40px 20px;
-    background: #fff;
+    background: #F7F1DC;
     border-top: 1px solid var(--gray-200);
     border-radius: var(--radius) var(--radius) 0 0;
 }
@@ -731,7 +731,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 .date-input { border: 1px solid var(--gray-300); border-radius: 8px; padding: 5px 10px; font-size: 15px; background: #fff; color: var(--gray-900); }
 
 /* 리스크 카드 */
-.risk-card { background: #fff; border-radius: 12px; border: 1px solid var(--gray-200); padding: 16px; margin-bottom: 14px; }
+.risk-card { background: var(--gray-100); border-radius: 12px; border: 2px solid var(--gray-300); padding: 16px; margin-bottom: 14px; }
 .risk-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .risk-label { font-size: 15px; color: var(--gray-700); font-weight: 500; }
 .risk-date-range { font-size: 13px; color: var(--gray-500); }
