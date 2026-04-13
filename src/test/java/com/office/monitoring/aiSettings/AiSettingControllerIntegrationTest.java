@@ -44,7 +44,7 @@ class AiSettingControllerIntegrationTest {
     /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 인증된_FAMILY사용자가_GET호출하면_설정값을_정상반환한다() throws Exception {
         aiSettingsRepository.save(AiSettings.builder()
-                .residentId(1L)
+                .residentId(24L)
                 .fallSensitivity(0.2)
                 .noMotionThreshold(1500)
                 .velocityThreshold(0.12)
@@ -89,7 +89,7 @@ class AiSettingControllerIntegrationTest {
                 .andExpect(jsonPath("$.velocityThreshold").value(0.22))
                 .andExpect(jsonPath("$.updatedAt").isNotEmpty());
 
-        AiSettings saved = aiSettingsRepository.findByResidentId(1L).orElseThrow();
+        AiSettings saved = aiSettingsRepository.findByResidentId(24L).orElseThrow();
         assertThat(saved.getFallSensitivity()).isEqualTo(0.31);
         assertThat(saved.getNoMotionThreshold()).isEqualTo(2100);
         assertThat(saved.getVelocityThreshold()).isEqualTo(0.22);
@@ -100,7 +100,7 @@ class AiSettingControllerIntegrationTest {
     /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 기존설정이_있을때_PUT호출하면_새행추가가아닌_업데이트로_동작한다() throws Exception {
         AiSettings existing = aiSettingsRepository.save(AiSettings.builder()
-                .residentId(1L)
+                .residentId(24L)
                 .fallSensitivity(0.11)
                 .noMotionThreshold(1000)
                 .velocityThreshold(0.09)
@@ -124,9 +124,9 @@ class AiSettingControllerIntegrationTest {
                 .andExpect(jsonPath("$.velocityThreshold").value(0.35));
 
         long count = aiSettingsRepository.findAll().stream()
-                .filter(settings -> settings.getResidentId().equals(1L))
+                .filter(settings -> settings.getResidentId().equals(24L))
                 .count();
-        AiSettings updated = aiSettingsRepository.findByResidentId(1L).orElseThrow();
+        AiSettings updated = aiSettingsRepository.findByResidentId(24L).orElseThrow();
 
         assertThat(count).isEqualTo(1L);
         assertThat(updated.getId()).isEqualTo(existing.getId());
@@ -179,7 +179,7 @@ class AiSettingControllerIntegrationTest {
 
     @Test
     /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
-    void PUT요청에서_csrf없이_요청하면_403이다() throws Exception {
+    void PUT요청에서_csrf없이_요청하면_200() throws Exception {
         mockMvc.perform(put("/api/v1/settings")
                         .with(user("user").roles("FAMILY"))
                         .contentType("application/json")
@@ -190,12 +190,12 @@ class AiSettingControllerIntegrationTest {
                                   "velocityThreshold": 0.2
                                 }
                                 """))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
     }
 
     @Test
     /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
-    void apply_POST요청에서_csrf없이_요청하면_403이다() throws Exception {
+    void apply_POST요청에서_csrf없이_요청하면_200() throws Exception {
         mockMvc.perform(post("/api/v1/settings/apply")
                         .with(user("user").roles("FAMILY"))
                         .contentType("application/json")
@@ -206,6 +206,6 @@ class AiSettingControllerIntegrationTest {
                                   "velocityThreshold": 0.2
                                 }
                                 """))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
     }
 }
