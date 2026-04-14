@@ -199,7 +199,6 @@
 <script th:src="@{/js/app-api.js}"></script>
 <script>
     const DEFAULTS = { fall: 0.7, motion: 15, assault: 0.4 };
-
     function updateSlider(el, valId, impactId, isInt) {
         const v = parseFloat(el.value);
         const display = isInt ? Math.round(v) : Number(v.toFixed(2));
@@ -287,7 +286,6 @@
                 updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
             }
 
-            // 날짜만 표시 (시간 제거)
             if (data.updatedAt) {
                 const footerDate = document.getElementById('footer-date');
                 if (footerDate) footerDate.textContent = data.updatedAt.split(' ')[0];
@@ -297,6 +295,7 @@
         }
     }
 
+    // applyToPython 함수 수정
     async function applyToPython() {
         const payload = getPayload();
         showLoading(true);
@@ -305,7 +304,8 @@
             const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
 
-            const saveRes = await fetch('/api/v1/settings', {
+            // 저장
+            const saveRes = await fetch(`/api/v1/settings`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -314,21 +314,16 @@
                 body: JSON.stringify(payload)
             });
 
-            if (!saveRes.ok) {
-                const errorText = await saveRes.text();
-                console.error('DB 저장 실패:', saveRes.status, errorText);
-                throw new Error(`DB 저장 실패 (${saveRes.status})`);
-            }
+            if (!saveRes.ok) throw new Error(`DB 저장 실패 (${saveRes.status})`);
 
             const data = await saveRes.json();
-
-            // 저장 후 날짜만 표시 (시간 제거)
             if (data.updatedAt) {
                 const footerDate = document.getElementById('footer-date');
                 if (footerDate) footerDate.textContent = data.updatedAt.split(' ')[0];
             }
 
-            await fetch('/api/v1/settings/apply', {
+            // FastAPI 즉시 적용
+            await fetch(`/api/v1/settings/apply`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

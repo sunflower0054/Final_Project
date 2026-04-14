@@ -1,5 +1,6 @@
 package com.office.monitoring.aiSettings;
 
+import com.office.monitoring.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -12,23 +13,26 @@ import org.springframework.web.bind.annotation.*;
 public class AiSettingController {
 
     private final AiSettingsService aiSettingsService;
-    private static final Long TEMP_RESIDENT_ID = 24L;
+    private final CurrentUserService currentUserService;   // ← 추가
 
-    // 설정값 조회 (슬라이더 초기값 로딩)
+    // 설정값 조회
     @GetMapping
     public ResponseEntity<AiSettingsDto> get() {
-        return ResponseEntity.ok(aiSettingsService.get(TEMP_RESIDENT_ID));
+        Long residentId = currentUserService.getResidentId();
+        return ResponseEntity.ok(aiSettingsService.get(residentId));
     }
 
-    // 설정값 변경 (슬라이더 변경 시 호출)
+    // 설정값 변경
     @PutMapping
     public ResponseEntity<AiSettingsDto> update(@RequestBody AiSettingsDto dto) {
-        return ResponseEntity.ok(aiSettingsService.save(TEMP_RESIDENT_ID, dto));
+        Long residentId = currentUserService.getResidentId();
+        return ResponseEntity.ok(aiSettingsService.save(residentId, dto));
     }
 
     // FastAPI 즉시 전달
     @PostMapping("/apply")
     public ResponseEntity<Void> apply(@RequestBody AiSettingsDto dto) {
+        Long residentId = currentUserService.getResidentId();   // 필요하면 service에 전달 가능
         aiSettingsService.applyToFastApi(dto);
         return ResponseEntity.ok().build();
     }
