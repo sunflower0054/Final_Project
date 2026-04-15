@@ -167,7 +167,7 @@
 
         const finalPurpose = selectedRadio.value === '기타' ? purposeEtc : selectedRadio.value;
 
-        // CSRF 토큰 가져오기 (Spring Security 사용 시 필수)
+        // CSRF 토큰 가져오기
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
 

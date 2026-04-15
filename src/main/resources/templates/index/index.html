@@ -16,11 +16,6 @@
 <div class="main-container">
     <div class="top-row">
         <section class="content-card">
-            <!--
-              수정 완료:
-              eventId가 없으면(상황 발생 X) -> 'green-border'
-              eventId가 있으면(상황 발생 O) -> 'red-border'
-            -->
             <div class="monitoring-box green-border" id="monitoringContainer">
 
                 <div id="videoLoader" class="video-loader">
@@ -30,7 +25,6 @@
 
                 <img id="videoFeed" src="http://192.168.0.23:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">
 
-                <!-- 라이브 인디케이터 점 색상도 eventId 기준으로 변경 -->
                 <div class="live-indicator">
                     <div class="live-dot" id="liveDot" style="background: #2ecc71;"></div>
                     LIVE MONITORING
@@ -74,7 +68,6 @@
 
     <section class="content-card">
         <div class="wrap">
-            <!-- resident 객체가 존재할 경우 이름을 출력하고, 없을 경우 '거주자 미등록'을 출력합니다 -->
             <div class="resident-name" th:text="${resident != null ? resident.name + ' 어르신' : '거주자 미등록'}"></div>
             <div class="section-title">
                 이벤트 타임라인
@@ -145,7 +138,7 @@
     ]]*/ null;
     const residentIdForApi = currentResidentId || 0;
 
-    let currentEventId = null;   // ← 새로 추가: 현재 활성 이벤트 ID 관리
+    let currentEventId = null;
 
     function showVideo() {
         const loader = document.getElementById('videoLoader');
@@ -173,7 +166,7 @@
             fetchTimelineData(todayStr);
         }
 
-        // ★★★ 핵심: 항상 기본 버튼 핸들러 등록 (이벤트 없을 때 alert 나오게 함)
+        // 항상 기본 버튼 핸들러 등록 (이벤트 없을 때 alert 나오게 함)
         setupDefaultButtonHandlers();
 
         // 초기 이벤트 처리
@@ -202,7 +195,7 @@
         }
     }
 
-    // 새로 추가: 이벤트 없을 때 UI 초기화 (빨간 박스 문제 해결)
+    // 이벤트 없을 때 UI 초기화
     function resetUrgentAlertUI() {
         const alertBox = document.getElementById('urgentAlertBox');
         const container = document.getElementById('monitoringContainer');
@@ -219,7 +212,7 @@
         if (liveDot) liveDot.style.background = '#2ecc71';
 
         currentEventId = null;
-        setupDefaultButtonHandlers();   // 다시 기본 핸들러로 복구
+        setupDefaultButtonHandlers();
     }
 
     async function checkNewEvent() {
@@ -237,14 +230,14 @@
             }
             else if (response.status === 204) {
                 console.log('ℹ️ 현재 PENDING 이벤트 없음 (204)');
-                resetUrgentAlertUI();   // ← 여기서 녹색 복구 + 빈 박스 제거
+                resetUrgentAlertUI();
             }
         } catch (e) {
             console.error("🚨 이벤트 체크 fetch 실패:", e);
         }
     }
 
-    // UI 동적 갱신 함수 (기존 로직 + 개선)
+    // UI 동적 갱신 함수
     function updateUrgentAlertUI(event) {
         if (!event) return;
 
@@ -254,14 +247,13 @@
         const container = document.getElementById('monitoringContainer');
         const liveDot = document.getElementById('liveDot');
 
-        // 빨간색으로 변경
         if (container) {
             container.classList.remove('green-border');
             container.classList.add('red-border');
         }
         if (liveDot) liveDot.style.background = '#e74c3c';
 
-        // 제목, 시간, 신뢰도 등 기존 로직 그대로 유지 (생략 없이 전체 붙여넣기)
+        // 제목, 시간, 신뢰도 등 기존 로직
         const titles = {
             'FALL_DETECTED': '🚨 낙상 발생',
             'NO_MOTION_DETECTED': '🚨 무응답 감지',
@@ -325,42 +317,35 @@
     }
 
 
-    // 3. 위험 지수 카드 업데이트 (3단계 색상 그대로 + 점진적 그라데이션)
+    // 3. 위험 지수 카드 업데이트
     function updateRiskCard(risk) {
         if (!risk) return;
 
         const score = risk.totalScore || 0;
 
-        // 기존 데이터 업데이트 (변경 없음)
+        // 기존 데이터 업데이트
         document.getElementById('riskDateRange').innerText = risk.dateRange || '-';
         document.getElementById('riskLevelBadge').innerText = risk.riskLevel || '확인중';
         document.getElementById('riskScoreNum').innerText = score + '점';
 
-        // 게이지 너비 계산 (기존 그대로)
+        // 게이지 너비 계산
         const percent = Math.min((score / 200) * 100, 100);
         const gaugeFill = document.getElementById('riskGaugeFill');
         gaugeFill.style.width = percent + '%';
 
-        // ===== 3단계 색상 그대로 사용하면서 점진적으로 변하게 =====
-        // 안전(초록) → 주의(주황) → 위험(빨강) 부드럽게 연결
         let dynamicColor;
 
         if (score <= 100) {
-            // 0~100점 : 초록 → 주황 (부드러운 전환)
             dynamicColor = interpolateColor('#2ecc71', '#ff9800', score / 100);
         } else {
-            // 100~200점 : 주황 → 빨강 (부드러운 전환)
             dynamicColor = interpolateColor('#ff9800', '#e74c3c', (score - 100) / 100);
         }
 
-        // 게이지바 색상 적용
         gaugeFill.style.background = dynamicColor;
 
-        // 점수 숫자도 같은 색상으로 (모던하게 통일)
         const scoreNum = document.getElementById('riskScoreNum');
         scoreNum.style.color = dynamicColor;
 
-        // 위험 배지는 기존 3단계 색상 그대로 유지 (riskLevel 기준)
         const badge = document.getElementById('riskLevelBadge');
         if (risk.riskLevel === '안전') {
             badge.style.background = '#e7f7ed';
@@ -374,18 +359,14 @@
         }
     }
 
-    // 색상 보간(Interpolation) 헬퍼 함수 (부드러운 그라데이션 핵심)
     function interpolateColor(color1, color2, factor) {
-        // HEX → RGB 변환
         const rgb1 = hexToRgb(color1);
         const rgb2 = hexToRgb(color2);
 
-        // 선형 보간 (lerp)
         const r = Math.round(rgb1[0] + (rgb2[0] - rgb1[0]) * factor);
         const g = Math.round(rgb1[1] + (rgb2[1] - rgb1[1]) * factor);
         const b = Math.round(rgb1[2] + (rgb2[2] - rgb1[2]) * factor);
 
-        // RGB → HEX 변환
         return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
     }
 
@@ -396,7 +377,6 @@
         return [r, g, b];
     }
 
-    // 4. 요약 칩 숫자 업데이트 (DaySummary 연동)
     function updateSummaryChips(summary) {
         if (!summary) return;
         document.getElementById('chipAllCount').innerText = `전체 ${summary.totalCount || 0}건`;
@@ -405,7 +385,6 @@
         document.getElementById('chipFightCount').innerText = `폭행 ${summary.violentCount || 0}건`;
     }
 
-    // 5. 타임라인 리스트 렌더링 (이미지 및 상세정보 포함)
     function renderTimeline(events) {
         const container = document.getElementById('timelineContainer');
         if (!events || events.length === 0) {
@@ -440,7 +419,6 @@
             </div>
         `).join('');
 
-        // 필터 상태 유지
         applyActiveFilter();
     }
 
@@ -472,7 +450,6 @@
         });
     }
 
-    // 기타 유틸리티 (기존 로직 유지)
     function getEventTitle(type) {
         const titles = { 'FALL_DETECTED': '낙상 감지', 'NO_MOTION_DETECTED': '무응답', 'VIOLENT_MOTION_DETECTED': '폭행' };
         return titles[type] || type;
@@ -499,7 +476,6 @@
         document.querySelectorAll('.dropdown-menu').forEach(m => m.onclick = (e) => e.stopPropagation());
     }
 
-    // 로그아웃 (CSRF 토큰 대응)
     document.addEventListener('click', async (e) => {
         const btn = e.target.closest('.js-logout-btn');
         if (!btn) return;

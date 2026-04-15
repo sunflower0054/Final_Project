@@ -50,7 +50,7 @@
             color: var(--gray-600);
             transition: all 0.2s ease;
         }
-        /* 카테고리 활성화 스타일 - 서비스 남색 적용 */
+
         .cat-chip.active {
             background: var(--navy);
             color: #fff;
@@ -63,16 +63,14 @@
             margin-top: 10px;
         }
 
-        /* 2. 메인 콘텐츠 영역 (지도 + 리스트) */
         .content-section {
             grid-area: content;
             display: grid;
-            grid-template-columns: 1fr 420px; /* 지도 1 : 리스트 고정 너비 */
+            grid-template-columns: 1fr 420px;
             gap: 20px;
-            overflow: hidden; /* 자식 요소의 스크롤을 위해 필수 */
+            overflow: hidden;
         }
 
-        /* 지도 영역 */
         .map-section {
             background: #fff;
             border-radius: 12px;
@@ -81,7 +79,6 @@
         }
         #map { width: 100%; height: 100%; }
 
-        /* 리스트 영역 */
         .list-section {
             background: #fff;
             border-radius: 12px;
@@ -90,6 +87,7 @@
             flex-direction: column;
             overflow: hidden;
         }
+
         .list-section h4 {
             font-size: 18px;
             font-weight: 800;
@@ -98,6 +96,7 @@
             border-bottom: 1px solid var(--gray-100);
             background: #fcfcfc;
         }
+
         .facility-scroll {
             flex: 1;
             overflow-y: auto;
@@ -105,7 +104,6 @@
             background: #f8f9fa;
         }
 
-        /* 🏥 시설 리스트 아이템 (좌우 분할 + 전화버튼 스타일) */
         #facilityList { display: flex; flex-direction: column; gap: 12px; }
         .facility-item {
             padding: 18px;
@@ -118,27 +116,28 @@
             justify-content: space-between;
             align-items: center;
         }
+
         .facility-item:hover {
             border-color: var(--navy);
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
+
         .f-info-wrap { display: flex; flex-direction: column; gap: 4px; }
         .f-name { font-weight: 800; color: #1a202c; font-size: 17px; }
         .f-dist { font-size: 14px; color: var(--navy-mid); font-weight: 700; }
         .f-info { font-size: 14px; color: var(--gray-600); }
 
-        /* 전화 걸기 버튼 스타일 */
         .h-call-btn {
             display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px;
             background: var(--gray-100); color: var(--gray-700); font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--gray-200);
         }
+
         .h-call-btn:hover { background: #e2e8f0; }
 
-        /* 개선된 거주자 위치 마커 (커스텀 오버레이) - 빨간색에서 남색으로 변경 */
         .resident-label {
             padding: 8px 16px;
-            background: var(--navy); /* 서비스 남색 적용 */
+            background: var(--navy);
             color: white;
             border-radius: 20px;
             font-weight: 800;
@@ -148,7 +147,6 @@
             white-space: nowrap;
         }
 
-        /* 개선된 지도 인포윈도우 디자인 (말풍선) */
         .custom-infowindow {
             padding: 15px;
             background: white;
@@ -158,6 +156,7 @@
             position: relative;
             margin-bottom: 15px;
         }
+
         .custom-infowindow::after {
             content: '';
             position: absolute;
@@ -168,12 +167,14 @@
             border-style: solid;
             border-color: white transparent transparent;
         }
+
         .custom-infowindow-title {
             font-size: 16px;
             font-weight: 800;
             color: var(--navy);
             margin-bottom: 5px;
         }
+
         .custom-infowindow-desc {
             font-size: 13px;
             color: var(--gray-600);
@@ -220,13 +221,12 @@
 
     let map, ps, infowindow;
     let markers = [];
-    let selectedKeywords = []; // 초기 선택 없음
+    let selectedKeywords = [];
 
     document.addEventListener("DOMContentLoaded", function() {
         const mapContainer = document.getElementById('map');
         map = new kakao.maps.Map(mapContainer, { center: new kakao.maps.LatLng(37.5668, 126.9786), level: 4 });
         ps = new kakao.maps.services.Places();
-        // 기본 인포윈도우는 사용하지 않고, CustomOverlay로 대체합니다.
 
         const geocoder = new kakao.maps.services.Geocoder();
         geocoder.addressSearch(residentAddr, function(result, status) {
@@ -247,7 +247,6 @@
 
                 map.setCenter(coords);
             } else {
-                // 이 부분을 추가해 주세요!
                 console.error("카카오맵 API 주소 검색 실패. 전달된 주소:", residentAddr);
                 alert("거주자의 주소(" + residentAddr + ")를 찾을 수 없습니다. 상세 주소(동/호수)가 있다면 제거해 주세요.");
             }
@@ -263,7 +262,7 @@
                     this.classList.remove('active');
                     selectedKeywords = selectedKeywords.filter(k => k !== keyword);
                 } else {
-                    // 선택되지 않은 경우 추가
+                    // 선택되지 않은 경우
                     this.classList.add('active');
                     selectedKeywords.push(keyword);
                 }
@@ -359,7 +358,6 @@
                 yAnchor: 1.2 /* 마커 위에 배치 */
             });
 
-            // 🌟 새롭게 적용한 리스트 아이템 디자인 (+ 전화버튼)
             const phoneText = place.phone || '전화번호 없음';
             const phoneLink = place.phone ? 'tel:' + place.phone.replace(/-/g, '') : '#';
 

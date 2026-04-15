@@ -182,7 +182,7 @@
     </div>
 </div>
 
-<!-- ========== 새로운 3단계 : 가입 경로 설문조사 ========== -->
+
 <div id="step3" class="step-container" style="display: none;">
     <div class="card">
         <div class="step-bar-card">
@@ -230,7 +230,6 @@
     </div>
 </div>
 
-<!-- ========== 새로운 4단계 : 가입 환영 메시지 ========== -->
 <div id="step4" class="step-container" style="display: none;">
     <div class="card">
         <div class="step-bar-card">
@@ -482,7 +481,7 @@
         registerErr.classList.remove('show');
         registerErr.textContent = '';
 
-        // 1. 필수 항목 검사 (존재하지 않던 purpose 검사 제외)
+        // 1. 필수 항목 검사
         if(!username || !password || !password2 || !name || !phone){
             alert('필수 항목을 모두 입력해주세요.');
             return;
@@ -546,7 +545,6 @@
             finalPurpose = purposes.join(', ');
         }
 
-        // ✅ birth_year를 birthYear로 수정했습니다 (백엔드 DTO와 맞춤)
         const payload = {
             username:   document.getElementById('userId').value.trim(),
             password:   document.getElementById('pw').value,
@@ -562,11 +560,9 @@
         if (submitBtn) submitBtn.disabled = true;
         if (skipBtn) skipBtn.disabled = true;
 
-        // ✅ HTML 메타 태그에서 CSRF 토큰과 헤더 이름을 읽어옵니다.
         const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
 
-        // ✅ 기본 헤더 설정 (CSRF 토큰이 있으면 추가합니다)
         const headers = {
             'Content-Type': 'application/json'
         };
@@ -577,7 +573,7 @@
         try {
             const response = await fetch('/api/v1/auth/register', {
                 method: 'POST',
-                headers: headers, // ✅ CSRF 토큰이 포함된 헤더를 전송합니다.
+                headers: headers,
                 body: JSON.stringify(payload)
             });
 

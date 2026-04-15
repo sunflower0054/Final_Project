@@ -121,7 +121,6 @@
                     기본값으로 초기화
                 </button>
 
-                <!-- ← 여기 추가 (마지막 저장 날짜 표시) -->
                 <span class="footer-note">마지막 저장: <span id="footer-date" style="font-weight:700; color:var(--gray-900);">-</span></span>
 
                 <button class="apply-btn" onclick="applyToPython()">
@@ -132,7 +131,6 @@
         </div>
     </div>
 
-    <!-- 나머지 섹션은 그대로 유지 -->
     <div class="section">
         <div class="section-header">
             <div class="section-title">
@@ -295,7 +293,6 @@
         }
     }
 
-    // applyToPython 함수 수정
     async function applyToPython() {
         const payload = getPayload();
         showLoading(true);
