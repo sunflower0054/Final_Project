@@ -45,6 +45,7 @@ abstract class ResidentIntegrationTestSupport {
     protected PasswordEncoder passwordEncoder;
 
     @BeforeEach
+    /** 요청된 거주자 작업의 입력 조건을 반영해 결과를 만든다. */
     void setUp() {
         eventRepository.deleteAll();
         aiSettingsRepository.deleteAll();
@@ -83,6 +84,7 @@ abstract class ResidentIntegrationTestSupport {
                 .build());
     }
 
+    /** 요청 데이터를 거주자 기준으로 저장하고 저장 결과를 반환한다. */
     protected void createDailyActivityTableIfNeeded() {
         jdbcTemplate.execute("""
                 create table if not exists daily_activity (
@@ -94,6 +96,7 @@ abstract class ResidentIntegrationTestSupport {
                 """);
     }
 
+    /** 요청된 거주자 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     private void clearDailyActivityTableIfExists() {
         Integer tableCount = jdbcTemplate.queryForObject(
                 "select count(*) from information_schema.tables where table_name = 'DAILY_ACTIVITY'",

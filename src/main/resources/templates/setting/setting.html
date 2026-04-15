@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관제 시스템 - AI 감지 설정</title>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
@@ -26,7 +27,6 @@
             <div class="status-sub">카메라가 연결되었습니다.</div>
         </div>
         <span class="status-badge">● 실시간 연동</span>
-        <!--        <span class="status-badge badge-fail">● 실시간 연동 실패</span>-->
     </div>
 
     <div class="section">
@@ -41,14 +41,10 @@
 
         <div class="content-card">
             <div class="sensitivity-item">
-                <div class="si-icon">
-                    <!--                <div class="si-icon red">-->
-                    <!--                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 7l-5 5-5-5"/><line x1="12" y1="12" x2="12" y2="19"/></svg>-->
-                </div>
+                <div class="si-icon"></div>
                 <div class="si-main">
                     <div class="si-header">
                         <span class="si-name">낙상 감지 민감도</span>
-                        <span class="si-field"></span>
                         <span class="si-desc">" 숫자가 높을수록 조금만 넘어져도 바로 알려드려요. "</span>
                     </div>
                     <div class="slider-wrap">
@@ -70,14 +66,10 @@
             </div>
 
             <div class="sensitivity-item">
-                <div class="si-icon">
-                    <!--                <div class="si-icon orange">-->
-                    <!--                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>-->
-                </div>
+                <div class="si-icon"></div>
                 <div class="si-main">
                     <div class="si-header">
                         <span class="si-name">무응답 감지 시간</span>
-                        <span class="si-field"></span>
                         <span class="si-desc">" 이 시간(초) 동안 움직임이 없으면 알림을 보내요 "</span>
                     </div>
                     <div class="slider-wrap">
@@ -99,14 +91,10 @@
             </div>
 
             <div class="sensitivity-item">
-                <div class="si-icon">
-                    <!--                <div class="si-icon yellow">-->
-                    <!--                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>-->
-                </div>
+                <div class="si-icon"></div>
                 <div class="si-main">
                     <div class="si-header">
                         <span class="si-name">폭행 의심 임계값</span>
-                        <span class="si-field"></span>
                         <span class="si-desc">" 숫자가 낮을수록 작은 충격도 민감하게 감지해요 "</span>
                     </div>
                     <div class="slider-wrap">
@@ -132,9 +120,12 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.93"/></svg>
                     기본값으로 초기화
                 </button>
+
+                <span class="footer-note">마지막 저장: <span id="footer-date" style="font-weight:700; color:var(--gray-900);">-</span></span>
+
                 <button class="apply-btn" onclick="applyToPython()">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                    Python에 즉시 적용
+                    즉시 적용
                 </button>
             </div>
         </div>
@@ -188,18 +179,6 @@
         </div>
     </div>
 
-
-    <div class="footer-bar">
-        <span class="footer-note">마지막 저장: <span id="footer-date" style="font-weight:700; color:var(--gray-900);">2024-04-24 14:30:25</span></span>
-        <div class="footer-btns">
-            <button class="btn-cancel" onclick="cancelChanges()">취소</button>
-            <button class="btn-save" onclick="saveSettings()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-                모든 설정 저장
-            </button>
-        </div>
-    </div>
-
 </div>
 
 <div class="toast" id="toast">
@@ -218,42 +197,30 @@
 <script th:src="@{/js/app-api.js}"></script>
 <script>
     const DEFAULTS = { fall: 0.7, motion: 15, assault: 0.4 };
-    let saved = { ...DEFAULTS };
-
     function updateSlider(el, valId, impactId, isInt) {
         const v = parseFloat(el.value);
         const display = isInt ? Math.round(v) : Number(v.toFixed(2));
 
-        // 값 표시 업데이트
         const valEl = document.getElementById(valId);
         if (valEl) valEl.textContent = display;
 
-        // pct 계산 (각 슬라이더 특성에 맞게)
         let pct = 0;
-        if (valId === 'fall-val') {
-            pct = v * 100;                    // 0.0~1.0 → 높을수록 민감 (높음)
-        } else if (valId === 'motion-val') {
-            pct = ((v - 5) / 55) * 100;       // 5~60초 → 짧을수록 즉각 (높음)
-        } else if (valId === 'assault-val') {
-            pct = v * 100;                    // 0.0~1.0 → 높을수록 둔감? (주의)
-        }
+        if (valId === 'fall-val') pct = v * 100;
+        else if (valId === 'motion-val') pct = ((v - 5) / 55) * 100;
+        else if (valId === 'assault-val') pct = v * 100;
         pct = Math.min(100, Math.max(0, pct));
 
-        // 게이지 바 업데이트
         const bar = document.getElementById(impactId);
         if (bar) {
             bar.style.width = pct + '%';
-
-            // 색상은 각 impact 카드별로 고정
             const colorMap = {
-                'fall-impact':    'var(--primary-mid)',
-                'motion-impact':  'var(--accent)',
+                'fall-impact': 'var(--primary-mid)',
+                'motion-impact': 'var(--accent)',
                 'assault-impact': 'var(--primary)'
             };
             bar.style.background = colorMap[impactId] || 'var(--navy)';
         }
 
-        // 라벨 업데이트 (높음 / 보통 / 낮음)
         const labelEl = document.getElementById(impactId + '-label');
         if (labelEl) {
             let levelText = '낮음';
@@ -262,203 +229,143 @@
             labelEl.textContent = levelText;
         }
 
-        // hint 업데이트
         updateImpactHint(impactId, pct, v);
-
-        // 슬라이더 트랙 색상 업데이트
         updateTrack(el);
     }
 
     function updateImpactHint(impactId, pct, currentValue) {
-    const hintEl = document.querySelector(`#${impactId}`).closest('.impact-card')?.querySelector('.impact-hint');
-    if (!hintEl) return;
+        const hintEl = document.querySelector(`#${impactId}`).closest('.impact-card')?.querySelector('.impact-hint');
+        if (!hintEl) return;
 
-    let hintText = '';
-
-    if (impactId === 'fall-impact') {
-        hintText = pct > 65 ? '민감도 높음 → 오탐 주의' :
-                   pct > 30 ? '민감도 보통 → 균형 유지' : '민감도 낮음 → 오탐 감소';
+        let hintText = '';
+        if (impactId === 'fall-impact') {
+            hintText = pct > 65 ? '민감도 높음 → 오탐 주의' :
+                       pct > 30 ? '민감도 보통 → 균형 유지' : '민감도 낮음 → 오탐 감소';
+        } else if (impactId === 'motion-impact') {
+            hintText = currentValue <= 15 ? '짧은 대기 → 즉각 알림 발송' :
+                       currentValue >= 40 ? '긴 대기 → 여유로운 반응' :
+                       Math.round(currentValue) + '초 후 알림 발송';
+        } else if (impactId === 'assault-impact') {
+            hintText = pct > 65 ? '임계값 높음 → 둔감' :
+                       pct > 30 ? '임계값 보통 → 균형' : '임계값 낮음 → 민감';
+        }
+        hintEl.textContent = hintText;
     }
-    else if (impactId === 'motion-impact') {
-        hintText = currentValue <= 15 ? '짧은 대기 → 즉각 알림 발송' :
-                   currentValue >= 40 ? '긴 대기 → 여유로운 반응' :
-                   Math.round(currentValue) + '초 후 알림 발송';
-    }
-    else if (impactId === 'assault-impact') {
-        hintText = pct > 65 ? '임계값 높음 → 둔감' :
-                   pct > 30 ? '임계값 보통 → 균형' : '임계값 낮음 → 민감';
-    }
-
-    hintEl.textContent = hintText;
-}
-
 
     function updateTrack(el) {
-      const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
-      const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
-      el.style.setProperty('--pct', pct);
+        const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
+        const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
+        el.style.setProperty('--pct', pct);
     }
 
     function init() {
-      updateSlider(document.getElementById('fall-slider'),    'fall-val',    'fall-impact',    false);
-      updateSlider(document.getElementById('motion-slider'),  'motion-val',  'motion-impact',  true);
-      updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
-      loadSettings();
+        updateSlider(document.getElementById('fall-slider'), 'fall-val', 'fall-impact', false);
+        updateSlider(document.getElementById('motion-slider'), 'motion-val', 'motion-impact', true);
+        updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
+        loadSettings();
     }
 
     async function loadSettings() {
-      try {
-        const res = await fetch('/api/v1/settings');
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.fallSensitivity !== undefined) {
-          document.getElementById('fall-slider').value = data.fallSensitivity;
-          updateSlider(document.getElementById('fall-slider'), 'fall-val', 'fall-impact', false);
-        }
-        if (data.noMotionThreshold !== undefined) {
-          document.getElementById('motion-slider').value = data.noMotionThreshold;
-          updateSlider(document.getElementById('motion-slider'), 'motion-val', 'motion-impact', true);
-        }
-        if (data.velocityThreshold !== undefined) {
-          document.getElementById('assault-slider').value = data.velocityThreshold;
-          updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
-        }
-        if (data.updatedAt) document.getElementById('footer-date').textContent = data.updatedAt;
-      } catch(e) {
-        console.log('서버 미연결 - 기본값 사용');
-      }
-    }
+        try {
+            const res = await fetch('/api/v1/settings');
+            if (!res.ok) return;
+            const data = await res.json();
 
-    async function saveSettings() {
-      const payload = getPayload();
-      showLoading(true);
-      try {
-        const res = await fetch('/api/v1/settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('저장 실패');
-        const data = await res.json();
-        if (data.updatedAt) document.getElementById('footer-date').textContent = data.updatedAt;
+            if (data.fallSensitivity !== undefined) {
+                document.getElementById('fall-slider').value = data.fallSensitivity;
+                updateSlider(document.getElementById('fall-slider'), 'fall-val', 'fall-impact', false);
+            }
+            if (data.noMotionThreshold !== undefined) {
+                document.getElementById('motion-slider').value = data.noMotionThreshold;
+                updateSlider(document.getElementById('motion-slider'), 'motion-val', 'motion-impact', true);
+            }
+            if (data.velocityThreshold !== undefined) {
+                document.getElementById('assault-slider').value = data.velocityThreshold;
+                updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
+            }
 
-        await applyToPython();
-
-        showToast('✅ 설정이 저장되고 Python에 적용되었습니다.');
-        document.getElementById('last-sync').textContent = '방금 전';
-      } catch(e) {
-        showToast('설정이 저장되었습니다. (개발 모드)');
-      } finally {
-        showLoading(false);
-      }
+            if (data.updatedAt) {
+                const footerDate = document.getElementById('footer-date');
+                if (footerDate) footerDate.textContent = data.updatedAt.split(' ')[0];
+            }
+        } catch(e) {
+            console.log('서버 미연결 - 기본값 사용');
+        }
     }
 
     async function applyToPython() {
-      const payload = getPayload();
-      try {
-        await fetch('/api/v1/settings/apply', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        showToast('Python 감지 서버에 적용되었습니다.');
-        document.getElementById('last-sync').textContent = '방금 전';
-      } catch(e) {
-        showToast('Python 적용 완료 (개발 모드)');
-      }
+        const payload = getPayload();
+        showLoading(true);
+
+        try {
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+
+            // 저장
+            const saveRes = await fetch(`/api/v1/settings`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(csrfToken && { [csrfHeader]: csrfToken })
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!saveRes.ok) throw new Error(`DB 저장 실패 (${saveRes.status})`);
+
+            const data = await saveRes.json();
+            if (data.updatedAt) {
+                const footerDate = document.getElementById('footer-date');
+                if (footerDate) footerDate.textContent = data.updatedAt.split(' ')[0];
+            }
+
+            // FastAPI 즉시 적용
+            await fetch(`/api/v1/settings/apply`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(csrfToken && { [csrfHeader]: csrfToken })
+                },
+                body: JSON.stringify(payload)
+            });
+
+            showToast('✅ 설정이 적용되었습니다.');
+        } catch (e) {
+            console.error(e);
+            showToast('❌ 적용 실패. 다시 시도해주세요.');
+        } finally {
+            showLoading(false);
+        }
     }
 
     function getPayload() {
-      return {
-        fallSensitivity:    parseFloat(document.getElementById('fall-slider').value),
-        noMotionThreshold:  parseInt(document.getElementById('motion-slider').value),
-        velocityThreshold:  parseFloat(document.getElementById('assault-slider').value)
-      };
+        return {
+            fallSensitivity: parseFloat(document.getElementById('fall-slider').value),
+            noMotionThreshold: parseInt(document.getElementById('motion-slider').value),
+            velocityThreshold: parseFloat(document.getElementById('assault-slider').value)
+        };
     }
 
     function resetDefaults() {
-      document.getElementById('fall-slider').value = DEFAULTS.fall;
-      document.getElementById('motion-slider').value = DEFAULTS.motion;
-      document.getElementById('assault-slider').value = DEFAULTS.assault;
-      updateSlider(document.getElementById('fall-slider'),    'fall-val',    'fall-impact',    false);
-      updateSlider(document.getElementById('motion-slider'),  'motion-val',  'motion-impact',  true);
-      updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
-      showToast('기본값으로 초기화되었습니다.');
-    }
-
-    function cancelChanges() {
-      loadSettings();
-      showToast('변경사항이 취소되었습니다.');
+        document.getElementById('fall-slider').value = DEFAULTS.fall;
+        document.getElementById('motion-slider').value = DEFAULTS.motion;
+        document.getElementById('assault-slider').value = DEFAULTS.assault;
+        updateSlider(document.getElementById('fall-slider'), 'fall-val', 'fall-impact', false);
+        updateSlider(document.getElementById('motion-slider'), 'motion-val', 'motion-impact', true);
+        updateSlider(document.getElementById('assault-slider'), 'assault-val', 'assault-impact', false);
+        showToast('기본값으로 초기화되었습니다.');
     }
 
     function showToast(msg) {
-      const t = document.getElementById('toast');
-      document.getElementById('toast-msg').textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
+        const t = document.getElementById('toast');
+        document.getElementById('toast-msg').textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
     }
 
     function showLoading(v) {
-      document.getElementById('loading').classList.toggle('show', v);
+        document.getElementById('loading').classList.toggle('show', v);
     }
-
-    function copyCode() {
-      const f = parseFloat(document.getElementById('fall-slider').value).toFixed(2);
-      const m = parseInt(document.getElementById('motion-slider').value);
-      const a = parseFloat(document.getElementById('assault-slider').value).toFixed(2);
-      const code = `class DetectorConfig:\n    FALL_SENSITIVITY = ${f}\n    NO_MOTION_THRESHOLD = ${m}  # seconds\n    VELOCITY_THRESHOLD = ${a}`;
-      navigator.clipboard.writeText(code).then(() => showToast('코드가 복사되었습니다.'));
-    }
-
-    // ── 화면 표시 설정 ──────────────────────────
-    const LANG_LABELS = { ko:'KO', en:'EN', ja:'JA', zh:'ZH' };
-    const FONT_LABELS = { 1:'소', 2:'중', 3:'대' };
-
-    function selectLang(el, val) {
-      document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('active'));
-      el.classList.add('active');
-      document.getElementById('lang-val').textContent = LANG_LABELS[val] || val.toUpperCase();
-      showToast('언어가 변경되었습니다: ' + el.textContent.trim());
-    }
-
-    function selectTheme(mode) {
-      ['light','dark','system'].forEach(m => {
-        document.getElementById('theme-' + m).classList.remove('active');
-      });
-      document.getElementById('theme-' + mode).classList.add('active');
-      const labels = { light:'라이트', dark:'다크', system:'시스템' };
-      const icons = {
-        light: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
-        dark:  `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
-        system:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`
-      };
-      const themeValEl = document.getElementById('theme-val');
-      themeValEl.innerHTML = icons[mode];
-      themeValEl.nextElementSibling.textContent = labels[mode];
-      showToast('테마가 변경되었습니다: ' + labels[mode]);
-    }
-
-    function updateFontSize(el) {
-      const v = parseInt(el.value);
-      document.getElementById('font-val').textContent = FONT_LABELS[v];
-      const pct = ((v - 1) / 2 * 100).toFixed(1) + '%';
-      el.style.setProperty('--pct', pct);
-    }
-
-    function resetDisplaySettings() {
-      document.querySelectorAll('.lang-option').forEach((o,i) => o.classList.toggle('active', i===0));
-      document.getElementById('lang-val').textContent = 'KO';
-      selectTheme('light');
-      const fs = document.getElementById('font-slider');
-      fs.value = 2;
-      updateFontSize(fs);
-      showToast('화면 설정이 기본값으로 초기화되었습니다.');
-    }
-
-    function applyDisplaySettings() {
-      showToast('화면 표시 설정이 적용되었습니다.');
-    }
-    // ─────────────────────────────────────────────
 
     init();
 </script>

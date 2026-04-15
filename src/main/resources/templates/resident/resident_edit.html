@@ -20,7 +20,6 @@
             <p class="page-subtitle">거주자 정보를 수정합니다. 변경 후 저장해주세요.</p>
         </div>
 
-        <!-- 안내 배너: 주황색에서 연두색 톤으로 변경 -->
         <div style="background:var(--primary-light); border:1px solid var(--primary-mid); border-radius:12px; padding:14px 20px; display:flex; align-items:center; gap:10px; font-size:14px; color:var(--text-main); margin-bottom:24px;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--primary);">
                 <circle cx="12" cy="12" r="10"/>
@@ -39,7 +38,6 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group">
-                        <!-- 필수 표시(*) 색상 통일 -->
                         <label class="form-label">이름 <span style="color:var(--error);">*</span></label>
                         <input type="text" class="form-control" id="name" placeholder="이름을 입력하세요">
                     </div>
@@ -89,12 +87,7 @@
                     </div>
                 </div>
             </div>
-
-
-
         </div>
-
-        <!-- 저장 / 취소 버튼 -->
         <div style="margin-top: 32px; display: flex; justify-content: flex-end; gap: 12px;">
             <button onclick="history.back()"
                     class="btn"
@@ -147,8 +140,6 @@
         return fallbackMessage;
     }
 
-    // [삭제됨] 체크박스를 제어하던 syncDiseaseCheckboxes 함수는 더 이상 필요 없으므로 삭제했습니다.
-
     document.addEventListener('DOMContentLoaded', function() {
         initBirthDateSelects();
 
@@ -187,7 +178,6 @@
                 document.getElementById('birthDate').value = '';
             }
 
-            // [수정됨] textarea에 백엔드에서 가져온 기저질환 텍스트를 바로 넣어줍니다.
             document.getElementById('disease').value = resident.disease || '';
 
         } catch (error) {
@@ -195,7 +185,6 @@
         }
     }
 
-    // ==================== 생년월일 셀렉트 초기화 ====================
     function initBirthDateSelects() {
         const yearSelect = document.getElementById('birthYear');
         const monthSelect = document.getElementById('birthMonth');
@@ -273,8 +262,6 @@
         const detailAddress = document.getElementById('detailAddress').value.trim();
         const latitude = Number.parseFloat(selectedLat);
         const longitude = Number.parseFloat(selectedLon);
-
-        // [수정됨] 체크박스를 조회하던 로직을 지우고, textarea의 값을 읽어옵니다.
         const disease = document.getElementById('disease').value.trim();
 
         if (!name) {

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/** 회원 정보 조회, 가입, 수정, 탈퇴와 관련된 도메인 동작을 담당하는 구성 요소. */
 public class WithdrawnUser {
 
     @Id
@@ -52,12 +53,14 @@ public class WithdrawnUser {
     private LocalDateTime withdrawnAt;
 
     @PrePersist
+    /** 요청된 회원 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     protected void onCreate() {
         if (withdrawnAt == null) {
             withdrawnAt = LocalDateTime.now();
         }
     }
 
+    /** 요청/엔티티 데이터를 다른 표현 객체로 변환해 반환한다. */
     public static WithdrawnUser from(Member member) {
         return WithdrawnUser.builder()
                 .originalUserId(member.getId())

@@ -1,15 +1,15 @@
 package com.office.monitoring;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableConfigurationProperties //coolsms랑 연결
 @EnableScheduling // 스케줄러랑 연결
-@MapperScan("com.office.monitoring.dailyActivity") // 마이바티스 매퍼 빈으로 등록
+@EnableAsync
 public class MonitoringApplication {
 
 	public static void main(String[] args) {

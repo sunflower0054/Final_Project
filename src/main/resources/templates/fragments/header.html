@@ -9,7 +9,7 @@
 
 <header class="header-area" th:fragment="header">
     <a href="/" class="brand-logo" style="display: flex; align-items: center; gap: 5px; text-decoration: none;">
-        <img src="/images/neulbom-logo.png" alt="NEULBOM 로고" height="60">
+        <img src="/images/nelbom.png" alt="NEULBOM 로고" height="60">
         <span class="brand-name">늘 봄</span>
     </a>
 
@@ -128,8 +128,9 @@
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
             // 드롭다운 설정
-
             setupDropdown('profileBtn', 'profileDropdown');
+            // [1. 여기에 추가] 알림 버튼(notiBtn)도 클릭 시 열리도록 설정
+            setupDropdown('notiBtn', 'notiDropdown');
 
             // 알림 데이터 불러오기
             const currentResidentId = /*[[${currentUser != null ? currentUser['residentId'] : null}]]*/ null;
@@ -152,7 +153,6 @@
                     document.getElementById(otherId)?.classList.remove('open');
                 });
 
-                // ★★★ 핵심 수정 ★★★
                 // 드롭다운 내부 클릭 시 닫히지 않게 막음
                 dropdown.addEventListener('click', (e) => {
                     e.stopImmediatePropagation();
@@ -164,26 +164,41 @@
                 document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
             });
 
-            // fetchNotificationStatus 함수는 그대로 유지
+            // fetchNotificationStatus 함수 (하루 안보기 로직 추가)
             async function fetchNotificationStatus(residentId) {
                 try {
-                    const response = await fetch(`/api/v1/notifications/fall-activity-alert?residentId=22`);
+                    const response = await fetch(`/api/v1/notifications/fall-activity-alert?residentId=${residentId}`);
                     if (!response.ok) throw new Error('불러오기 실패');
                     const data = await response.json();
 
-                    if (data.success && data.recoveryStatus === 'NOT_RECOVERED') {
+                    if (data.triggered === true) {
+                        // 1. 우측 상단 알림 아이콘 업데이트 (이건 팝업과 무관하게 항상 실행)
                         document.getElementById('notiDot').style.display = 'block';
                         document.getElementById('notiCount').innerText = '1건';
                         document.getElementById('notiList').innerHTML = `
                             <div class="noti-item">
                                 <div class="noti-detail-title">낙상 후 활동량 추적</div>
-                                <div class="noti-detail-row"><span>최근 낙상</span><span class="value">${data.lastFallTimestamp || '확인불가'}</span></div>
-                                <div class="noti-detail-row"><span>활동량</span><span class="value">평소 대비 ${data.recentPercent || 0}%</span></div>
-                                <div class="noti-alert-box">${data.message?.replace(/\n/g, '<br>') || '병원 방문을 권장합니다.'}</div>
+                                <div class="noti-detail-row"><span>최근 낙상</span><span class="value">${data.fallDate} ${data.fallTime}</span></div>
+                                <div class="noti-detail-row"><span>활동량 감소</span><span class="value">${data.dropPercent}% ↓</span></div>
+                                <div class="noti-alert-box">${data.message}</div>
                             </div>`;
+
+                        // 2. 화면 중앙 팝업창 데이터 넣기
+                        document.getElementById('popupFallDate').innerText = `${data.fallDate} ${data.fallTime}`;
+                        document.getElementById('popupDropPercent').innerText = data.dropPercent + '% ↓';
+                        document.getElementById('popupMessage').innerText = data.message;
+
+                        // 3. 오늘 하루 보지 않기 체크
+                        const hideUntil = localStorage.getItem('hideFallAlertUntil');
+                        const now = new Date().getTime();
+
+                        // 저장된 시간이 없거나, 현재 시간이 저장된 시간을 지났을 때만 팝업 표시
+                        if (!hideUntil || now > parseInt(hideUntil)) {
+                            document.getElementById('fallAlertPopup').style.display = 'flex';
+                        }
                     }
                 } catch (e) {
-                    console.error(e);
+                    console.error('알림 로드 에러:', e);
                 }
             }
         });
@@ -217,10 +232,55 @@
                 console.error("통신 에러:", error);
             }
         }
+
+        function closeFallAlertPopup() {
+            const hideToday = document.getElementById('hideTodayChk');
+            if (hideToday && hideToday.checked) {
+                // 체크되었을 경우, 현재 시간 + 24시간을 밀리초로 저장
+                const now = new Date();
+                now.setHours(now.getHours() + 24);
+                localStorage.setItem('hideFallAlertUntil', now.getTime());
+            }
+            document.getElementById('fallAlertPopup').style.display = 'none';
+        }
     </script>
+
+    <!-- 팝업 HTML 요소 -->
+    <div id="fallAlertPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+     background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:16px; padding:30px; width:380px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="font-size:16px; font-weight:700; color:#e74c3c;">🚨 낙상 후 활동량 경고</h3>
+                <button onclick="closeFallAlertPopup()"
+                        style="background:none; border:none; font-size:20px; cursor:pointer; color:#999;">✕</button>
+            </div>
+
+            <div style="background:#fff5f5; border-radius:10px; padding:15px; margin-bottom:15px;">
+                <div style="font-size:12px; color:#999; margin-bottom:4px;">낙상 발생 일시</div>
+                <div style="font-size:15px; font-weight:700; color:#333;" id="popupFallDate">-</div>
+            </div>
+
+            <div style="background:#fff5f5; border-radius:10px; padding:15px; text-align:center; margin-bottom:15px;">
+                <div style="font-size:12px; color:#999; margin-bottom:4px;">활동량 감소율</div>
+                <div style="font-size:28px; font-weight:800; color:#e74c3c;" id="popupDropPercent">-</div>
+            </div>
+
+            <div style="background:#f8f9fa; border-radius:10px; padding:15px; font-size:13px;
+                    color:#555; line-height:1.6; text-align:center;" id="popupMessage">-</div>
+
+            <!-- 하단 닫기 및 하루안보기 영역 -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
+                <label style="font-size:12px; color:#666; display:flex; align-items:center; cursor:pointer;">
+                    <input type="checkbox" id="hideTodayChk" style="margin-right:6px;"> 오늘 하루 보지 않기
+                </label>
+                <button onclick="closeFallAlertPopup()" style="background:#f1f1f1; border:none; padding:8px 16px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; color:#333;">닫기</button>
+            </div>
+
+        </div>
+    </div>
+
 </header>
-
-
 
 </body>
 </html>

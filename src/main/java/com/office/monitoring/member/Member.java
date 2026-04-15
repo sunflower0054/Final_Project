@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/** 회원 정보 조회, 가입, 수정, 탈퇴와 관련된 도메인 동작을 담당하는 구성 요소. */
 public class Member {
 
     @Id
@@ -48,6 +49,7 @@ public class Member {
     private LocalDateTime createdAt;
 
     @PrePersist
+    /** 요청된 회원 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     protected void onCreate() {
         if (role == null) {
             role = Role.FAMILY;
@@ -57,12 +59,19 @@ public class Member {
         }
     }
 
+    /** 수정 요청값을 기존 회원 정보에 반영하고 최신 결과를 반환한다. */
     public void updateMyInfo(String name, String phone, String purpose) {
         this.name = name.trim();
         this.phone = phone.trim();
         this.purpose = purpose.trim();
     }
 
+    /** 탈퇴 직전 사유 정보를 최신값으로 갱신한다. */
+    public void updatePurpose(String purpose) {
+        this.purpose = purpose == null ? null : purpose.trim();
+    }
+
+    /** 요청된 회원 작업에 필요한 입력을 반영해 결과 값을 생성한다. */
     public void assignResident(Long residentId) {
         this.residentId = residentId;
     }

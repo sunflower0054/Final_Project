@@ -16,13 +16,7 @@
 <div class="main-container">
     <div class="top-row">
         <section class="content-card">
-            <!--
-              수정 완료:
-              eventId가 없으면(상황 발생 X) -> 'green-border'
-              eventId가 있으면(상황 발생 O) -> 'red-border'
-            -->
-            <div class="monitoring-box" id="monitoringContainer"
-                 th:classappend="${eventId == null} ? 'green-border' : 'red-border'">
+            <div class="monitoring-box green-border" id="monitoringContainer">
 
                 <div id="videoLoader" class="video-loader">
                     <div class="spinner"></div>
@@ -31,9 +25,8 @@
 
                 <img id="videoFeed" src="http://192.168.0.23:5005/video_feed" alt="Realtime Video" style="display: none;" onload="showVideo()">
 
-                <!-- 라이브 인디케이터 점 색상도 eventId 기준으로 변경 -->
                 <div class="live-indicator">
-                    <div class="live-dot" th:style="${eventId == null} ? 'background: #2ecc71;' : 'background: #e74c3c;'"></div>
+                    <div class="live-dot" id="liveDot" style="background: #2ecc71;"></div>
                     LIVE MONITORING
                 </div>
             </div>
@@ -42,40 +35,14 @@
         <aside class="content-card control-panel">
             <h2 style="font-size: 14px; color: var(--gray-500); margin-bottom: 15px;">실시간 감지 정보</h2>
 
-            <!--
-              수정 완료:
-              event 객체의 데이터를 활용하여 상황에 맞는 동적 알림창을 띄웁니다.
-            -->
-            <div th:if="${event != null}" class="urgent-alert">
+            <div class="urgent-alert" id="urgentAlertBox"
+                 th:style="${event == null} ? 'display: none;' : 'display: block;'">
 
-                <!-- 1. 이벤트 타입에 따른 제목 표시 -->
-                <th:block th:switch="${event.eventType}">
-                    <h3 th:case="'FALL_DETECTED'">🚨 낙상 발생</h3>
-                    <h3 th:case="'NO_MOTION_DETECTED'">🚨 무응답 감지</h3>
-                    <h3 th:case="'VIOLENT_MOTION_DETECTED'">🚨 폭행 의심 감지</h3>
-                    <h3 th:case="*">🚨 이상 상황 발생</h3>
-                </th:block>
-
-                <!-- 2. 거주자 이름 표시 -->
-                <p><b th:text="${resident.name} + ' 어르신'">김영희 어르신</b></p>
-
-                <!-- 3. 실제 신뢰도와 감지 시간 표시 -->
-                <p style="font-size:13px; margin-top:5px;">
-                    <span th:if="${event.confidence != null}" th:text="'신뢰도 ' + ${#numbers.formatDecimal(event.confidence * 100, 1, 0)} + '% | '"></span>
-                    <span th:text="${#temporals.format(event.timestamp, 'HH:mm:ss')}"></span>
-                </p>
-
-                <!-- 4. 폭행(폭행 등)일 경우 최대 속도 및 인원수 표시 -->
-                <p style="font-size:12px; margin-top:5px; color: var(--gray-600);"
-                   th:if="${event.eventType == 'VIOLENT_MOTION_DETECTED' and event.maxVelocity != null}">
-                    <span th:text="'최대 속도: ' + ${event.maxVelocity} + 'm/s'"></span>
-                    <span th:if="${event.personCount != null}" th:text="' | 인원: ' + ${event.personCount} + '명'"></span>
-                </p>
             </div>
 
             <!-- 버튼 그룹은 기존과 동일하게 유지 -->
             <div class="btn-group">
-                <button class="btn btn-red" th:onclick="|goToManualReport(${eventId})|">
+                <button class="btn btn-red" id="manualReportBtn">
                     🚨 119 수동 신고
                 </button>
 
@@ -92,8 +59,7 @@
                     📍 주변 안심 시설 찾기
                 </button>
 
-                <button class="btn btn-success"
-                        th:onclick="|closeSituation(${eventId})|">
+                <button class="btn btn-success" id="closeSituationBtn">
                     상황 종료
                 </button>
             </div>
@@ -102,7 +68,7 @@
 
     <section class="content-card">
         <div class="wrap">
-            <div class="resident-name">김순자 어르신</div>
+            <div class="resident-name" th:text="${resident != null ? resident.name + ' 어르신' : '거주자 미등록'}"></div>
             <div class="section-title">
                 이벤트 타임라인
                 <input type="date" class="date-input" id="timelineDateInput">
@@ -151,47 +117,176 @@
 
 <script th:src="@{/js/app-api.js}"></script>
 <script th:inline="javascript">
+
     // 1. 초기화 및 이벤트 리스너 설정
+    window.currentResidentName = /*[[${resident != null ? resident.name + ' 어르신' : '어르신'}]]*/ '어르신';
     window.addEventListener('load', initialize);
 
-    function showVideo() {
-        // 1. 로딩 UI 숨기기
-        const loader = document.getElementById('videoLoader');
-        if (loader) {
-            loader.style.display = 'none';
-        }
+    const initialEvent = /*[[${event != null ?
+    {id: event.id,
+     eventType: event.eventType,
+     timestamp: event.timestamp,
+     confidence: event.confidence,
+     status: event.status,
+     maxVelocity: event.maxVelocity,
+     personCount: event.personCount}
+    : null}]]*/ null;
 
-        // 2. 영상 피드 보여주기
+    const currentResidentId = /*[[
+        ${resident != null ? resident.id :
+          (currentUser != null && currentUser.residentId != null ? currentUser.residentId : null)}
+    ]]*/ null;
+    const residentIdForApi = currentResidentId || 0;
+
+    let currentEventId = null;
+
+    function showVideo() {
+        const loader = document.getElementById('videoLoader');
+        if (loader) loader.style.display = 'none';
         const videoFeed = document.getElementById('videoFeed');
-        if (videoFeed) {
-            videoFeed.style.display = 'block'; // 숨겨진 영상을 나타나게 함
-        }
+        if (videoFeed) videoFeed.style.display = 'block';
     }
 
     function initialize() {
         updateClock();
         setInterval(updateClock, 1000);
 
-        setupDropdown('notiBtn', 'notiDropdown');
         setupDropdown('profileBtn', 'profileDropdown');
         document.addEventListener('click', closeDropdownsOnOutside);
         preventCloseInsideDropdown();
 
-        // 필터 버튼(Pills) 이벤트 바인딩
         setupTimelineFilter();
 
-        // 날짜 입력창 초기화 (오늘 날짜)
+        // 날짜 입력창
         const dateInput = document.getElementById('timelineDateInput');
         if (dateInput) {
             const todayStr = new Date().toISOString().split('T')[0];
             dateInput.value = todayStr;
-
-            // 날짜 변경 시 API 호출 (페이지 새로고침 없음)
             dateInput.addEventListener('change', (e) => fetchTimelineData(e.target.value));
-
-            // 첫 진입 시 데이터 자동 로드
             fetchTimelineData(todayStr);
         }
+
+        // 항상 기본 버튼 핸들러 등록 (이벤트 없을 때 alert 나오게 함)
+        setupDefaultButtonHandlers();
+
+        // 초기 이벤트 처리
+        if (initialEvent) {
+            updateUrgentAlertUI(initialEvent);
+        }
+
+        checkNewEvent();
+        setInterval(checkNewEvent, 3000);
+    }
+
+    // 새로 추가: 기본 버튼 핸들러 (이벤트 없을 때)
+    function setupDefaultButtonHandlers() {
+        const reportBtn = document.getElementById('manualReportBtn');
+        const closeBtn = document.getElementById('closeSituationBtn');
+
+        if (reportBtn) {
+            reportBtn.onclick = () => {
+                alert("현재 진행 중인 상황이 없습니다.");
+            };
+        }
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                alert("현재 진행 중인 상황이 없습니다.");
+            };
+        }
+    }
+
+    // 이벤트 없을 때 UI 초기화
+    function resetUrgentAlertUI() {
+        const alertBox = document.getElementById('urgentAlertBox');
+        const container = document.getElementById('monitoringContainer');
+        const liveDot = document.getElementById('liveDot');
+
+        if (alertBox) {
+            alertBox.style.display = 'none';
+            alertBox.innerHTML = '';
+        }
+        if (container) {
+            container.classList.remove('red-border');
+            container.classList.add('green-border');
+        }
+        if (liveDot) liveDot.style.background = '#2ecc71';
+
+        currentEventId = null;
+        setupDefaultButtonHandlers();
+    }
+
+    async function checkNewEvent() {
+        console.log(`🔍 checkNewEvent 실행 → residentId=${residentIdForApi}`);
+
+        if (residentIdForApi === 0) return;
+
+        try {
+            const response = await fetch(`/api/v1/events/latest-pending?residentId=${residentIdForApi}`);
+
+            if (response.status === 200) {
+                const event = await response.json();
+                console.log('✅ PENDING 이벤트 발견!', event);
+                updateUrgentAlertUI(event);
+            }
+            else if (response.status === 204) {
+                console.log('ℹ️ 현재 PENDING 이벤트 없음 (204)');
+                resetUrgentAlertUI();
+            }
+        } catch (e) {
+            console.error("🚨 이벤트 체크 fetch 실패:", e);
+        }
+    }
+
+    // UI 동적 갱신 함수
+    function updateUrgentAlertUI(event) {
+        if (!event) return;
+
+        currentEventId = event.id;
+
+        const alertBox = document.getElementById('urgentAlertBox');
+        const container = document.getElementById('monitoringContainer');
+        const liveDot = document.getElementById('liveDot');
+
+        if (container) {
+            container.classList.remove('green-border');
+            container.classList.add('red-border');
+        }
+        if (liveDot) liveDot.style.background = '#e74c3c';
+
+        // 제목, 시간, 신뢰도 등 기존 로직
+        const titles = {
+            'FALL_DETECTED': '🚨 낙상 발생',
+            'NO_MOTION_DETECTED': '🚨 무응답 감지',
+            'VIOLENT_MOTION_DETECTED': '🚨 폭행 의심 감지'
+        };
+        const eventTitle = titles[event.eventType] || '🚨 이상 상황 발생';
+        const eventTime = new Date(event.timestamp).toLocaleTimeString('ko-KR', {hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        const confidence = event.confidence ? Math.round(event.confidence * 100) : 0;
+        const residentName = window.currentResidentName || '어르신';
+
+        alertBox.innerHTML = `
+            <h3>${eventTitle}</h3>
+            <p><b>${residentName} 감지됨</b></p>
+            <p style="font-size:13px; margin-top:5px;">
+                <span>신뢰도 ${confidence}% | </span>
+                <span>${eventTime}</span>
+            </p>
+            ${event.eventType === 'VIOLENT_MOTION_DETECTED' ? `
+                <p style="font-size:12px; margin-top:5px; color: var(--gray-600);">
+                    ${event.maxVelocity !== null && event.maxVelocity !== undefined ? `<span>최대 속도: ${event.maxVelocity}m/s</span>` : ''}
+                    ${event.personCount !== null && event.personCount !== undefined ? `<span> | 인원: ${event.personCount}명</span>` : ''}
+                </p>
+            ` : ''}
+        `;
+
+        alertBox.style.display = 'block';
+
+        // 버튼 이벤트 연결 (이벤트 있을 때만)
+        const reportBtn = document.getElementById('manualReportBtn');
+        const closeBtn = document.getElementById('closeSituationBtn');
+
+        if (reportBtn) reportBtn.onclick = () => goToManualReport(event.id);
+        if (closeBtn) closeBtn.onclick = () => closeSituation(event.id);
     }
 
     // 2. 서버 API 데이터 연동 (JSON만 주고받음)
@@ -199,50 +294,89 @@
         const container = document.getElementById('timelineContainer');
         container.innerHTML = '<div style="text-align:center; padding:30px;">데이터를 분석 중입니다...</div>';
 
+        if (residentIdForApi === 0) {
+            container.innerHTML = '<div style="text-align:center; color:red; padding:30px;">거주자 정보가 없습니다.</div>';
+            return;
+        }
+
         try {
-            // 정렬 값이 필요하다면 여기에 쿼리 파라미터로 추가 가능
-            const response = await fetch(`/api/v1/eventsTimeline?date=${date}`);
+            const response = await fetch(`/api/v1/eventsTimeline?date=${date}&residentId=${residentIdForApi}`);
             if (!response.ok) throw new Error('서버 응답 오류');
 
-            const data = await response.json(); // EventTimelineDto 구조체 수신
+            const data = await response.json();
 
-            // [핵심] 받은 데이터로 UI 각 부분 업데이트
-            updateRiskCard(data.riskSummary);   // 위험 지수 연동
-            updateSummaryChips(data.daySummary); // 요약 건수 연동
-            renderTimeline(data.events);        // 타임라인 리스트 연동 (이미지 포함)
+            updateRiskCard(data.riskSummary);
+            updateSummaryChips(data.daySummary);
+            renderTimeline(data.events);
 
-            // 데이터 렌더링 후 현재 선택된 필터 다시 적용
             applyActiveFilter();
-
         } catch (error) {
             console.error('Data Fetch Error:', error);
             container.innerHTML = '<div style="text-align:center; color:red; padding:30px;">데이터 로드 실패</div>';
         }
     }
 
-    // 3. 위험 지수 카드 업데이트 (RiskSummary 연동)
+
+    // 3. 위험 지수 카드 업데이트
     function updateRiskCard(risk) {
         if (!risk) return;
+
+        const score = risk.totalScore || 0;
+
+        // 기존 데이터 업데이트
         document.getElementById('riskDateRange').innerText = risk.dateRange || '-';
         document.getElementById('riskLevelBadge').innerText = risk.riskLevel || '확인중';
-        document.getElementById('riskScoreNum').innerText = (risk.totalScore || 0) + '점';
+        document.getElementById('riskScoreNum').innerText = score + '점';
 
-        // 200점 만점 기준 게이지 바 너비 계산
-        const percent = Math.min(((risk.totalScore || 0) / 200) * 100, 100);
-        document.getElementById('riskGaugeFill').style.width = percent + '%';
+        // 게이지 너비 계산
+        const percent = Math.min((score / 200) * 100, 100);
+        const gaugeFill = document.getElementById('riskGaugeFill');
+        gaugeFill.style.width = percent + '%';
 
-        // 위험 수준별 색상 변경
+        let dynamicColor;
+
+        if (score <= 100) {
+            dynamicColor = interpolateColor('#2ecc71', '#ff9800', score / 100);
+        } else {
+            dynamicColor = interpolateColor('#ff9800', '#e74c3c', (score - 100) / 100);
+        }
+
+        gaugeFill.style.background = dynamicColor;
+
+        const scoreNum = document.getElementById('riskScoreNum');
+        scoreNum.style.color = dynamicColor;
+
         const badge = document.getElementById('riskLevelBadge');
         if (risk.riskLevel === '안전') {
-            badge.style.background = '#e7f7ed'; badge.style.color = '#2ecc71';
+            badge.style.background = '#e7f7ed';
+            badge.style.color = '#2ecc71';
         } else if (risk.riskLevel === '주의') {
-            badge.style.background = '#fff4e5'; badge.style.color = '#ff9800';
+            badge.style.background = '#fff4e5';
+            badge.style.color = '#ff9800';
         } else {
-            badge.style.background = '#ffebee'; badge.style.color = '#e74c3c';
+            badge.style.background = '#ffebee';
+            badge.style.color = '#e74c3c';
         }
     }
 
-    // 4. 요약 칩 숫자 업데이트 (DaySummary 연동)
+    function interpolateColor(color1, color2, factor) {
+        const rgb1 = hexToRgb(color1);
+        const rgb2 = hexToRgb(color2);
+
+        const r = Math.round(rgb1[0] + (rgb2[0] - rgb1[0]) * factor);
+        const g = Math.round(rgb1[1] + (rgb2[1] - rgb1[1]) * factor);
+        const b = Math.round(rgb1[2] + (rgb2[2] - rgb1[2]) * factor);
+
+        return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+
+    function hexToRgb(hex) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return [r, g, b];
+    }
+
     function updateSummaryChips(summary) {
         if (!summary) return;
         document.getElementById('chipAllCount').innerText = `전체 ${summary.totalCount || 0}건`;
@@ -251,7 +385,6 @@
         document.getElementById('chipFightCount').innerText = `폭행 ${summary.violentCount || 0}건`;
     }
 
-    // 5. 타임라인 리스트 렌더링 (이미지 및 상세정보 포함)
     function renderTimeline(events) {
         const container = document.getElementById('timelineContainer');
         if (!events || events.length === 0) {
@@ -286,7 +419,6 @@
             </div>
         `).join('');
 
-        // 필터 상태 유지
         applyActiveFilter();
     }
 
@@ -318,7 +450,6 @@
         });
     }
 
-    // 기타 유틸리티 (기존 로직 유지)
     function getEventTitle(type) {
         const titles = { 'FALL_DETECTED': '낙상 감지', 'NO_MOTION_DETECTED': '무응답', 'VIOLENT_MOTION_DETECTED': '폭행' };
         return titles[type] || type;
@@ -345,7 +476,6 @@
         document.querySelectorAll('.dropdown-menu').forEach(m => m.onclick = (e) => e.stopPropagation());
     }
 
-    // 로그아웃 (CSRF 토큰 대응)
     document.addEventListener('click', async (e) => {
         const btn = e.target.closest('.js-logout-btn');
         if (!btn) return;
@@ -365,10 +495,7 @@
             alert("이벤트 정보가 없어 신고를 진행할 수 없습니다.");
             return;
         }
-
-        // 사용자의 실수를 방지하기 위해 한 번 더 확인창을 띄워주는 것이 좋습니다.
         if (confirm("119 수동 신고를 진행하시겠습니까? 관련 정보가 문자로 전송됩니다.")) {
-            // SmsController의 @GetMapping("/confirm") 경로로 이동하며 eventId 전달
             location.href = `/report/confirm?eventId=${eventId}`;
         }
     }
@@ -392,28 +519,7 @@
                     const message = await response.text();
                     alert(message);
 
-                    // 긴급 알림창 숨기기
-                    const alertBox = document.querySelector('.urgent-alert');
-                    if (alertBox) {
-                        alertBox.style.display = 'none';
-                    }
-
-                    // --- 추가된 부분: 모니터링 테두리를 녹색으로 원상복구 ---
-                    const monitoringContainer = document.getElementById('monitoringContainer');
-                    if (monitoringContainer) {
-                        monitoringContainer.classList.remove('red-border');
-                        monitoringContainer.classList.add('green-border');
-
-                        // 라이브 인디케이터 색상도 녹색으로 변경
-                        const liveDot = monitoringContainer.querySelector('.live-dot');
-                        if(liveDot) {
-                            liveDot.style.background = '#2ecc71';
-                        }
-                    }
-
-                    // (선택) 처리 완료 후 우측의 수동신고 / 상황종료 버튼들도 숨기거나 비활성화 처리할 수 있습니다.
-                    // const actionBtns = document.querySelectorAll('.btn-red, .btn-success');
-                    // actionBtns.forEach(btn => btn.style.display = 'none');
+                    resetUrgentAlertUI();
 
                 } else {
                     alert("상황 종료 처리에 실패했습니다. 서버 상태를 확인해 주세요.");

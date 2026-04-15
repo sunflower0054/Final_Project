@@ -1,37 +1,47 @@
-/*
 package com.office.monitoring.admin;
 
-//import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import com.office.monitoring.admin.dto.AdminCreatedAtStatsFilter;
+import com.office.monitoring.admin.dto.AdminEventStatsFilter;
+import com.office.monitoring.admin.dto.AdminStatsDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+/** 관리자 통계 API 요청을 받는 컨트롤러. */
 @RestController
 @RequestMapping("/api/v1/admin/stats")
 @RequiredArgsConstructor
-// ADMIN 권한 검증 (Security 설정에 따라 조정)
-//@PreAuthorize("hasRole('ADMIN')")
 public class AdminStatsController {
 
     private final AdminStatsService adminStatsService;
 
-    // [AD-01] 회원 통계 조회
+    /** 회원 통계 집계 결과를 반환한다. */
     @GetMapping("/users")
-    public AdminStatsDTO.UserStatsResponse getUserStats() {
-        return adminStatsService.getUserStats();
+    public AdminStatsDTO.UserStatsResponse getUserStats(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        return adminStatsService.getUserStats(new AdminCreatedAtStatsFilter(year, month));
     }
 
-    // [AD-02] 독거노인 통계 조회
+    /** 거주자 통계 집계 결과를 반환한다. */
     @GetMapping("/residents")
-    public AdminStatsDTO.ResidentStatsResponse getResidentStats() {
-        return adminStatsService.getResidentStats();
+    public AdminStatsDTO.ResidentStatsResponse getResidentStats(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month) {
+        return adminStatsService.getResidentStats(new AdminCreatedAtStatsFilter(year, month));
     }
 
-    // [AD-03] 이벤트 통계 조회
+    /** 연도·월 조건에 맞는 이벤트 통계를 반환한다. */
     @GetMapping("/events")
     public AdminStatsDTO.EventStatsResponse getEventStats(
             @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer month) {
-        return adminStatsService.getEventStats(year, month);
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) String eventType,
+            @RequestParam(required = false) String status) {
+        return adminStatsService.getEventStats(
+                new AdminEventStatsFilter(year, month, eventType, status)
+        );
     }
 }
-*/

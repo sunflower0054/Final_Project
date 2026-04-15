@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+/** 거주자 기능의 조건별 응답과 저장 결과를 검증하는 테스트 클래스. */
 class ResidentServiceTest {
 
     @Mock
@@ -47,6 +48,7 @@ class ResidentServiceTest {
     private ResidentService residentService;
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 신규등록시_기존_ai설정이_있으면_기본_ai설정_insert를_생략한다() {
         Member currentMember = Member.builder()
                 .id(1L)
@@ -88,6 +90,7 @@ class ResidentServiceTest {
     }
 
     @Test
+    /** 주어진 요청 조건에서 기대한 상태 코드와 응답/데이터 결과가 유지되는지 검증한다. */
     void 신규등록시_ai설정이_없으면_기존_기본값으로_생성한다() {
         Member currentMember = Member.builder()
                 .id(1L)

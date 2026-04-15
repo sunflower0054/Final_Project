@@ -197,7 +197,6 @@
         document.getElementById('profile-age-gender').textContent =
             age !== null ? `만 ${age}세` : '정보를 입력해주세요';
 
-        // 📅 등록일 표시 (연도를 두 자리로)
         if (resident.createdAt) {
             const dateObj = new Date(resident.createdAt);
             // getFullYear()에서 문자열로 바꾼 뒤 뒤의 두 자리만 가져옵니다
@@ -209,8 +208,6 @@
             document.getElementById('reg-date').textContent = '-';
         }
 
-        // 📅 최근 낙상일 표시 (백엔드 변수명이 lastFallDate라고 가정)
-        // 만약 변수명이 다르면 resident.lastFallDate 부분을 맞춰서 수정해주세요
         if (resident.lastFallDate) {
             const fallDateObj = new Date(resident.lastFallDate);
             const fallYy = String(fallDateObj.getFullYear()).slice(-2);
@@ -248,7 +245,6 @@ function setDetailViewMode(enabled) {
         document.getElementById('birthDay').disabled = isReadOnly;
         document.getElementById('address-search-btn').disabled = isReadOnly;
 
-        // 읽기 전용(상세 보기)일 때 불필요한 입력칸 숨기기
         const postcodeWrapper = document.getElementById('postcode-wrapper');
         const detailAddressInput = document.getElementById('detailAddress');
 
